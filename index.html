@@ -86,13 +86,17 @@
         // 调试脚本 - 检查资源加载状态
         window.addEventListener('load', function() {
             console.log('页面加载完成');
-            console.log('Chart.js 已加载:', typeof Chart !== 'undefined');
+            console.log('Chart.js 已加载:', typeof window.Chart !== 'undefined');
             console.log('DataVisualization 已加载:', typeof DataVisualization !== 'undefined');
             
             // 检查canvas元素
             const canvas = document.getElementById('chartCanvas');
             console.log('Canvas元素:', canvas);
-            console.log('Canvas尺寸:', canvas.width, 'x', canvas.height);
+            if (canvas) {
+                console.log('Canvas尺寸:', canvas.width, 'x', canvas.height);
+            } else {
+                console.error('Canvas元素未找到！');
+            }
             
             // 检查按钮
             const prevBtn = document.getElementById('prevChart');
@@ -102,7 +106,23 @@
             
             // 检查图表是否已创建
             const chartInfo = document.getElementById('chartInfo');
-            console.log('图表信息区域:', chartInfo.innerHTML);
+            console.log('图表信息区域:', chartInfo ? chartInfo.innerHTML : '未找到图表信息区域');
+            
+            // 如果Chart.js加载失败，显示错误信息
+            if (typeof window.Chart === 'undefined') {
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #ffebee; color: #c62828; padding: 15px; margin: 10px; border: 1px solid #ffcdd2; border-radius: 4px;';
+                errorDiv.innerHTML = `
+                    <h3>Chart.js加载失败</h3>
+                    <p>请检查：</p>
+                    <ul>
+                        <li>网络连接是否正常</li>
+                        <li>CDN链接是否可访问：https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js</li>
+                        <li>浏览器控制台是否有错误信息</li>
+                    </ul>
+                `;
+                document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.chart-container'));
+            }
         });
     </script>
 </body>

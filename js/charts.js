@@ -9,8 +9,8 @@ class DataVisualization {
         ];
         this.chartInstance = null;
         
-        // 检查Chart.js是否加载
-        if (typeof Chart === 'undefined') {
+        // 检查Chart.js是否加载 - 使用正确的全局变量名
+        if (typeof window.Chart === 'undefined') {
             console.error('Chart.js未加载！');
             this.showErrorMessage('Chart.js库未正确加载，请检查网络连接。');
             return;
@@ -500,8 +500,8 @@ class DataVisualization {
         const chartData = this.charts[this.currentChart];
         
         try {
-            // 创建新的图表实例
-            this.chartInstance = new Chart(ctx, chartData.config);
+            // 创建新的图表实例 - 使用正确的Chart构造函数
+            this.chartInstance = new window.Chart(ctx, chartData.config);
             
             // 更新图表信息
             chartInfo.innerHTML = `
@@ -518,6 +518,7 @@ class DataVisualization {
                 <h3>${chartData.type}</h3>
                 <p><strong>描述:</strong> ${chartData.description}</p>
                 <p style="color: orange;"><strong>注意:</strong> Chart.js加载失败，显示基本图表</p>
+                <p style="color: red;"><strong>错误详情:</strong> ${error.message}</p>
             `;
         }
         
