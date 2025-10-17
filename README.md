@@ -12,8 +12,14 @@ dierzhang2/
 ├── README.md           # 项目说明文档
 ├── css/                # 样式文件目录
 │   └── style.css       # 主样式文件
-└── js/                 # JavaScript文件目录
-    └── charts.js       # 图表功能脚本
+├── js/                 # JavaScript文件目录
+│   └── charts.js       # 图表功能脚本
+├── images/             # 图表示例目录
+│   ├── line_chart.svg  # 折线图示例
+│   ├── bar_chart.svg   # 柱形图示例
+│   ├── pie_chart.svg   # 饼图示例
+│   └── scatter_plot.svg # 散点图示例
+└── .gitignore          # Git忽略文件配置
 ```
 
 ## 功能特性

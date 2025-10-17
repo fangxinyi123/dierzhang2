@@ -1,0 +1,15 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  <text x="200" y="30" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">饼图示例</text>
+  <circle cx="200" cy="150" r="80" fill="#f8f9fa" stroke="#ccc" stroke-width="1"/>
+  <path d="M200,150 L200,70 A80,80 0 0,1 280,150 Z" fill="#ff6b6b"/>
+  <path d="M200,150 L280,150 A80,80 0 0,1 240,230 Z" fill="#4ecdc4"/>
+  <path d="M200,150 L240,230 A80,80 0 0,1 160,230 Z" fill="#45b7d1"/>
+  <path d="M200,150 L160,230 A80,80 0 0,1 120,150 Z" fill="#96ceb4"/>
+  <path d="M200,150 L120,150 A80,80 0 0,1 200,70 Z" fill="#feca57"/>
+  <text x="240" y="120" font-family="Arial" font-size="12" fill="#fff">25%</text>
+  <text x="220" y="190" font-family="Arial" font-size="12" fill="#fff">20%</text>
+  <text x="170" y="190" font-family="Arial" font-size="12" fill="#fff">30%</text>
+  <text x="140" y="140" font-family="Arial" font-size="12" fill="#fff">15%</text>
+  <text x="180" y="100" font-family="Arial" font-size="12" fill="#fff">10%</text>
+</svg>
