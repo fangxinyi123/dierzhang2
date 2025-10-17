@@ -622,6 +622,12 @@ class DataVisualization {
 }
 
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
-    new DataVisualization();
+window.addEventListener('load', function() {
+    console.log('开始初始化DataVisualization...');
+    if (typeof DataVisualization !== 'undefined') {
+        new DataVisualization();
+        console.log('DataVisualization初始化完成');
+    } else {
+        console.error('DataVisualization类未定义');
+    }
 });

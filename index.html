@@ -78,55 +78,58 @@
 
     <!-- 引入Chart.js库 - 使用本地文件 -->
     <script src="./js/chart.umd.min.js"></script>
-    <script src="./js/charts.js"></script>
+    <script>
+        // 确保Chart.js加载后再加载charts.js
+        window.addEventListener('load', function() {
+            console.log('Chart.js状态:', typeof window.Chart);
+            
+            if (typeof window.Chart !== 'undefined') {
+                // 加载主图表脚本
+                const script = document.createElement('script');
+                script.src = './js/charts.js';
+                document.head.appendChild(script);
+                
+                // 创建测试图表
+                const testCanvas = document.getElementById('testChart');
+                if (testCanvas) {
+                    try {
+                        new window.Chart(testCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: ['A', 'B'],
+                                datasets: [{
+                                    data: [10, 20],
+                                    backgroundColor: ['#ff6b6b', '#4ecdc4']
+                                }]
+                            },
+                            options: {
+                                responsive: false,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: '测试图表'
+                                    },
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                        console.log('测试图表创建成功！');
+                    } catch (error) {
+                        console.error('测试图表创建失败:', error);
+                    }
+                }
+            } else {
+                console.error('Chart.js未正确加载');
+            }
+        });
+    </script>
     
     <!-- 最简图表测试代码 -->
     <div style="margin: 20px; padding: 20px; border: 2px solid #007bff; background: #f8f9fa;">
         <h3>测试图表（最简代码）</h3>
         <canvas id="testChart" width="400" height="200"></canvas>
     </div>
-    
-    <script>
-        // 最简图表测试
-        window.addEventListener('load', function() {
-            console.log('开始测试最简图表...');
-            const testCanvas = document.getElementById('testChart');
-            if (testCanvas && typeof window.Chart !== 'undefined') {
-                console.log('创建测试图表...');
-                try {
-                    new window.Chart(testCanvas, {
-                        type: 'bar',
-                        data: {
-                            labels: ['A', 'B'],
-                            datasets: [{
-                                data: [10, 20],
-                                backgroundColor: ['#ff6b6b', '#4ecdc4']
-                            }]
-                        },
-                        options: {
-                            responsive: false,
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: '测试图表'
-                                },
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                    console.log('测试图表创建成功！');
-                } catch (error) {
-                    console.error('测试图表创建失败:', error);
-                }
-            } else {
-                console.error('测试图表创建条件不满足:', {
-                    canvas: testCanvas,
-                    Chart: typeof window.Chart
-                });
-            }
-        });
-    </script>
 </body>
 </html>
