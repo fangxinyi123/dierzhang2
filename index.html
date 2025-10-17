@@ -25,16 +25,19 @@
         
         <div class="chart-container">
             <div class="chart-title">数据可视化图表展示</div>
-            <canvas id="chartCanvas" width="600" height="400"></canvas>
-        </div>
+            <div class="chart-display-area">
+                <canvas id="chartCanvas" width="800" height="500"></canvas>
+            </div>
+            
+            <div class="controls">
+                <button id="prevChart">上一个图表</button>
+                <span class="chart-counter">图表 1/10</span>
+                <button id="nextChart">下一个图表</button>
+            </div>
 
-        <div class="controls">
-            <button id="prevChart">上一个图表</button>
-            <button id="nextChart">下一个图表</button>
-        </div>
-
-        <div id="chartInfo" class="chart-info">
-            <!-- 图表信息将动态显示在这里 -->
+            <div id="chartInfo" class="chart-info">
+                <!-- 图表信息将动态显示在这里 -->
+            </div>
         </div>
 
         <div class="chart-examples">

@@ -233,7 +233,17 @@ class DataVisualization {
             <p><strong>数据类型:</strong> ${this.getDataType(chartData)}</p>
         `;
         
+        // 更新图表计数器
+        this.updateChartCounter();
+        
         this.drawBasicChart(ctx, chartData);
+    }
+
+    updateChartCounter() {
+        const counter = document.querySelector('.chart-counter');
+        if (counter) {
+            counter.textContent = `图表 ${this.currentChart + 1}/${this.charts.length}`;
+        }
     }
 
     getDataPointCount(chartData) {
@@ -254,6 +264,7 @@ class DataVisualization {
     }
 
     drawBasicChart(ctx, chartData) {
+        const canvas = document.getElementById('chartCanvas');
         const width = canvas.width;
         const height = canvas.height;
         const margin = 50;
