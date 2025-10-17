@@ -1,0 +1,34 @@
+# 忽略第1-9章的Jupyter Notebook文件
+第1章.ipynb
+第2章.ipynb
+第3章.ipynb
+第4章.ipynb
+第5章.ipynb
+第6章.ipynb
+第7章.ipynb
+第8章.ipynb
+第9章.ipynb
+
+# 忽略Jupyter检查点目录
+.ipynb_checkpoints/
+
+# 忽略Python缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 忽略Python虚拟环境
+venv/
+env/
+.venv/
+
+# 忽略IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
