@@ -1,16 +1,5 @@
-# GitHub Pages配置
-title: "第二章数据可视化平台"
-description: "基于第二章知识的数据可视化Web平台"
+title: 第二章数据可视化平台
+description: 展示10种不同类型的数据可视化图表
+url: https://022340609.xyz
 baseurl: ""
-url: "https://fangxinyi123.github.io/dierzhang2"
 theme: jekyll-theme-minimal
-
-# 排除文件
-exclude:
-  - .gitignore
-  - README.md
-  - _config.yml
-
-# 插件
-plugins:
-  - jekyll-sitemap
