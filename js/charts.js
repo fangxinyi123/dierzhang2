@@ -8,13 +8,38 @@ class DataVisualization {
             "饼图", "散点图", "箱形图", "雷达图", "误差棒图"
         ];
         this.chartInstance = null;
+        
+        // 检查Chart.js是否加载
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js未加载！');
+            this.showErrorMessage('Chart.js库未正确加载，请检查网络连接。');
+            return;
+        }
+        
         this.init();
     }
 
     init() {
+        console.log('初始化DataVisualization...');
         this.createAllCharts();
         this.setupEventListeners();
         this.renderChart();
+    }
+
+    showErrorMessage(message) {
+        const chartInfo = document.getElementById('chartInfo');
+        if (chartInfo) {
+            chartInfo.innerHTML = `
+                <h3 style="color: red;">错误</h3>
+                <p>${message}</p>
+                <p>请检查：</p>
+                <ul>
+                    <li>网络连接是否正常</li>
+                    <li>Chart.js CDN是否可访问</li>
+                    <li>浏览器控制台是否有错误信息</li>
+                </ul>
+            `;
+        }
     }
 
     createAllCharts() {
@@ -464,6 +489,9 @@ class DataVisualization {
         const ctx = canvas.getContext('2d');
         const chartInfo = document.getElementById('chartInfo');
         
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         // 销毁之前的图表实例
         if (this.chartInstance) {
             this.chartInstance.destroy();
@@ -471,19 +499,107 @@ class DataVisualization {
         
         const chartData = this.charts[this.currentChart];
         
-        // 创建新的图表实例
-        this.chartInstance = new Chart(ctx, chartData.config);
-        
-        // 更新图表信息
-        chartInfo.innerHTML = `
-            <h3>${chartData.type}</h3>
-            <p><strong>描述:</strong> ${chartData.description}</p>
-            <p><strong>交互功能:</strong> 悬停查看数据详情，点击图例切换数据系列</p>
-            <p><strong>图表特性:</strong> 支持缩放、平移等交互操作</p>
-        `;
+        try {
+            // 创建新的图表实例
+            this.chartInstance = new Chart(ctx, chartData.config);
+            
+            // 更新图表信息
+            chartInfo.innerHTML = `
+                <h3>${chartData.type}</h3>
+                <p><strong>描述:</strong> ${chartData.description}</p>
+                <p><strong>交互功能:</strong> 悬停查看数据详情，点击图例切换数据系列</p>
+                <p><strong>图表特性:</strong> 支持缩放、平移等交互操作</p>
+            `;
+        } catch (error) {
+            console.error('图表创建失败:', error);
+            // 如果Chart.js失败，显示基本图表
+            this.drawBasicChart(ctx, chartData);
+            chartInfo.innerHTML = `
+                <h3>${chartData.type}</h3>
+                <p><strong>描述:</strong> ${chartData.description}</p>
+                <p style="color: orange;"><strong>注意:</strong> Chart.js加载失败，显示基本图表</p>
+            `;
+        }
         
         // 更新图表计数器
         this.updateChartCounter();
+    }
+
+    drawBasicChart(ctx, chartData) {
+        const canvas = document.getElementById('chartCanvas');
+        const width = canvas.width;
+        const height = canvas.height;
+        const margin = 50;
+        
+        // 绘制背景
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        
+        // 绘制标题
+        ctx.fillStyle = '#333333';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(chartData.type, width / 2, 30);
+        
+        // 绘制简单的图表
+        const data = chartData.config.data.datasets[0].data;
+        const maxVal = Math.max(...data);
+        const scale = (height - 2*margin) / maxVal * 0.8;
+        
+        if (chartData.type === '折线图') {
+            this.drawBasicLineChart(ctx, data, margin, margin + 40, width - 2*margin, height - 2*margin - 40, scale);
+        } else if (chartData.type === '柱形图') {
+            this.drawBasicBarChart(ctx, data, margin, margin + 40, width - 2*margin, height - 2*margin - 40, scale);
+        } else {
+            this.drawBasicGenericChart(ctx, data, margin, margin + 40, width - 2*margin, height - 2*margin - 40, scale);
+        }
+    }
+
+    drawBasicLineChart(ctx, data, x, y, w, h, scale) {
+        ctx.strokeStyle = '#ff6b6b';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        
+        const barWidth = w / data.length;
+        data.forEach((value, i) => {
+            const xPos = x + i * barWidth + barWidth/2;
+            const yPos = y + h - value * scale;
+            
+            if (i === 0) {
+                ctx.moveTo(xPos, yPos);
+            } else {
+                ctx.lineTo(xPos, yPos);
+            }
+        });
+        ctx.stroke();
+    }
+
+    drawBasicBarChart(ctx, data, x, y, w, h, scale) {
+        const barWidth = w / data.length * 0.8;
+        const spacing = w / data.length * 0.2;
+        
+        data.forEach((value, i) => {
+            const xPos = x + i * (barWidth + spacing);
+            const barHeight = value * scale;
+            
+            ctx.fillStyle = '#45b7d1';
+            ctx.fillRect(xPos, y + h - barHeight, barWidth, barHeight);
+        });
+    }
+
+    drawBasicGenericChart(ctx, data, x, y, w, h, scale) {
+        // 简单的点状表示
+        const pointSpacing = w / data.length;
+        
+        data.forEach((value, i) => {
+            const xPos = x + i * pointSpacing + pointSpacing/2;
+            const yPos = y + h - value * scale;
+            
+            ctx.fillStyle = '#6a89cc';
+            ctx.beginPath();
+            ctx.arc(xPos, yPos, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        });
     }
 
     updateChartCounter() {
