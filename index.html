@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第二章数据可视化平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>第二章数据可视化平台</h1>
+        
+        <div class="chart-container">
+            <div class="chart-title">数据可视化图表展示</div>
+            <canvas id="chartCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <div class="controls">
+            <button id="prevChart">上一个图表</button>
+            <button id="nextChart">下一个图表</button>
+        </div>
+
+        <div class="info-section">
+            <h3>项目说明</h3>
+            <p>本项目展示了第二章中介绍的数据可视化技术，包括：</p>
+            <ul>
+                <li>折线图 - 显示数据变化趋势</li>
+                <li>柱形图 - 比较不同类别的数值</li>
+                <li>条形图 - 水平排列的分类数据比较</li>
+                <li>饼图 - 显示各部分占整体的比例</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/charts.js"></script>
+</body>
+</html>
