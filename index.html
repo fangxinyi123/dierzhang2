@@ -80,24 +80,15 @@
         </div>
     </div>
 
+    <!-- 引入Chart.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/charts.js"></script>
     <script>
         // 调试脚本 - 检查资源加载状态
         window.addEventListener('load', function() {
             console.log('页面加载完成');
-            
-            // 检查CSS是否加载
-            var stylesheets = document.styleSheets;
-            console.log('已加载的样式表数量:', stylesheets.length);
-            
-            // 检查图片是否加载
-            var images = document.querySelectorAll('img');
-            images.forEach(function(img, index) {
-                console.log('图片 ' + index + ':', img.src, img.complete ? '已加载' : '加载中');
-            });
-            
-            // 检查JS是否加载
-            console.log('Charts.js 已加载:', typeof DataVisualization !== 'undefined');
+            console.log('Chart.js 已加载:', typeof Chart !== 'undefined');
+            console.log('DataVisualization 已加载:', typeof DataVisualization !== 'undefined');
         });
     </script>
 </body>
