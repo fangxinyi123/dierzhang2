@@ -486,11 +486,13 @@ class DataVisualization {
 
     renderChart() {
         const canvas = document.getElementById('chartCanvas');
-        const ctx = canvas.getContext('2d');
         const chartInfo = document.getElementById('chartInfo');
         
-        // 清除画布
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 检查canvas元素是否存在
+        if (!canvas) {
+            console.error('Canvas元素未找到！');
+            return;
+        }
         
         // 销毁之前的图表实例
         if (this.chartInstance) {
@@ -500,8 +502,8 @@ class DataVisualization {
         const chartData = this.charts[this.currentChart];
         
         try {
-            // 创建新的图表实例 - 使用正确的Chart构造函数
-            this.chartInstance = new window.Chart(ctx, chartData.config);
+            // 创建新的图表实例 - Chart.js 4.x版本的正确语法
+            this.chartInstance = new window.Chart(canvas, chartData.config);
             
             // 更新图表信息
             chartInfo.innerHTML = `
@@ -513,7 +515,7 @@ class DataVisualization {
         } catch (error) {
             console.error('图表创建失败:', error);
             // 如果Chart.js失败，显示基本图表
-            this.drawBasicChart(ctx, chartData);
+            this.drawBasicChart(chartData);
             chartInfo.innerHTML = `
                 <h3>${chartData.type}</h3>
                 <p><strong>描述:</strong> ${chartData.description}</p>
@@ -526,11 +528,20 @@ class DataVisualization {
         this.updateChartCounter();
     }
 
-    drawBasicChart(ctx, chartData) {
+    drawBasicChart(chartData) {
         const canvas = document.getElementById('chartCanvas');
+        if (!canvas) {
+            console.error('Canvas元素未找到！');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
         const margin = 50;
+        
+        // 清除画布
+        ctx.clearRect(0, 0, width, height);
         
         // 绘制背景
         ctx.fillStyle = '#ffffff';

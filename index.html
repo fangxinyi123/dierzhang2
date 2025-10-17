@@ -81,7 +81,23 @@
 
     <!-- 引入Chart.js库 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
-    <script src="./js/charts.js"></script>
+    <script>
+        // 等待Chart.js加载完成后再加载charts.js
+        function loadChartsScript() {
+            if (typeof window.Chart !== 'undefined') {
+                console.log('Chart.js已加载，开始加载charts.js');
+                const script = document.createElement('script');
+                script.src = './js/charts.js';
+                document.head.appendChild(script);
+            } else {
+                console.error('Chart.js未加载，延迟重试...');
+                setTimeout(loadChartsScript, 100);
+            }
+        }
+        
+        // 页面加载完成后开始加载charts.js
+        window.addEventListener('DOMContentLoaded', loadChartsScript);
+    </script>
     <script>
         // 调试脚本 - 检查资源加载状态
         window.addEventListener('load', function() {
