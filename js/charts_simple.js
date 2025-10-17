@@ -1,5 +1,5 @@
-// 第二章数据可视化图表功能
-class DataVisualization {
+// 简化的数据可视化图表功能
+class SimpleDataVisualization {
     constructor() {
         this.charts = [];
         this.currentChart = 0;
@@ -9,7 +9,7 @@ class DataVisualization {
     }
 
     init() {
-        console.log('初始化数据可视化平台...');
+        console.log('初始化SimpleDataVisualization...');
         this.createAllCharts();
         this.setupEventListeners();
         this.renderChart();
@@ -27,9 +27,7 @@ class DataVisualization {
                         label: '销售额',
                         data: [65, 59, 80, 81, 56, 55],
                         borderColor: '#ff6b6b',
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                        borderWidth: 2,
-                        fill: true
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)'
                     }]
                 },
                 options: {
@@ -55,9 +53,7 @@ class DataVisualization {
                     datasets: [{
                         label: '销量',
                         data: [12, 19, 3, 5],
-                        backgroundColor: '#45b7d1',
-                        borderColor: '#45b7d1',
-                        borderWidth: 1
+                        backgroundColor: '#45b7d1'
                     }]
                 },
                 options: {
@@ -136,9 +132,7 @@ class DataVisualization {
                     datasets: [{
                         label: '能力评估',
                         data: [85, 70, 90, 75, 80],
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 2
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)'
                     }]
                 },
                 options: {
@@ -170,15 +164,6 @@ class DataVisualization {
                 this.showChart(this.currentChart + 1);
             });
         }
-
-        // 键盘快捷键
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                this.showChart(this.currentChart - 1);
-            } else if (e.key === 'ArrowRight') {
-                this.showChart(this.currentChart + 1);
-            }
-        });
     }
 
     showChart(index) {
@@ -214,7 +199,7 @@ class DataVisualization {
                 chartInfo.innerHTML = `
                     <h3>${chartData.type}</h3>
                     <p><strong>描述:</strong> ${chartData.description}</p>
-                    <p><strong>交互功能:</strong> 支持图表切换和键盘快捷键</p>
+                    <p><strong>交互功能:</strong> 支持基本的图表展示</p>
                 `;
             }
         } catch (error) {
@@ -240,47 +225,19 @@ class DataVisualization {
     }
 }
 
-// 页面加载完成后初始化
-function initializePlatform() {
-    console.log('开始初始化数据可视化平台...');
-    console.log('Chart.js状态:', typeof Chart);
+// 直接初始化
+window.addEventListener('load', function() {
+    console.log('页面加载完成，开始初始化图表...');
     
-    // 检查Chart.js是否已加载
     if (typeof Chart === 'undefined') {
         console.error('Chart.js未加载！');
-        setTimeout(initializePlatform, 100);
+        document.getElementById('chartInfo').innerHTML = `
+            <h3 style="color: red;">错误</h3>
+            <p>Chart.js库未正确加载，请检查网络连接或刷新页面。</p>
+        `;
         return;
     }
     
-    console.log('Chart.js版本:', Chart.version);
-    
-    // 检查canvas元素是否存在
-    const canvas = document.getElementById('chartCanvas');
-    if (!canvas) {
-        console.error('Canvas元素未找到！');
-        return;
-    }
-    
-    console.log('Canvas元素已找到');
-    
-    // 创建数据可视化实例
-    try {
-        new DataVisualization();
-        console.log('数据可视化平台初始化完成');
-    } catch (error) {
-        console.error('初始化失败:', error);
-    }
-}
-
-// 使用DOMContentLoaded事件确保DOM已加载
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM内容已加载，准备初始化...');
-    setTimeout(initializePlatform, 100);
+    new SimpleDataVisualization();
+    console.log('图表初始化完成');
 });
-
-// 备用初始化方式
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializePlatform);
-} else {
-    setTimeout(initializePlatform, 100);
-}

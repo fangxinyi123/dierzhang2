@@ -3,3 +3,12 @@ description: 展示10种不同类型的数据可视化图表
 url: https://022340609.xyz
 baseurl: ""
 theme: jekyll-theme-minimal
+include:
+  - assets
+  - css
+  - js
+  - images
+exclude:
+  - test.html
+sass:
+  style: compressed
