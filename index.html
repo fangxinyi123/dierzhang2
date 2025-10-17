@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第二章数据可视化平台</title>
-    <base href="/dierzhang2/">
     <link rel="stylesheet" href="./css/style.css">
     <style>
         .debug-info {
@@ -89,6 +88,21 @@
             console.log('页面加载完成');
             console.log('Chart.js 已加载:', typeof Chart !== 'undefined');
             console.log('DataVisualization 已加载:', typeof DataVisualization !== 'undefined');
+            
+            // 检查canvas元素
+            const canvas = document.getElementById('chartCanvas');
+            console.log('Canvas元素:', canvas);
+            console.log('Canvas尺寸:', canvas.width, 'x', canvas.height);
+            
+            // 检查按钮
+            const prevBtn = document.getElementById('prevChart');
+            const nextBtn = document.getElementById('nextChart');
+            console.log('上一个按钮:', prevBtn);
+            console.log('下一个按钮:', nextBtn);
+            
+            // 检查图表是否已创建
+            const chartInfo = document.getElementById('chartInfo');
+            console.log('图表信息区域:', chartInfo.innerHTML);
         });
     </script>
 </body>
