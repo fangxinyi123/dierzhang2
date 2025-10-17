@@ -4,10 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第二章数据可视化平台</title>
-    <link rel="stylesheet" href="css/style.css">
+    <base href="/dierzhang2/">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .debug-info {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
+        <div class="debug-info">
+            <strong>调试信息：</strong> 页面已加载，检查资源路径...
+        </div>
         <h1>第二章数据可视化平台</h1>
         
         <div class="chart-container">
@@ -28,19 +41,19 @@
             <h3>图表示例</h3>
             <div class="example-grid">
                 <div class="example-item">
-                    <img src="images/line_chart.svg" alt="折线图示例" width="200" height="150">
+                    <img src="./images/line_chart.svg" alt="折线图示例" width="200" height="150">
                     <p>折线图 - 显示数据变化趋势</p>
                 </div>
                 <div class="example-item">
-                    <img src="images/bar_chart.svg" alt="柱形图示例" width="200" height="150">
+                    <img src="./images/bar_chart.svg" alt="柱形图示例" width="200" height="150">
                     <p>柱形图 - 比较不同类别的数值</p>
                 </div>
                 <div class="example-item">
-                    <img src="images/pie_chart.svg" alt="饼图示例" width="200" height="150">
+                    <img src="./images/pie_chart.svg" alt="饼图示例" width="200" height="150">
                     <p>饼图 - 显示各部分占整体的比例</p>
                 </div>
                 <div class="example-item">
-                    <img src="images/scatter_plot.svg" alt="散点图示例" width="200" height="150">
+                    <img src="./images/scatter_plot.svg" alt="散点图示例" width="200" height="150">
                     <p>散点图 - 显示变量间关系</p>
                 </div>
             </div>
@@ -64,6 +77,25 @@
         </div>
     </div>
 
-    <script src="js/charts.js"></script>
+    <script src="./js/charts.js"></script>
+    <script>
+        // 调试脚本 - 检查资源加载状态
+        window.addEventListener('load', function() {
+            console.log('页面加载完成');
+            
+            // 检查CSS是否加载
+            var stylesheets = document.styleSheets;
+            console.log('已加载的样式表数量:', stylesheets.length);
+            
+            // 检查图片是否加载
+            var images = document.querySelectorAll('img');
+            images.forEach(function(img, index) {
+                console.log('图片 ' + index + ':', img.src, img.complete ? '已加载' : '加载中');
+            });
+            
+            // 检查JS是否加载
+            console.log('Charts.js 已加载:', typeof DataVisualization !== 'undefined');
+        });
+    </script>
 </body>
 </html>
