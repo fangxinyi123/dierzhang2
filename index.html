@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:url" content="https://022340609.xyz">
+    <meta property="og:title" content="第二章数据可视化平台 - 10种图表类型">
+    <meta property="og:description" content="展示10种不同类型的数据可视化图表">
+    <link rel="canonical" href="https://022340609.xyz">
     <title>第二章数据可视化平台 - 10种图表类型</title>
     <style>
         body {
@@ -173,6 +177,8 @@
         // 全局变量
         let currentChart = 0;
         let chartInstance = null;
+        let isRendering = false; // 防止重复渲染标志
+        let chartInstances = []; // 存储所有图表实例
         
         // 10种图表数据 - 基于第二章知识
         const charts = [
@@ -409,30 +415,36 @@
                 application: "广告投入与销售额关系、温度与销量关系、年龄与收入关系"
             },
             
-            // 8. 箱形图 - 显示数据分布特征
+            // 8. 箱形图 - 显示数据分布特征（使用分组柱形图替代）
             {
                 type: "箱形图",
                 config: {
-                    type: 'boxplot',
+                    type: 'bar',
                     data: {
-                        labels: ['2023年', '2024年'],
-                        datasets: [{
-                            label: '销售额分布',
-                            data: [
-                                [40, 50, 60, 70, 80],  // 2023年: [最小值,Q1,中位数,Q3,最大值]
-                                [45, 55, 65, 75, 85]   // 2024年
-                            ],
-                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            borderWidth: 1
-                        }]
+                        labels: ['最小值', 'Q1', '中位数', 'Q3', '最大值'],
+                        datasets: [
+                            {
+                                label: '2023年',
+                                data: [40, 50, 60, 70, 80],
+                                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '2024年',
+                                data: [45, 55, 65, 75, 85],
+                                backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                                borderColor: 'rgba(255, 159, 64, 1)',
+                                borderWidth: 1
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         plugins: {
                             title: {
                                 display: true,
-                                text: '年度销售额分布特征'
+                                text: '年度销售额分布特征（箱形图模拟）'
                             }
                         }
                     }
@@ -477,27 +489,57 @@
                 application: "员工能力评估、产品特性比较、学校科目成绩"
             },
             
-            // 10. 误差棒图 - 显示测量数据误差
+            // 10. 误差棒图 - 显示测量数据误差（使用分组柱形图模拟）
             {
                 type: "误差棒图",
                 config: {
                     type: 'bar',
                     data: {
                         labels: ['实验1', '实验2', '实验3', '实验4'],
-                        datasets: [{
-                            label: '测量值',
-                            data: [45, 52, 48, 55],
-                            backgroundColor: '#e15f41',
-                            borderColor: '#e15f41',
-                            borderWidth: 1
-                        }]
+                        datasets: [
+                            {
+                                label: '测量值',
+                                data: [45, 52, 48, 55],
+                                backgroundColor: '#e15f41',
+                                borderColor: '#e15f41',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '误差范围',
+                                data: [8, 8, 8, 8], // 误差范围高度
+                                backgroundColor: 'rgba(225, 95, 65, 0.3)',
+                                borderColor: 'rgba(225, 95, 65, 0.5)',
+                                borderWidth: 1
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         plugins: {
                             title: {
                                 display: true,
-                                text: '科学实验测量数据'
+                                text: '科学实验测量数据（含误差范围）'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const index = context.dataIndex;
+                                        const errors = [5, 4, 6, 3]; // 误差值
+                                        if (context.dataset.label === '测量值') {
+                                            return `测量值: ${context.parsed.y} ± ${errors[index]}`;
+                                        }
+                                        return context.dataset.label + ': ' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '测量值'
+                                }
                             }
                         }
                     }
@@ -509,35 +551,80 @@
 
         // 显示图表函数
         function showChart(index) {
+            // 防止重复点击
+            if (isRendering) {
+                console.log('图表正在渲染中，请稍候...');
+                return;
+            }
+            
             if (index < 0) index = charts.length - 1;
             if (index >= charts.length) index = 0;
             
+            // 如果切换到当前图表，不做任何操作
+            if (index === currentChart) {
+                return;
+            }
+            
             currentChart = index;
-            renderChart();
             updateChartButtons();
+            
+            // 使用延迟渲染避免快速点击冲突
+            setTimeout(() => {
+                renderChart();
+            }, 50);
         }
 
         // 渲染图表函数
         function renderChart() {
+            // 设置渲染标志
+            isRendering = true;
+            
             const canvas = document.getElementById('chartCanvas');
             const chartInfo = document.getElementById('chartInfo');
             const chartCounter = document.querySelector('.chart-counter');
             
             if (!canvas) {
                 console.error('Canvas元素未找到！');
+                isRendering = false;
                 return;
             }
             
-            // 销毁之前的图表实例
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-            
+            // 获取图表数据
             const chartData = charts[currentChart];
             
+            // 无论是否使用缓存，都先销毁当前显示的图表实例
+            if (chartInstance) {
+                try {
+                    chartInstance.destroy();
+                    console.log('销毁当前图表实例');
+                } catch (destroyError) {
+                    console.warn('销毁图表时出现警告:', destroyError);
+                }
+                chartInstance = null;
+            }
+            
             try {
-                // 创建新的图表实例
-                chartInstance = new Chart(canvas, chartData.config);
+                // 检查是否已经有该图表的缓存实例
+                if (chartInstances[currentChart]) {
+                    console.log(`使用缓存的图表实例: ${chartData.type}`);
+                    // 重新创建Canvas上下文
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 从缓存中获取配置并重新创建实例
+                    chartInstance = new Chart(canvas, chartData.config);
+                } else {
+                    // 清除Canvas上下文
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 创建新的图表实例
+                    chartInstance = new Chart(canvas, chartData.config);
+                    
+                    // 缓存图表配置（不缓存实例本身）
+                    chartInstances[currentChart] = true;
+                    console.log(`创建新的图表实例: ${chartData.type}`);
+                }
                 
                 // 更新图表信息
                 if (chartInfo) {
@@ -553,6 +640,8 @@
                     chartCounter.textContent = `图表 ${currentChart + 1}/${charts.length}`;
                 }
                 
+                console.log(`成功渲染图表: ${chartData.type}`);
+                
             } catch (error) {
                 console.error('图表创建失败:', error);
                 if (chartInfo) {
@@ -562,6 +651,16 @@
                         <p style="color: red;"><strong>错误:</strong> ${error.message}</p>
                     `;
                 }
+                
+                // 错误恢复：重置图表实例和缓存
+                chartInstance = null;
+                chartInstances[currentChart] = null;
+                
+                // 强制重置Canvas
+                canvas.width = canvas.width;
+            } finally {
+                // 无论成功失败，都重置渲染标志
+                isRendering = false;
             }
         }
 
@@ -577,11 +676,27 @@
             });
         }
 
+        // 重置Canvas函数
+        function resetCanvas() {
+            const canvas = document.getElementById('chartCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // 重置Canvas状态
+                canvas.width = canvas.width; // 强制重置Canvas
+            }
+        }
+
         // 页面加载完成后初始化
         window.addEventListener('load', function() {
-            console.log('页面加载完成，开始渲染图表...');
-            renderChart();
-            updateChartButtons();
+            console.log('页面加载完成，开始初始化图表...');
+            // 初始化图表实例数组
+            chartInstances = new Array(charts.length);
+            resetCanvas(); // 确保Canvas干净
+            setTimeout(() => {
+                renderChart();
+                updateChartButtons();
+            }, 100); // 延迟初始化确保DOM完全加载
         });
 
         // 键盘快捷键支持
