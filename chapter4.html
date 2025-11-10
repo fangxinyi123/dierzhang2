@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第四章数据可视化平台 - 完整版</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            padding: 20px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chart-container .chart-title {
+            margin-bottom: 15px;
+            min-height: 50px;
+        }
+        
+        .chart-container div[style*="height"] {
+            flex: 1;
+            min-height: 400px;
+            width: 100%;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .description ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .description li {
+            margin-bottom: 8px;
+        }
+        
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .single-chart {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .single-chart {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #2c3e50;
+        }
+        
+        .chart-group {
+            display: none;
+        }
+        
+        .chart-group.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .data-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                margin: 5px 0;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 第四章数据可视化平台</h1>
+            <p>基于matplotlib图表样式、颜色使用和线型选择的数据可视化展示</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('tab1')">基础图表</button>
+            <button class="nav-tab" onclick="showTab('tab2')">线型技术</button>
+            <button class="nav-tab" onclick="showTab('tab3')">填充图表</button>
+            <button class="nav-tab" onclick="showTab('tab4')">其他图表</button>
+        </div>
+        
+        <div class="description">
+            <h3>📋 第四章核心技术要点</h3>
+            <ul>
+                <li><strong>图表样式修改</strong> - 自定义matplotlib图表样式参数</li>
+                <li><strong>基础颜色使用</strong> - 支持十六进制颜色码和命名颜色</li>
+                <li><strong>颜色映射表</strong> - 使用colormap实现渐变色彩效果</li>
+                <li><strong>线型选择</strong> - 实线、虚线、点划线等多种线型样式</li>
+                <li><strong>网格显示</strong> - 可配置的网格线样式和透明度</li>
+                <li><strong>填充区域</strong> - 图表填充技术实现彩色效果</li>
+                <li><strong>标记点样式</strong> - 自定义标记点形状、大小和颜色</li>
+            </ul>
+        </div>
+        
+        <!-- 基础图表标签页 -->
+        <div id="tab1" class="chart-group active">
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📚 图书采购数据对比柱状图</div>
+                    <div id="bookChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">💱 汇率走势分析折线图</div>
+                    <div id="exchangeChart" style="height: 400px;"></div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📈 产品销售折线图</div>
+                    <div id="salesChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 线型技术标签页 -->
+        <div id="tab2" class="chart-group">
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🌡️ 15天温度走势折线图</div>
+                    <div id="temperatureChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">📈 不同线型对比图</div>
+                    <div id="lineStyleChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 填充图表标签页 -->
+        <div id="tab3" class="chart-group">
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🌈 正弦余弦函数填充图</div>
+                    <div id="fillChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🎨 彩色雪花填充图</div>
+                    <div id="snowChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 其他图表标签页 -->
+        <div id="tab4" class="chart-group">
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">⚡ 标记点样式展示</div>
+                    <div id="markerChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">📊 文本注释技术</div>
+                    <div id="textChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="description">
+            <h3>🎨 第四章颜色配置说明</h3>
+            <ul>
+                <li><strong>图书采购图</strong>：使用第四章示例颜色 - #FFCC00(黄色)和#B0C4DE(浅蓝色)</li>
+                <li><strong>汇率走势图</strong>：采用第四章线型技术 - 实线(2017年)和虚线(2019年)</li>
+                <li><strong>温度走势图</strong>：最高温度(红色)和最低温度(蓝色)对比，使用标记点技术</li>
+                <li><strong>填充图表</strong>：使用dodgerblue(天蓝色)和orangered(橙红色)实现填充效果</li>
+                <li><strong>背景网格</strong>：灰色透明度网格，符合第四章网格显示规范</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 标签页切换功能
+        function showTab(tabId) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.chart-group').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('.nav-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(tabId).classList.add('active');
+            
+            // 为当前按钮添加active类
+            event.target.classList.add('active');
+        }
+
+        // 图书采购数据对比柱状图
+        var bookData = [
+            {
+                x: ['家庭', '小说', '心理', '科技', '儿童'],
+                y: [1200, 2400, 1800, 2200, 1600],
+                name: '地区1',
+                type: 'bar',
+                marker: {
+                    color: '#FFCC00',
+                    line: {
+                        color: '#000000',
+                        width: 1
+                    }
+                }
+            },
+            {
+                x: ['家庭', '小说', '心理', '科技', '儿童'],
+                y: [1050, 2100, 1300, 1600, 1340],
+                name: '地区2',
+                type: 'bar',
+                marker: {
+                    color: '#B0C4DE',
+                    line: {
+                        color: '#000000',
+                        width: 1
+                    }
+                }
+            }
+        ];
+
+        var bookLayout = {
+            title: {
+                text: '地区1和地区2对各类图书的采购情况',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '图书种类',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '采购数量(本)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            barmode: 'group',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('bookChart', bookData, bookLayout);
+
+        // 汇率走势分析折线图
+        var exchangeMonths = ['3日', '4日', '5日', '6日', '7日', '8日', '9日', '10日', '11日', '12日', '13日', '14日', '17日', '18日', '19日', '24日', '25日', '26日', '31日'];
+        var exchange2017 = [6.8327, 6.8327, 6.8510, 6.8608, 6.8647, 6.8647, 6.8647, 6.8677, 6.8662, 6.8662, 6.8662, 6.8827, 6.8761, 6.8635, 6.8860, 6.8737, 6.8796, 6.8841, 6.8841];
+        
+        var exchangeData = [
+            {
+                x: exchangeMonths,
+                y: exchange2017,
+                name: '2017年7月美元/人民币汇率',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#006374',
+                    width: 3,
+                    dash: 'solid'
+                },
+                marker: {
+                    size: 6,
+                    color: '#006374'
+                }
+            },
+            {
+                x: exchangeMonths,
+                y: [6.70, 6.72, 6.71, 6.72, 6.90, 6.87, 6.88, 7.05, 7.12, 7.08, 7.04, 7.01, 6.98, 6.95, 6.92, 6.89, 6.86, 6.83, 6.80],
+                name: '2019年7月美元/人民币汇率',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#8A2BE2',
+                    width: 3,
+                    dash: 'dash'
+                },
+                marker: {
+                    size: 6,
+                    color: '#8A2BE2'
+                }
+            }
+        ];
+
+        var exchangeLayout = {
+            title: {
+                text: '2017年与2019年7月美元/人民币汇率走势',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '日期',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '汇率',
+                range: [6.6, 7.3],
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('exchangeChart', exchangeData, exchangeLayout);
+
+        // 产品销售折线图（不同线型标记）
+        var quarters = ['第1季度', '第2季度', '第3季度', '第4季度'];
+        var saleA = [2144, 4617, 7674, 6666];
+        var saleB = [853, 1214, 2414, 4409];
+        var saleC = [153, 155, 292, 680];
+
+        var salesData = [
+            {
+                x: quarters,
+                y: saleA,
+                name: '产品A',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF4444',
+                    width: 3
+                },
+                marker: {
+                    symbol: 'diamond',
+                    size: 10,
+                    color: '#FF4444'
+                }
+            },
+            {
+                x: quarters,
+                y: saleB,
+                name: '产品B',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#3366CC',
+                    width: 3,
+                    dash: 'dot'
+                },
+                marker: {
+                    symbol: 'triangle-up',
+                    size: 10,
+                    color: '#3366CC'
+                }
+            },
+            {
+                x: quarters,
+                y: saleC,
+                name: '产品C',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#33CC33',
+                    width: 3,
+                    dash: 'dash'
+                },
+                marker: {
+                    symbol: 'square',
+                    size: 10,
+                    color: '#33CC33'
+                }
+            }
+        ];
+
+        var salesLayout = {
+            title: {
+                text: '不同产品季度销售额对比',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '季度',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '销售额(万元)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('salesChart', salesData, salesLayout);
+
+        // 15天温度走势折线图
+        var dates = ['4日', '5日', '6日', '7日', '8日', '9日', '10日', '11日', '12日', '13日', '14日', '15日', '16日', '17日', '18日'];
+        var highTemps = [32, 33, 34, 34, 33, 31, 30, 29, 30, 29, 26, 23, 21, 25, 31];
+        var lowTemps = [19, 19, 20, 22, 22, 21, 22, 16, 18, 18, 17, 14, 15, 16, 16];
+
+        var temperatureData = [
+            {
+                x: dates,
+                y: highTemps,
+                name: '最高温度',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF4444',
+                    width: 3
+                },
+                marker: {
+                    size: 8,
+                    color: '#FF4444'
+                }
+            },
+            {
+                x: dates,
+                y: lowTemps,
+                name: '最低温度',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#3366CC',
+                    width: 3
+                },
+                marker: {
+                    size: 8,
+                    color: '#3366CC'
+                }
+            }
+        ];
+
+        var temperatureLayout = {
+            title: {
+                text: '未来15天最高气温和最低气温的走势',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '日期',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '温度(°C)',
+                range: [0, 40],
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('temperatureChart', temperatureData, temperatureLayout);
+
+        // 不同线型对比图
+        var x = [1, 2, 3, 4, 5];
+        var lineStyleData = [
+            {
+                x: x,
+                y: [3, 4, 5, 4, 3],
+                name: '实线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FF6B6B',
+                    width: 3,
+                    dash: 'solid'
+                }
+            },
+            {
+                x: x,
+                y: [2, 3, 4, 3, 2],
+                name: '虚线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#4ECDC4',
+                    width: 3,
+                    dash: 'dash'
+                }
+            },
+            {
+                x: x,
+                y: [1, 2, 3, 2, 1],
+                name: '点划线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FFCC00',
+                    width: 3,
+                    dash: 'dashdot'
+                }
+            }
+        ];
+
+        var lineStyleLayout = {
+            title: {
+                text: '不同线型样式对比',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('lineStyleChart', lineStyleData, lineStyleLayout);
+
+        // 正弦余弦函数填充图
+        var xSin = [];
+        var sinY = [];
+        var cosY = [];
+        for (var i = 0; i <= 8 * Math.PI; i += 0.1) {
+            xSin.push(i);
+            sinY.push(Math.sin(i));
+            cosY.push(Math.cos(1.5 * i / Math.PI) / 2);
+        }
+
+        var fillData = [
+            {
+                x: xSin,
+                y: sinY,
+                name: 'sin(x)',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FF6B6B',
+                    width: 2
+                }
+            },
+            {
+                x: xSin,
+                y: cosY,
+                name: 'cos(1.5x/π)/2',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#4ECDC4',
+                    width: 2
+                }
+            }
+        ];
+
+        var fillLayout = {
+            title: {
+                text: '正弦余弦函数填充图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('fillChart', fillData, fillLayout);
+
+        // 彩色雪花填充图
+        var snowX = [];
+        var snowY = [];
+        var snowColors = [];
+        
+        // 生成雪花图案数据
+        for (var i = 0; i < 200; i++) {
+            var angle = Math.random() * 2 * Math.PI;
+            var radius = Math.random() * 10;
+            snowX.push(radius * Math.cos(angle));
+            snowY.push(radius * Math.sin(angle));
+            snowColors.push(Math.random() > 0.5 ? '#FF6B6B' : '#4ECDC4');
+        }
+
+        var snowData = [
+            {
+                x: snowX,
+                y: snowY,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: snowColors,
+                    symbol: 'star'
+                }
+            }
+        ];
+
+        var snowLayout = {
+            title: {
+                text: '彩色雪花图案',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)',
+                range: [-12, 12]
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)',
+                range: [-12, 12]
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('snowChart', snowData, snowLayout);
+
+        // 标记点样式展示
+        var markerX = [1, 2, 3, 4, 5];
+        var markerData = [
+            {
+                x: markerX,
+                y: [5, 4, 3, 4, 5],
+                name: '圆形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#FF6B6B',
+                    symbol: 'circle'
+                }
+            },
+            {
+                x: markerX,
+                y: [4, 3, 2, 3, 4],
+                name: '星形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#4ECDC4',
+                    symbol: 'star'
+                }
+            },
+            {
+                x: markerX,
+                y: [3, 2, 1, 2, 3],
+                name: '方形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#FFCC00',
+                    symbol: 'square'
+                }
+            }
+        ];
+
+        var markerLayout = {
+            title: {
+                text: '不同标记点样式展示',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('markerChart', markerData, markerLayout);
+
+        // 文本注释技术
+        var textX = [1, 2, 3];
+        var textData = [
+            {
+                x: textX,
+                y: [3, 4, 5],
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF6B6B',
+                    width: 3
+                },
+                marker: {
+                    size: 15,
+                    color: '#FF6B6B'
+                }
+            }
+        ];
+
+        var textLayout = {
+            title: {
+                text: '文本注释技术示例',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            annotations: [
+                {
+                    x: 1.9,
+                    y: 3.75,
+                    text: 'y=x+2',
+                    showarrow: false,
+                    font: {
+                        family: 'serif',
+                        size: 16,
+                        color: '#FF6B6B'
+                    },
+                    bgcolor: 'yellow',
+                    bordercolor: '#FF6B6B',
+                    borderwidth: 2
+                }
+            ]
+        };
+
+        Plotly.newPlot('textChart', textData, textLayout);
+
+        // 添加响应式布局调整
+        window.addEventListener('resize', function() {
+            Plotly.Plots.resize('bookChart');
+            Plotly.Plots.resize('exchangeChart');
+            Plotly.Plots.resize('temperatureChart');
+            Plotly.Plots.resize('lineStyleChart');
+            Plotly.Plots.resize('fillChart');
+            Plotly.Plots.resize('snowChart');
+            Plotly.Plots.resize('markerChart');
+            Plotly.Plots.resize('textChart');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化综合平台 - 第二章与第四章整合</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+        
+        .nav-tab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #2c3e50;
+        }
+        
+        .chart-section {
+            display: none;
+            padding: 20px;
+        }
+        
+        .chart-section.active {
+            display: block;
+        }
+        
+        .chart-container {
+            padding: 20px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .chart-container div[style*="height"] {
+            flex: 1;
+            min-height: 400px;
+            width: 100%;
+        }
+        
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .single-chart {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .description ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .description li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .data-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                margin: 5px 0;
+                width: 90%;
+            }
+        }
+        
+        /* 第二章特有样式 */
+        .chapter2-intro {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        /* 第四章特有样式 */
+        .chapter4-intro {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .chapter-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            background: #95a5a6;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .chapter-tab {
+            padding: 8px 15px;
+            background: #7f8c8d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .chapter-tab.active {
+            background: #34495e;
+        }
+        
+        .chapter-group {
+            display: none;
+        }
+        
+        .chapter-group.active {
+            display: block;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 数据可视化综合平台</h1>
+            <p>第二章：基础图表与第四章：图表样式和颜色配置的完美结合</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('chapter2')">第二章：基础图表</button>
+            <button class="nav-tab" onclick="showSection('chapter4')">第四章：图表样式</button>
+            <button class="nav-tab" onclick="showSection('combined')">整合视图</button>
+        </div>
+        
+        <!-- 第二章内容 -->
+        <div id="chapter2" class="chart-section active">
+            <div class="chapter2-intro">
+                <h2>📈 第二章 - 基础图表可视化</h2>
+                <p>展示基础的图表类型和数据分析方法</p>
+            </div>
+            
+            <div class="description">
+                <h3>📋 第二章可视化内容</h3>
+                <p>第二章展示了10种基础图表类型，包括：</p>
+                <ul>
+                    <li>折线图 - 显示数据趋势变化</li>
+                    <li>柱形图 - 比较不同类别数据</li>
+                    <li>条形图 - 横向比较数据</li>
+                    <li>堆积面积图 - 显示部分与整体关系</li>
+                    <li>直方图 - 展示数据分布</li>
+                    <li>饼图 - 显示比例关系</li>
+                    <li>散点图 - 分析变量相关性</li>
+                    <li>箱型图 - 显示数据分布特征</li>
+                    <li>雷达图 - 多维数据比较</li>
+                    <li>误差棒图 - 显示数据波动范围</li>
+                </ul>
+            </div>
+            
+            <!-- 第二章图表平铺展示 -->
+            <div class="chapter-tabs">
+                <button class="chapter-tab active" onclick="showChapter2Tab('basicCharts')">基本图表</button>
+                <button class="chapter-tab" onclick="showChapter2Tab('advancedCharts')">高级图表</button>
+                <button class="chapter-tab" onclick="showChapter2Tab('statisticalCharts')">统计图表</button>
+            </div>
+            
+            <!-- 基本图表标签页 -->
+            <div id="basicCharts" class="chapter-group active">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📈 折线图 - 销售趋势分析</div>
+                        <div id="chapter2LineChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">📊 柱形图 - 产品销量对比</div>
+                        <div id="chapter2BarChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📋 条形图 - 市场份额</div>
+                        <div id="chapter2HorizontalBarChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">🍰 饼图 - 产品分布比例</div>
+                        <div id="chapter2PieChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高级图表标签页 -->
+            <div id="advancedCharts" class="chapter-group">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">🔍 散点图 - 相关性分析</div>
+                        <div id="chapter2ScatterChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">📈 面积图 - 趋势填充</div>
+                        <div id="chapter2AreaChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">🧮 直方图 - 数据分布</div>
+                        <div id="chapter2HistogramChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 统计图表标签页 -->
+            <div id="statisticalCharts" class="chapter-group">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📦 箱型图 - 统计分布</div>
+                        <div id="chapter2BoxPlotChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">🎯 雷达图 - 多维比较</div>
+                        <div id="chapter2RadarChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📏 误差棒图 - 数据波动</div>
+                        <div id="chapter2ErrorBarChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第四章内容 -->
+        <div id="chapter4" class="chart-section">
+            <div class="chapter4-intro">
+                <h2>🎨 第四章 - 图表样式和颜色配置</h2>
+                <p>基于matplotlib图表样式、颜色使用和线型选择的数据可视化展示</p>
+            </div>
+            
+            <div class="chapter-tabs">
+                <button class="chapter-tab active" onclick="showChapterTab('tab1')">基础图表</button>
+                <button class="chapter-tab" onclick="showChapterTab('tab2')">线型技术</button>
+                <button class="chapter-tab" onclick="showChapterTab('tab3')">填充图表</button>
+                <button class="chapter-tab" onclick="showChapterTab('tab4')">其他图表</button>
+            </div>
+            
+            <div class="description">
+                <h3>📋 第四章核心技术要点</h3>
+                <ul>
+                    <li><strong>图表样式修改</strong> - 自定义matplotlib图表样式参数</li>
+                    <li><strong>基础颜色使用</strong> - 支持十六进制颜色码和命名颜色</li>
+                    <li><strong>颜色映射表</strong> - 使用colormap实现渐变色彩效果</li>
+                    <li><strong>线型选择</strong> - 实线、虚线、点划线等多种线型样式</li>
+                    <li><strong>网格显示</strong> - 可配置的网格线样式和透明度</li>
+                    <li><strong>填充区域</strong> - 图表填充技术实现彩色效果</li>
+                    <li><strong>标记点样式</strong> - 自定义标记点形状、大小和颜色</li>
+                </ul>
+            </div>
+            
+            <!-- 基础图表标签页 -->
+            <div id="tab1" class="chapter-group active">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📚 图书采购数据对比柱状图</div>
+                        <div id="bookChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">💱 汇率走势分析折线图</div>
+                        <div id="exchangeChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📈 产品销售折线图</div>
+                        <div id="salesChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 线型技术标签页 -->
+            <div id="tab2" class="chapter-group">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">🌡️ 15天温度走势折线图</div>
+                        <div id="temperatureChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">📈 不同线型对比图</div>
+                        <div id="lineStyleChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 填充图表标签页 -->
+            <div id="tab3" class="chapter-group">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">🌈 正弦余弦函数填充图</div>
+                        <div id="fillChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">🎨 彩色雪花填充图</div>
+                        <div id="snowChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 其他图表标签页 -->
+            <div id="tab4" class="chapter-group">
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">⚡ 标记点样式展示</div>
+                        <div id="markerChart" style="height: 400px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">📊 文本注释技术</div>
+                        <div id="textChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="description">
+                <h3>🎨 第四章颜色配置说明</h3>
+                <ul>
+                    <li><strong>图书采购图</strong>：使用第四章示例颜色 - #FFCC00(黄色)和#B0C4DE(浅蓝色)</li>
+                    <li><strong>汇率走势图</strong>：采用第四章线型技术 - 实线(2017年)和虚线(2019年)</li>
+                    <li><strong>温度走势图</strong>：最高温度(红色)和最低温度(蓝色)对比，使用标记点技术</li>
+                    <li><strong>填充图表</strong>：使用dodgerblue(天蓝色)和orangered(橙红色)实现填充效果</li>
+                    <li><strong>背景网格</strong>：灰色透明度网格，符合第四章网格显示规范</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 整合视图 -->
+        <div id="combined" class="chart-section">
+            <div class="chapter2-intro" style="background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);">
+                <h2>🌐 整合视图 - 第二章与第四章对比展示</h2>
+                <p>同时查看基础图表和高级样式配置的完美结合</p>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📊 第二章基础图表</div>
+                    <iframe src="data-visualization-10-charts.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🎨 第四章样式图表</div>
+                    <iframe src="chapter4.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                </div>
+            </div>
+            
+            <div class="description">
+                <h3>🔄 整合说明</h3>
+                <ul>
+                    <li><strong>第二章</strong>：提供了基础的图表类型和数据分析方法</li>
+                    <li><strong>第四章</strong>：展示了图表样式、颜色配置和高级视觉效果</li>
+                    <li><strong>整合优势</strong>：结合了基础的图表功能和高级的视觉效果</li>
+                    <li><strong>应用场景</strong>：适用于数据分析、业务报告、学术研究等多种场景</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主标签页切换功能
+        function showSection(sectionId) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.chart-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('.nav-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 为当前按钮添加active类
+            event.target.classList.add('active');
+        }
+
+        // 第四章内部标签页切换
+        function showChapterTab(tabId) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.chapter-group').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('.chapter-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(tabId).classList.add('active');
+            
+            // 为当前按钮添加active类
+            event.target.classList.add('active');
+        }
+
+        // 第四章图表数据配置
+        // 图书采购数据对比柱状图
+        var bookData = [
+            {
+                x: ['家庭', '小说', '心理', '科技', '儿童'],
+                y: [1200, 2400, 1800, 2200, 1600],
+                name: '地区1',
+                type: 'bar',
+                marker: {
+                    color: '#FFCC00',
+                    line: {
+                        color: '#000000',
+                        width: 1
+                    }
+                }
+            },
+            {
+                x: ['家庭', '小说', '心理', '科技', '儿童'],
+                y: [1050, 2100, 1300, 1600, 1340],
+                name: '地区2',
+                type: 'bar',
+                marker: {
+                    color: '#B0C4DE',
+                    line: {
+                        color: '#000000',
+                        width: 1
+                    }
+                }
+            }
+        ];
+
+        var bookLayout = {
+            title: {
+                text: '地区1和地区2对各类图书的采购情况',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '图书种类',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '采购数量(本)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            barmode: 'group',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('bookChart', bookData, bookLayout);
+
+        // 汇率走势分析折线图
+        var exchangeMonths = ['3日', '4日', '5日', '6日', '7日', '8日', '9日', '10日', '11日', '12日', '13日', '14日', '17日', '18日', '19日', '24日', '25日', '26日', '31日'];
+        var exchange2017 = [6.8327, 6.8327, 6.8510, 6.8608, 6.8647, 6.8647, 6.8647, 6.8677, 6.8662, 6.8662, 6.8662, 6.8827, 6.8761, 6.8635, 6.8860, 6.8737, 6.8796, 6.8841, 6.8841];
+        
+        var exchangeData = [
+            {
+                x: exchangeMonths,
+                y: exchange2017,
+                name: '2017年7月美元/人民币汇率',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#006374',
+                    width: 3,
+                    dash: 'solid'
+                },
+                marker: {
+                    size: 6,
+                    color: '#006374'
+                }
+            },
+            {
+                x: exchangeMonths,
+                y: [6.70, 6.72, 6.71, 6.72, 6.90, 6.87, 6.88, 7.05, 7.12, 7.08, 7.04, 7.01, 6.98, 6.95, 6.92, 6.89, 6.86, 6.83, 6.80],
+                name: '2019年7月美元/人民币汇率',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#8A2BE2',
+                    width: 3,
+                    dash: 'dash'
+                },
+                marker: {
+                    size: 6,
+                    color: '#8A2BE2'
+                }
+            }
+        ];
+
+        var exchangeLayout = {
+            title: {
+                text: '2017年与2019年7月美元/人民币汇率走势',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '日期',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '汇率',
+                range: [6.6, 7.3],
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('exchangeChart', exchangeData, exchangeLayout);
+
+        // 产品销售折线图（不同线型标记）
+        var quarters = ['第1季度', '第2季度', '第3季度', '第4季度'];
+        var saleA = [2144, 4617, 7674, 6666];
+        var saleB = [853, 1214, 2414, 4409];
+        var saleC = [153, 155, 292, 680];
+
+        var salesData = [
+            {
+                x: quarters,
+                y: saleA,
+                name: '产品A',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF4444',
+                    width: 3
+                },
+                marker: {
+                    symbol: 'diamond',
+                    size: 10,
+                    color: '#FF4444'
+                }
+            },
+            {
+                x: quarters,
+                y: saleB,
+                name: '产品B',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#3366CC',
+                    width: 3,
+                    dash: 'dot'
+                },
+                marker: {
+                    symbol: 'triangle-up',
+                    size: 10,
+                    color: '#3366CC'
+                }
+            },
+            {
+                x: quarters,
+                y: saleC,
+                name: '产品C',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#33CC33',
+                    width: 3,
+                    dash: 'dash'
+                },
+                marker: {
+                    symbol: 'square',
+                    size: 10,
+                    color: '#33CC33'
+                }
+            }
+        ];
+
+        var salesLayout = {
+            title: {
+                text: '不同产品季度销售额对比',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '季度',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '销售额(万元)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('salesChart', salesData, salesLayout);
+
+        // 15天温度走势折线图
+        var dates = ['4日', '5日', '6日', '7日', '8日', '9日', '10日', '11日', '12日', '13日', '14日', '15日', '16日', '17日', '18日'];
+        var highTemps = [32, 33, 34, 34, 33, 31, 30, 29, 30, 29, 26, 23, 21, 25, 31];
+        var lowTemps = [19, 19, 20, 22, 22, 21, 22, 16, 18, 18, 17, 14, 15, 16, 16];
+
+        var temperatureData = [
+            {
+                x: dates,
+                y: highTemps,
+                name: '最高温度',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF4444',
+                    width: 3
+                },
+                marker: {
+                    size: 8,
+                    color: '#FF4444'
+                }
+            },
+            {
+                x: dates,
+                y: lowTemps,
+                name: '最低温度',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#3366CC',
+                    width: 3
+                },
+                marker: {
+                    size: 8,
+                    color: '#3366CC'
+                }
+            }
+        ];
+
+        var temperatureLayout = {
+            title: {
+                text: '未来15天最高气温和最低气温的走势',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '日期',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '温度(°C)',
+                range: [0, 40],
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('temperatureChart', temperatureData, temperatureLayout);
+
+        // 不同线型对比图
+        var x = [1, 2, 3, 4, 5];
+        var lineStyleData = [
+            {
+                x: x,
+                y: [3, 4, 5, 4, 3],
+                name: '实线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FF6B6B',
+                    width: 3,
+                    dash: 'solid'
+                }
+            },
+            {
+                x: x,
+                y: [2, 3, 4, 3, 2],
+                name: '虚线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#4ECDC4',
+                    width: 3,
+                    dash: 'dash'
+                }
+            },
+            {
+                x: x,
+                y: [1, 2, 3, 2, 1],
+                name: '点划线',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FFCC00',
+                    width: 3,
+                    dash: 'dashdot'
+                }
+            }
+        ];
+
+        var lineStyleLayout = {
+            title: {
+                text: '不同线型样式对比',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('lineStyleChart', lineStyleData, lineStyleLayout);
+
+        // 正弦余弦函数填充图
+        var xSin = [];
+        var sinY = [];
+        var cosY = [];
+        for (var i = 0; i <= 8 * Math.PI; i += 0.1) {
+            xSin.push(i);
+            sinY.push(Math.sin(i));
+            cosY.push(Math.cos(1.5 * i / Math.PI) / 2);
+        }
+
+        var fillData = [
+            {
+                x: xSin,
+                y: sinY,
+                name: 'sin(x)',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#FF6B6B',
+                    width: 2
+                }
+            },
+            {
+                x: xSin,
+                y: cosY,
+                name: 'cos(1.5x/π)/2',
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: '#4ECDC4',
+                    width: 2
+                }
+            }
+        ];
+
+        var fillLayout = {
+            title: {
+                text: '正弦余弦函数填充图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('fillChart', fillData, fillLayout);
+
+        // 彩色雪花填充图
+        var snowX = [];
+        var snowY = [];
+        var snowColors = [];
+        
+        // 生成雪花图案数据
+        for (var i = 0; i < 200; i++) {
+            var angle = Math.random() * 2 * Math.PI;
+            var radius = Math.random() * 10;
+            snowX.push(radius * Math.cos(angle));
+            snowY.push(radius * Math.sin(angle));
+            snowColors.push(Math.random() > 0.5 ? '#FF6B6B' : '#4ECDC4');
+        }
+
+        var snowData = [
+            {
+                x: snowX,
+                y: snowY,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: snowColors,
+                    symbol: 'star'
+                }
+            }
+        ];
+
+        var snowLayout = {
+            title: {
+                text: '彩色雪花图案',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)',
+                range: [-12, 12]
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)',
+                range: [-12, 12]
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('snowChart', snowData, snowLayout);
+
+        // 标记点样式展示
+        var markerX = [1, 2, 3, 4, 5];
+        var markerData = [
+            {
+                x: markerX,
+                y: [5, 4, 3, 4, 5],
+                name: '圆形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#FF6B6B',
+                    symbol: 'circle'
+                }
+            },
+            {
+                x: markerX,
+                y: [4, 3, 2, 3, 4],
+                name: '星形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#4ECDC4',
+                    symbol: 'star'
+                }
+            },
+            {
+                x: markerX,
+                y: [3, 2, 1, 2, 3],
+                name: '方形标记',
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    size: 15,
+                    color: '#FFCC00',
+                    symbol: 'square'
+                }
+            }
+        ];
+
+        var markerLayout = {
+            title: {
+                text: '不同标记点样式展示',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            legend: {
+                orientation: 'h',
+                x: 0.3,
+                y: -0.2
+            }
+        };
+
+        Plotly.newPlot('markerChart', markerData, markerLayout);
+
+        // 文本注释技术
+        var textX = [1, 2, 3];
+        var textData = [
+            {
+                x: textX,
+                y: [3, 4, 5],
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: '#FF6B6B',
+                    width: 3
+                },
+                marker: {
+                    size: 15,
+                    color: '#FF6B6B'
+                }
+            }
+        ];
+
+        var textLayout = {
+            title: {
+                text: '文本注释技术示例',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: 'X轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: 'Y轴',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            annotations: [
+                {
+                    x: 1.9,
+                    y: 3.75,
+                    text: 'y=x+2',
+                    showarrow: false,
+                    font: {
+                        family: 'serif',
+                        size: 16,
+                        color: '#FF6B6B'
+                    },
+                    bgcolor: 'yellow',
+                    bordercolor: '#FF6B6B',
+                    borderwidth: 2
+                }
+            ]
+        };
+
+        Plotly.newPlot('textChart', textData, textLayout);
+
+        // 添加响应式布局调整
+        window.addEventListener('resize', function() {
+            Plotly.Plots.resize('bookChart');
+            Plotly.Plots.resize('exchangeChart');
+            Plotly.Plots.resize('temperatureChart');
+            Plotly.Plots.resize('lineStyleChart');
+            Plotly.Plots.resize('fillChart');
+            Plotly.Plots.resize('snowChart');
+            Plotly.Plots.resize('markerChart');
+            Plotly.Plots.resize('textChart');
+            
+            // 第二章图表响应式调整
+            Plotly.Plots.resize('chapter2LineChart');
+            Plotly.Plots.resize('chapter2BarChart');
+            Plotly.Plots.resize('chapter2HorizontalBarChart');
+            Plotly.Plots.resize('chapter2PieChart');
+            Plotly.Plots.resize('chapter2ScatterChart');
+            Plotly.Plots.resize('chapter2AreaChart');
+            Plotly.Plots.resize('chapter2HistogramChart');
+            Plotly.Plots.resize('chapter2BoxPlotChart');
+            Plotly.Plots.resize('chapter2RadarChart');
+            Plotly.Plots.resize('chapter2ErrorBarChart');
+        });
+
+        // 第二章标签页切换功能
+        function showChapter2Tab(tabId) {
+            // 隐藏所有标签页
+            document.querySelectorAll('#chapter2 .chapter-group').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('#chapter2 .chapter-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(tabId).classList.add('active');
+            
+            // 为当前按钮添加active类
+            event.target.classList.add('active');
+        }
+
+        // 第二章图表数据配置
+        // 折线图 - 销售趋势分析
+        var months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        var salesData = [120, 180, 220, 150, 300, 280, 320, 400, 350, 300, 280, 250];
+        
+        var lineChartData = [{
+            x: months,
+            y: salesData,
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: {
+                color: '#3498db',
+                width: 3
+            },
+            marker: {
+                size: 8,
+                color: '#2980b9'
+            }
+        }];
+
+        var lineChartLayout = {
+            title: {
+                text: '年度销售趋势分析',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '月份',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '销售额(万元)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2LineChart', lineChartData, lineChartLayout);
+
+        // 柱形图 - 产品销量对比
+        var products = ['产品A', '产品B', '产品C', '产品D', '产品E'];
+        var salesVolume = [450, 320, 280, 500, 380];
+        
+        var barChartData = [{
+            x: products,
+            y: salesVolume,
+            type: 'bar',
+            marker: {
+                color: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+                line: {
+                    color: '#000000',
+                    width: 1
+                }
+            }
+        }];
+
+        var barChartLayout = {
+            title: {
+                text: '产品销量对比分析',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '产品名称',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '销量(件)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2BarChart', barChartData, barChartLayout);
+
+        // 条形图 - 市场份额
+        var companies = ['公司A', '公司B', '公司C', '公司D', '公司E'];
+        var marketShare = [35, 25, 20, 12, 8];
+        
+        var horizontalBarChartData = [{
+            x: marketShare,
+            y: companies,
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: 'rgba(52, 152, 219, 0.8)',
+                line: {
+                    color: 'rgba(41, 128, 185, 1)',
+                    width: 1
+                }
+            }
+        }];
+
+        var horizontalBarChartLayout = {
+            title: {
+                text: '各公司市场份额(%)',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '市场份额(%)',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '公司名称'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2HorizontalBarChart', horizontalBarChartData, horizontalBarChartLayout);
+
+        // 饼图 - 产品分布比例
+        var pieLabels = ['电子产品', '服装鞋帽', '食品饮料', '家居用品', '其他'];
+        var pieValues = [40, 25, 15, 12, 8];
+        
+        var pieChartData = [{
+            values: pieValues,
+            labels: pieLabels,
+            type: 'pie',
+            marker: {
+                colors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6']
+            }
+        }];
+
+        var pieChartLayout = {
+            title: {
+                text: '产品类别分布比例',
+                font: {size: 16}
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2PieChart', pieChartData, pieChartLayout);
+
+        // 散点图 - 相关性分析
+        var scatterX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        var scatterY = [2, 4, 5, 4, 5, 7, 8, 9, 10, 11];
+        
+        var scatterChartData = [{
+            x: scatterX,
+            y: scatterY,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 12,
+                color: '#e74c3c'
+            }
+        }];
+
+        var scatterChartLayout = {
+            title: {
+                text: '变量相关性分析散点图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '变量X',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '变量Y',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2ScatterChart', scatterChartData, scatterChartLayout);
+
+        // 面积图 - 趋势填充
+        var areaX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        var areaY = [10, 15, 13, 17, 20, 18, 25, 22, 30, 28];
+        
+        var areaChartData = [{
+            x: areaX,
+            y: areaY,
+            type: 'scatter',
+            mode: 'lines',
+            fill: 'tozeroy',
+            line: {
+                color: 'rgb(231, 76, 60)'
+            },
+            fillcolor: 'rgba(231, 76, 60, 0.3)'
+        }];
+
+        var areaChartLayout = {
+            title: {
+                text: '销售趋势面积图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '时间',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '销售额',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2AreaChart', areaChartData, areaChartLayout);
+
+        // 直方图 - 数据分布
+        var histogramData = [12, 15, 18, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50, 52, 55, 58, 60, 62];
+        
+        var histogramChartData = [{
+            x: histogramData,
+            type: 'histogram',
+            marker: {
+                color: '#3498db',
+                line: {
+                    color: '#2980b9',
+                    width: 1
+                }
+            }
+        }];
+
+        var histogramChartLayout = {
+            title: {
+                text: '数据分布直方图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '数值范围',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '频数',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2HistogramChart', histogramChartData, histogramChartLayout);
+
+        // 箱型图 - 统计分布
+        var boxPlotData = [
+            {
+                y: [12, 15, 18, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50],
+                type: 'box',
+                name: '数据集A',
+                marker: {
+                    color: '#e74c3c'
+                }
+            },
+            {
+                y: [18, 20, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50, 52],
+                type: 'box',
+                name: '数据集B',
+                marker: {
+                    color: '#3498db'
+                }
+            }
+        ];
+
+        var boxPlotLayout = {
+            title: {
+                text: '数据集统计分布箱型图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '数据集',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '数值范围',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2BoxPlotChart', boxPlotData, boxPlotLayout);
+
+        // 雷达图 - 多维比较
+        var radarCategories = ['质量', '价格', '设计', '功能', '服务', '品牌'];
+        var radarData = [
+            {
+                type: 'scatterpolar',
+                r: [90, 85, 75, 80, 95, 70],
+                theta: radarCategories,
+                fill: 'toself',
+                name: '产品A',
+                line: {
+                    color: 'rgb(231, 76, 60)'
+                },
+                fillcolor: 'rgba(231, 76, 60, 0.3)'
+            },
+            {
+                type: 'scatterpolar',
+                r: [70, 90, 85, 75, 80, 95],
+                theta: radarCategories,
+                fill: 'toself',
+                name: '产品B',
+                line: {
+                    color: 'rgb(52, 152, 219)'
+                },
+                fillcolor: 'rgba(52, 152, 219, 0.3)'
+            }
+        ];
+
+        var radarLayout = {
+            title: {
+                text: '产品多维比较雷达图',
+                font: {size: 16}
+            },
+            polar: {
+                radialaxis: {
+                    visible: true,
+                    range: [0, 100]
+                }
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2RadarChart', radarData, radarLayout);
+
+        // 误差棒图 - 数据波动
+        var errorX = ['实验1', '实验2', '实验3', '实验4', '实验5'];
+        var errorY = [50, 55, 60, 65, 70];
+        var error = [5, 4, 3, 6, 4];
+        
+        var errorBarData = [{
+            x: errorX,
+            y: errorY,
+            type: 'scatter',
+            mode: 'markers',
+            error_y: {
+                type: 'data',
+                array: error,
+                visible: true
+            },
+            marker: {
+                size: 10,
+                color: '#2ecc71'
+            }
+        }];
+
+        var errorBarLayout = {
+            title: {
+                text: '实验数据误差棒图',
+                font: {size: 16}
+            },
+            xaxis: {
+                title: '实验编号',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            yaxis: {
+                title: '实验结果',
+                gridcolor: 'rgba(128,128,128,0.2)'
+            },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('chapter2ErrorBarChart', errorBarData, errorBarLayout);
+    </script>
+</body>
+</html>
