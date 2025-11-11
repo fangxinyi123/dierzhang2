@@ -46,74 +46,70 @@
             opacity: 0.9;
         }
         
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            background: #ecf0f1;
-            padding: 15px;
-            border-bottom: 1px solid #bdc3c7;
-        }
-        
-        .nav-tab {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1em;
-        }
-        
-        .nav-tab:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-        
-        .nav-tab.active {
-            background: #1e8449;
-        }
-        
-        .chart-section {
-            display: none;
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 20px;
             padding: 20px;
-        }
-        
-        .chart-section.active {
-            display: block;
         }
         
         .chart-container {
-            padding: 20px;
             background: white;
-            margin: 10px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
             min-height: 500px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
         
         .chart-title {
             text-align: center;
             color: #2c3e50;
-            font-size: 1.5em;
-            margin-bottom: 20px;
+            font-size: 1.3em;
+            margin-bottom: 15px;
             font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
         }
         
         .chart-wrapper {
+            flex: 1;
             width: 100%;
-            max-width: 800px;
-            height: 400px;
+            height: 350px;
+            position: relative;
+        }
+        
+        .chart-description {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .chart-description h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .chart-description p {
+            line-height: 1.5;
+            color: #555;
+            font-size: 0.9em;
         }
         
         .description {
             background: #f8f9fa;
             padding: 20px;
-            margin: 20px;
+            margin: 0 20px 20px 20px;
             border-radius: 10px;
             border-left: 4px solid #27ae60;
         }
@@ -133,14 +129,10 @@
                 font-size: 2em;
             }
             
-            .nav-tabs {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .nav-tab {
-                margin: 5px 0;
-                width: 90%;
+            .chart-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
             }
             
             .chart-wrapper {
@@ -149,19 +141,11 @@
         }
     </style>
 </head>
-<body>
+    <body>
     <div class="container">
         <div class="header">
             <h1>📊 第三章数据可视化平台</h1>
-            <p>基于Chart.js的交互式数据可视化展示</p>
-        </div>
-        
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showChart('sinChart')">正弦余弦曲线</button>
-            <button class="nav-tab" onclick="showChart('movieChart')">电影票房</button>
-            <button class="nav-tab" onclick="showChart('alipayChart')">支付宝账单</button>
-            <button class="nav-tab" onclick="showChart('carChart')">汽车速度</button>
-            <button class="nav-tab" onclick="showChart('englishChart')">英语成绩</button>
+            <p>基于Chart.js的交互式数据可视化展示 - 5个图表平铺显示</p>
         </div>
         
         <div class="description">
@@ -169,71 +153,64 @@
             <p>本章展示了5种基础图表的交互式实现，使用Chart.js库将Matplotlib静态图表转换为Web交互式可视化。每个图表都支持鼠标悬停查看详细数据、缩放和导出功能。</p>
         </div>
         
-        <!-- 正弦余弦曲线 -->
-        <div id="sinChart" class="chart-section active">
+        <!-- 图表网格布局 -->
+        <div class="chart-grid">
+            <!-- 正弦余弦曲线 -->
             <div class="chart-container">
                 <div class="chart-title">📈 正弦余弦函数曲线（区间[-π, π]）</div>
                 <div class="chart-wrapper">
                     <canvas id="sineCosineChart"></canvas>
                 </div>
-                <div class="description">
-                    <h3>🔍 图表说明</h3>
+                <div class="chart-description">
+                    <h4>🔍 图表说明</h4>
                     <p>展示正弦函数(sin(x))和余弦函数(cos(x))在区间[-π, π]内的图像。正弦函数为红色实线，余弦函数为蓝色实线，可以清晰看到两个函数的周期性变化和相位关系。</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- 电影票房排行榜 -->
-        <div id="movieChart" class="chart-section">
+            
+            <!-- 电影票房排行榜 -->
             <div class="chart-container">
                 <div class="chart-title">🎬 2019年内地电影票房前15名</div>
                 <div class="chart-wrapper">
                     <canvas id="movieBoxOfficeChart"></canvas>
                 </div>
-                <div class="description">
-                    <h3>🔍 图表说明</h3>
+                <div class="chart-description">
+                    <h4>🔍 图表说明</h4>
                     <p>展示2019年内地电影票房前15名的横向条形图，数据来源于公开票房统计。票房数据以亿元为单位，可以直观比较各电影的票房表现。</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- 支付宝月账单 -->
-        <div id="alipayChart" class="chart-section">
+            
+            <!-- 支付宝月账单 -->
             <div class="chart-container">
                 <div class="chart-title">💳 支付宝月账单消费比例</div>
                 <div class="chart-wrapper">
                     <canvas id="alipayBillChart"></canvas>
                 </div>
-                <div class="description">
-                    <h3>🔍 图表说明</h3>
+                <div class="chart-description">
+                    <h4>🔍 图表说明</h4>
                     <p>展示支付宝月账单各消费类别的比例关系，使用饼图直观显示各项消费占总消费的百分比。包含购物、餐饮、交通、娱乐等主要消费类别。</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- 汽车速度与制动距离 -->
-        <div id="carChart" class="chart-section">
+            
+            <!-- 汽车速度与制动距离 -->
             <div class="chart-container">
                 <div class="chart-title">🚗 汽车速度与制动距离关系</div>
                 <div class="chart-wrapper">
                     <canvas id="carSpeedChart"></canvas>
                 </div>
-                <div class="description">
-                    <h3>🔍 图表说明</h3>
+                <div class="chart-description">
+                    <h4>🔍 图表说明</h4>
                     <p>展示汽车速度与制动距离之间的相关性分析。横轴为汽车速度(km/h)，纵轴为制动距离(米)，可以观察速度增加对制动距离的影响趋势。</p>
                 </div>
             </div>
-        </div>
-        
-        <!-- 英语成绩对比 -->
-        <div id="englishChart" class="chart-section">
+            
+            <!-- 英语成绩对比 -->
             <div class="chart-container">
                 <div class="chart-title">📚 高二年级各班英语平均成绩对比</div>
                 <div class="chart-wrapper">
                     <canvas id="englishScoreChart"></canvas>
                 </div>
-                <div class="description">
-                    <h3>🔍 图表说明</h3>
+                <div class="chart-description">
+                    <h4>🔍 图表说明</h4>
                     <p>展示高二年级各班英语平均成绩的对比分析，使用分组柱状图显示不同班级的成绩差异。包含6个班级的平均分数据对比。</p>
                 </div>
             </div>
@@ -241,37 +218,23 @@
     </div>
 
     <script>
-        // 图表切换功能
-        function showChart(chartId) {
-            // 隐藏所有图表
-            document.querySelectorAll('.chart-section').forEach(section => {
-                section.classList.remove('active');
-            });
+        // 页面加载完成后初始化所有图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 正弦余弦曲线图表
+            renderSineCosineChart();
             
-            // 移除所有按钮的active类
-            document.querySelectorAll('.nav-tab').forEach(button => {
-                button.classList.remove('active');
-            });
+            // 电影票房图表
+            renderMovieChart();
             
-            // 显示选中的图表
-            document.getElementById(chartId).classList.add('active');
+            // 支付宝账单图表
+            renderAlipayChart();
             
-            // 为当前按钮添加active类
-            event.target.classList.add('active');
+            // 汽车速度图表
+            renderCarChart();
             
-            // 重新渲染图表以确保正确显示
-            if (chartId === 'sinChart') {
-                renderSineCosineChart();
-            } else if (chartId === 'movieChart') {
-                renderMovieChart();
-            } else if (chartId === 'alipayChart') {
-                renderAlipayChart();
-            } else if (chartId === 'carChart') {
-                renderCarChart();
-            } else if (chartId === 'englishChart') {
-                renderEnglishChart();
-            }
-        }
+            // 英语成绩图表
+            renderEnglishChart();
+        });
 
         // 正弦余弦曲线图表
         function renderSineCosineChart() {
@@ -508,11 +471,6 @@
                 }
             });
         }
-
-        // 页面加载完成后初始化第一个图表
-        document.addEventListener('DOMContentLoaded', function() {
-            renderSineCosineChart();
-        });
     </script>
 </body>
 </html>
