@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化平台 - 022340609.xyz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+        
+        .nav-card h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .nav-card p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .nav-card .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-card .btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
+            transform: scale(1.05);
+        }
+        
+        .main-chart-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .main-chart-section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .chart-container {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .chart-container iframe {
+            width: 100%;
+            height: 800px;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>📊 数据可视化综合平台</h1>
+            <p>探索数据分析的无限可能 - 第二章、第三章、第四章内容整合展示</p>
+        </div>
+        
+        <div class="main-chart-section">
+            <h2>🎨 第三章 - 交互式数据可视化</h2>
+            <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">点击下方导航切换不同章节，或直接查看第三章完整大图</p>
+            
+            <div class="chart-container">
+                <iframe src="chapter3-merged.html" title="第三章交互式图表"></iframe>
+            </div>
+        </div>
+        
+        <div class="nav-cards">
+            <div class="nav-card">
+                <h2>📈 第二章</h2>
+                <p>基础图表展示与数据可视化基础</p>
+                <a href="data-visualization-10-charts.html" class="btn">查看第二章</a>
+            </div>
+            
+            <div class="nav-card">
+                <h2>🎨 第三章</h2>
+                <p>交互式图表平台与动态数据展示</p>
+                <a href="chapter3-merged.html" class="btn">查看大图版本</a>
+            </div>
+            
+            <div class="nav-card">
+                <h2>✨ 第四章</h2>
+                <p>图表样式配置与颜色主题选择</p>
+                <a href="chapter4.html" class="btn">查看第四章</a>
+            </div>
+        </div>
+        
+        <div style="text-align: center; color: #95a5a6; font-size: 0.9em; margin-top: 20px;">
+            <p>数据可视化项目 | 域名: 022340609.xyz</p>
+        </div>
+    </div>
+</body>
+</html>
