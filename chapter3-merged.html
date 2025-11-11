@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第三章 - 数据可视化综合平台</title>
+    <!-- 同时加载两个图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+        
+        /* 章节导航 */
+        .chapter-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #27ae60;
+            border-color: #ffffff;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        /* 基础图表样式 */
+        .chart-section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eaeaea;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: bold;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .chart-wrapper {
+            width: 100%;
+            height: 500px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* 交互式图表样式 */
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .controls h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        
+        .control-group {
+            margin: 18px 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .control-label {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 120px;
+        }
+        
+        .control-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .control-input:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.1);
+        }
+        
+        .control-button {
+            padding: 12px 24px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .control-button:hover {
+            background: #219a52;
+            transform: translateY(-1px);
+        }
+        
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eaeaea;
+        }
+        
+        .chart-container .chart-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* 描述区域 */
+        .description {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .description ul {
+            padding-left: 25px;
+            line-height: 1.7;
+        }
+        
+        .description li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        /* 图表间导航 */
+        .chart-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+        
+        .chart-nav-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-nav-btn:hover:not(:disabled) {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .chart-nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .chart-counter {
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #eaeaea;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .data-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .chapter-nav {
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            
+            .chart-section, .chart-container {
+                padding: 20px;
+            }
+            
+            .chart-wrapper {
+                height: 350px;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .chart-nav-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .header p {
+                font-size: 1.1em;
+            }
+            
+            .chart-title {
+                font-size: 1.4em;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 第三章 - 数据可视化综合平台</h1>
+            <p>基础图表展示与高级交互式可视化的完美结合</p>
+            
+            <!-- 章节导航 -->
+            <div class="chapter-nav">
+                <button class="nav-btn active" onclick="showSection('basic')">
+                    📈 基础图表展示
+                </button>
+                <button class="nav-btn" onclick="showSection('interactive')">
+                    🔄 交互式可视化
+                </button>
+            </div>
+        </div>
+        
+        <!-- 基础图表部分 -->
+        <div class="content-section active" id="basic-section">
+            <div class="description">
+                <h3>📋 基础图表核心技术要点</h3>
+                <ul>
+                    <li><strong>Chart.js 库</strong> - 轻量级但功能强大的图表库</li>
+                    <li><strong>5种基础图表类型</strong> - 线图、柱状图、饼图、散点图</li>
+                    <li><strong>静态数据展示</strong> - 清晰的图表布局和设计</li>
+                    <li><strong>响应式设计</strong> - 适配不同屏幕尺寸</li>
+                    <li><strong>鼠标交互</strong> - 悬停显示数据详情</li>
+                </ul>
+            </div>
+            
+            <!-- 基础图表导航 -->
+            <div class="chart-nav">
+                <button class="chart-nav-btn" id="prevBasicBtn" onclick="prevBasicChart()">
+                    ← 上一张图表
+                </button>
+                <div class="chart-counter">
+                    <span id="currentBasicChart">1</span> / <span id="totalBasicCharts">5</span>
+                </div>
+                <button class="chart-nav-btn" id="nextBasicBtn" onclick="nextBasicChart()">
+                    下一张图表 →
+                </button>
+            </div>
+            
+            <!-- 基础图表内容 -->
+            <div class="chart-section" id="basicChart1">
+                <div class="chart-title">📈 正弦余弦函数曲线</div>
+                <div class="chart-wrapper">
+                    <canvas id="sinCosChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section" id="basicChart2">
+                <div class="chart-title">🎬 电影票房排行</div>
+                <div class="chart-wrapper">
+                    <canvas id="movieChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section" id="basicChart3">
+                <div class="chart-title">💳 支付宝月账单</div>
+                <div class="chart-wrapper">
+                    <canvas id="alipayChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section" id="basicChart4">
+                <div class="chart-title">🚗 汽车速度分析</div>
+                <div class="chart-wrapper">
+                    <canvas id="carChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-section" id="basicChart5">
+                <div class="chart-title">📚 英语成绩对比</div>
+                <div class="chart-wrapper">
+                    <canvas id="englishChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 交互式图表部分 -->
+        <div class="content-section" id="interactive-section">
+            <div class="description">
+                <h3>💡 交互式可视化核心技术特点</h3>
+                <ul>
+                    <li><strong>Plotly.js 库</strong> - 专业级交互式图表库</li>
+                    <li><strong>动态数据更新</strong> - 实时数据流可视化</li>
+                    <li><strong>用户交互控件</strong> - 滑块、下拉菜单、按钮交互</li>
+                    <li><strong>实时数据刷新</strong> - 自动更新图表数据</li>
+                    <li><strong>多维度筛选</strong> - 动态数据过滤和筛选</li>
+                    <li><strong>动画效果</strong> - 平滑过渡和动态变化</li>
+                </ul>
+            </div>
+            
+            <!-- 交互式控件区域 -->
+            <div class="controls">
+                <h3>🎛️ 交互控制面板</h3>
+                <div class="control-group">
+                    <span class="control-label">数据点数量:</span>
+                    <input type="range" id="dataPoints" min="10" max="100" value="50" class="control-input">
+                    <span id="pointsValue">50</span>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">图表类型:</span>
+                    <select id="chartType" class="control-input">
+                        <option value="line">折线图</option>
+                        <option value="bar">柱状图</option>
+                        <option value="scatter">散点图</option>
+                        <option value="area">面积图</option>
+                    </select>
+                    <button class="control-button" onclick="updateCharts()">更新图表</button>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">动画速度:</span>
+                    <input type="range" id="animationSpeed" min="1" max="10" value="5" class="control-input">
+                    <span id="speedValue">5</span>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">数据范围:</span>
+                    <input type="range" id="dataRange" min="1" max="100" value="50" class="control-input">
+                    <span id="rangeValue">50</span>
+                </div>
+            </div>
+            
+            <!-- 交互式图表区域 -->
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📊 动态折线图 - 实时数据流</div>
+                    <div id="dynamicLineChart" style="height: 350px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🎯 交互式散点图 - 数据筛选</div>
+                    <div id="interactiveScatter" style="height: 350px;"></div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📈 实时柱状图 - 动态更新</div>
+                    <div id="liveBarChart" style="height: 350px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🌐 多图表联动</div>
+                    <div id="linkedCharts" style="height: 350px;"></div>
+                </div>
+            </div>
+            
+            <div class="description">
+                <h3>🔄 使用说明</h3>
+                <ul>
+                    <li><strong>数据点数量</strong>：调整图表中显示的数据点数量</li>
+                    <li><strong>图表类型</strong>：选择不同的图表类型进行展示</li>
+                    <li><strong>动画速度</strong>：控制图表更新的动画速度</li>
+                    <li><strong>数据范围</strong>：调整数据的数值范围</li>
+                    <li><strong>实时交互</strong>：所有控件都会实时影响图表显示</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 页面导航功能 ==========
+        function showSection(section) {
+            // 隐藏所有内容区域
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 移除所有导航按钮的激活状态
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的内容区域
+            document.getElementById(section + '-section').classList.add('active');
+            
+            // 设置导航按钮激活状态
+            event.target.classList.add('active');
+            
+            // 重置图表显示
+            if (section === 'basic') {
+                resetBasicCharts();
+            } else {
+                updateCharts();
+            }
+        }
+        
+        // ========== 基础图表导航功能 ==========
+        let currentBasicChartIndex = 0;
+        const basicCharts = document.querySelectorAll('#basic-section .chart-section');
+        const totalBasicCharts = basicCharts.length;
+        
+        function updateBasicNavigation() {
+            // 更新按钮状态
+            document.getElementById('prevBasicBtn').disabled = currentBasicChartIndex === 0;
+            document.getElementById('nextBasicBtn').disabled = currentBasicChartIndex === totalBasicCharts - 1;
+            
+            // 更新计数器
+            document.getElementById('currentBasicChart').textContent = currentBasicChartIndex + 1;
+            document.getElementById('totalBasicCharts').textContent = totalBasicCharts;
+            
+            // 显示/隐藏图表
+            basicCharts.forEach((chart, index) => {
+                chart.style.display = index === currentBasicChartIndex ? 'block' : 'none';
+            });
+        }
+        
+        function nextBasicChart() {
+            if (currentBasicChartIndex < totalBasicCharts - 1) {
+                currentBasicChartIndex++;
+                updateBasicNavigation();
+            }
+        }
+        
+        function prevBasicChart() {
+            if (currentBasicChartIndex > 0) {
+                currentBasicChartIndex--;
+                updateBasicNavigation();
+            }
+        }
+        
+        function resetBasicCharts() {
+            currentBasicChartIndex = 0;
+            updateBasicNavigation();
+        }
+        
+        // ========== 基础图表初始化 ==========
+        function initBasicCharts() {
+            // 正弦余弦函数曲线
+            const sinCosCtx = document.getElementById('sinCosChart').getContext('2d');
+            new Chart(sinCosCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
+                    datasets: [
+                        {
+                            label: 'sin(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'cos(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'x值（弧度）', font: {size: 16, weight: 'bold'} }
+                        },
+                        y: {
+                            title: { display: true, text: '函数值', font: {size: 16, weight: 'bold'} },
+                            suggestedMin: -1.5,
+                            suggestedMax: 1.5
+                        }
+                    }
+                }
+            });
+            
+            // 电影票房排行
+            const movieCtx = document.getElementById('movieChart').getContext('2d');
+            new Chart(movieCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长'],
+                    datasets: [{
+                        label: '票房（亿元）',
+                        data: [50.03, 46.86, 42.5, 31.7, 29.12],
+                        backgroundColor: '#27ae60',
+                        borderColor: '#2c3e50',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 支付宝月账单
+            const alipayCtx = document.getElementById('alipayChart').getContext('2d');
+            new Chart(alipayCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 8],
+                        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            
+            // 汽车速度分析
+            const carCtx = document.getElementById('carChart').getContext('2d');
+            new Chart(carCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '速度与制动距离',
+                        data: [
+                            {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
+                            {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}
+                        ],
+                        backgroundColor: '#e67e22',
+                        borderColor: '#d35400',
+                        borderWidth: 2,
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 英语成绩对比
+            const englishCtx = document.getElementById('englishChart').getContext('2d');
+            new Chart(englishCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1班', '2班', '3班', '4班', '5班'],
+                    datasets: [
+                        {
+                            label: '上学期',
+                            data: [85, 78, 92, 88, 76],
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        },
+                        {
+                            label: '下学期',
+                            data: [88, 82, 95, 91, 80],
+                            backgroundColor: '#e74c3c',
+                            borderColor: '#c0392b',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+        
+        // ========== 交互式图表功能 ==========
+        let chartData = {
+            points: 50,
+            type: 'line',
+            speed: 5,
+            range: 50
+        };
+        
+        // 初始化控件事件
+        document.getElementById('dataPoints').addEventListener('input', function() {
+            document.getElementById('pointsValue').textContent = this.value;
+            chartData.points = parseInt(this.value);
+            updateCharts();
+        });
+        
+        document.getElementById('animationSpeed').addEventListener('input', function() {
+            document.getElementById('speedValue').textContent = this.value;
+            chartData.speed = parseInt(this.value);
+            updateCharts();
+        });
+        
+        document.getElementById('dataRange').addEventListener('input', function() {
+            document.getElementById('rangeValue').textContent = this.value;
+            chartData.range = parseInt(this.value);
+            updateCharts();
+        });
+        
+        // 更新图表函数
+        function updateCharts() {
+            chartData.type = document.getElementById('chartType').value;
+            updateDynamicLineChart();
+            updateInteractiveScatter();
+            updateLiveBarChart();
+            updateLinkedCharts();
+        }
+        
+        // 各个图表更新函数
+        function updateDynamicLineChart() {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < chartData.points; i++) {
+                x.push(i);
+                y.push(Math.sin(i * chartData.range / 50) * 20 + Math.random() * 5);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                type: chartData.type,
+                mode: chartData.type === 'scatter' ? 'markers' : 'lines+markers',
+                line: { color: '#27ae60', width: 3 }
+            }];
+            
+            const layout = { title: `动态${getChartTypeName(chartData.type)} - 实时数据流` };
+            Plotly.newPlot('dynamicLineChart', data, layout);
+        }
+        
+        function updateInteractiveScatter() {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < chartData.points; i++) {
+                x.push(Math.random() * chartData.range);
+                y.push(Math.random() * chartData.range);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { size: 10, color: '#3498db', opacity: 0.7 }
+            }];
+            
+            Plotly.newPlot('interactiveScatter', data);
+        }
+        
+        function updateLiveBarChart() {
+            const categories = ['项目A', '项目B', '项目C', '项目D', '项目E'];
+            const values = categories.map(() => Math.random() * chartData.range);
+            
+            const data = [{
+                x: categories,
+                y: values,
+                type: 'bar',
+                marker: { color: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'] }
+            }];
+            
+            Plotly.newPlot('liveBarChart', data);
+        }
+        
+        function updateLinkedCharts() {
+            const x = Array.from({length: chartData.points}, (_, i) => i);
+            const y1 = x.map(i => Math.sin(i * 0.1) * chartData.range / 2 + chartData.range / 2);
+            const y2 = x.map(i => Math.cos(i * 0.1) * chartData.range / 2 + chartData.range / 2);
+            
+            const data = [
+                { x: x, y: y1, type: 'scatter', mode: 'lines', name: '数据集1', line: { color: '#e74c3c', width: 3 } },
+                { x: x, y: y2, type: 'scatter', mode: 'lines', name: '数据集2', line: { color: '#3498db', width: 3, dash: 'dash' } }
+            ];
+            
+            Plotly.newPlot('linkedCharts', data);
+        }
+        
+        function getChartTypeName(type) {
+            const names = {
+                'line': '折线图', 'bar': '柱状图', 'scatter': '散点图', 'area': '面积图'
+            };
+            return names[type] || '图表';
+        }
+        
+        // ========== 页面加载初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化基础图表
+            initBasicCharts();
+            updateBasicNavigation();
+            
+            // 初始化交互式图表
+            updateCharts();
+            
+            // 键盘导航支持
+            document.addEventListener('keydown', function(event) {
+                if (document.getElementById('basic-section').classList.contains('active')) {
+                    if (event.key === 'ArrowLeft') {
+                        prevBasicChart();
+                    } else if (event.key === 'ArrowRight') {
+                        nextBasicChart();
+                    }
+                }
+            });
+            
+            // 响应式调整
+            window.addEventListener('resize', function() {
+                Plotly.Plots.resize('dynamicLineChart');
+                Plotly.Plots.resize('interactiveScatter');
+                Plotly.Plots.resize('liveBarChart');
+                Plotly.Plots.resize('linkedCharts');
+            });
+        });
+        
+        // 自动更新功能（可选）
+        let autoUpdateInterval;
+        
+        function startAutoUpdate() {
+            if (autoUpdateInterval) clearInterval(autoUpdateInterval);
+            autoUpdateInterval = setInterval(() => {
+                updateCharts();
+            }, 2000 / chartData.speed);
+        }
+        
+        function stopAutoUpdate() {
+            if (autoUpdateInterval) {
+                clearInterval(autoUpdateInterval);
+                autoUpdateInterval = null;
+            }
+        }
+        
+        // 默认启动自动更新
+        startAutoUpdate();
+    </script>
+</body>
+</html>
