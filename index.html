@@ -1308,7 +1308,7 @@
 
         Plotly.newPlot('lineStyleChart', lineStyleData, lineStyleLayout);
 
-        // 正弦余弦函数填充图
+        // 正弦余弦函数填充图 - 真正的面积填充效果
         var xSin = [];
         var sinY = [];
         var cosY = [];
@@ -1328,7 +1328,9 @@
                 line: {
                     color: '#FF6B6B',
                     width: 2
-                }
+                },
+                fill: 'tozeroy',
+                fillcolor: 'rgba(255, 107, 107, 0.3)'
             },
             {
                 x: xSin,
@@ -1339,13 +1341,15 @@
                 line: {
                     color: '#4ECDC4',
                     width: 2
-                }
+                },
+                fill: 'tonexty',
+                fillcolor: 'rgba(78, 205, 196, 0.3)'
             }
         ];
 
         var fillLayout = {
             title: {
-                text: '正弦余弦函数填充图',
+                text: '正弦余弦函数填充图 - 面积填充效果',
                 font: {size: 16}
             },
             xaxis: {
@@ -1367,48 +1371,53 @@
 
         Plotly.newPlot('fillChart', fillData, fillLayout);
 
-        // 彩色雪花填充图
+        // 彩色雪花填充图 - 真正的面积填充效果
+        var snowAngles = [];
+        var snowRadii = [];
+        for (var i = 0; i <= 360; i += 10) {
+            snowAngles.push(i * Math.PI / 180);
+            // 雪花形状的极坐标公式
+            snowRadii.push(5 + 2 * Math.sin(6 * snowAngles[snowAngles.length - 1]));
+        }
+
+        // 转换为笛卡尔坐标
         var snowX = [];
         var snowY = [];
-        var snowColors = [];
-        
-        // 生成雪花图案数据
-        for (var i = 0; i < 200; i++) {
-            var angle = Math.random() * 2 * Math.PI;
-            var radius = Math.random() * 10;
-            snowX.push(radius * Math.cos(angle));
-            snowY.push(radius * Math.sin(angle));
-            snowColors.push(Math.random() > 0.5 ? '#FF6B6B' : '#4ECDC4');
+        for (var i = 0; i < snowAngles.length; i++) {
+            snowX.push(snowRadii[i] * Math.cos(snowAngles[i]));
+            snowY.push(snowRadii[i] * Math.sin(snowAngles[i]));
         }
 
         var snowData = [
             {
                 x: snowX,
                 y: snowY,
-                mode: 'markers',
                 type: 'scatter',
-                marker: {
-                    size: 8,
-                    color: snowColors,
-                    symbol: 'star'
-                }
+                mode: 'lines',
+                line: {
+                    color: '#4ECDC4',
+                    width: 2
+                },
+                fill: 'toself',
+                fillcolor: 'rgba(78, 205, 196, 0.5)',
+                name: '雪花形状'
             }
         ];
 
         var snowLayout = {
             title: {
-                text: '彩色雪花图案',
+                text: '彩色雪花填充图 - 面积填充效果',
                 font: {size: 16}
             },
             xaxis: {
                 title: 'X轴',
                 gridcolor: 'rgba(128,128,128,0.2)',
-                range: [-12, 12]
+                range: [-8, 8]
             },
             yaxis: {
                 title: 'Y轴',
                 gridcolor: 'rgba(128,128,128,0.2)',
-                range: [-12, 12]
+                range: [-8, 8]
             },
             plot_bgcolor: 'rgba(0,0,0,0)',
             paper_bgcolor: 'rgba(0,0,0,0)'
