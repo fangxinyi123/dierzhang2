@@ -343,27 +343,162 @@
         
         <!-- 第三章内容 -->
         <div id="chapter3" class="chart-section">
-            <div class="chapter2-intro" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
-                <h2>📊 第三章 - 交互式图表可视化</h2>
-                <p>基于Chart.js的交互式数据可视化展示</p>
+            <div class="header" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
+                <h1>📊 第三章 - 数据可视化综合平台</h1>
+                <p>基础图表展示与高级交互式可视化的完美结合</p>
+                
+                <!-- 章节导航 -->
+                <div class="chapter-nav">
+                    <button class="nav-btn active" onclick="showChapter3Section('basic')">
+                        📈 基础图表展示
+                    </button>
+                    <button class="nav-btn" onclick="showChapter3Section('interactive')">
+                        🔄 交互式可视化
+                    </button>
+                </div>
             </div>
             
-            <div class="description">
-                <h3>📋 第三章核心技术要点</h3>
-                <ul>
-                    <li><strong>正弦余弦函数曲线</strong> - 展示数学函数在区间[-π, π]内的图像</li>
-                    <li><strong>电影票房排行</strong> - 2019年内地电影票房前15名横向比较</li>
-                    <li><strong>支付宝月账单</strong> - 各消费类别比例关系的饼图展示</li>
-                    <li><strong>汽车速度分析</strong> - 速度与制动距离的相关性分析</li>
-                    <li><strong>英语成绩对比</strong> - 高二年级各班英语成绩的分组柱状图</li>
-                    <li><strong>交互式功能</strong> - 支持鼠标悬停、缩放、数据查看等交互功能</li>
-                </ul>
+            <!-- 基础图表部分 -->
+            <div class="chapter3-content-section active" id="chapter3-basic-section">
+                <div class="description">
+                    <h3>📋 基础图表核心技术要点</h3>
+                    <ul>
+                        <li><strong>Chart.js 库</strong> - 轻量级但功能强大的图表库</li>
+                        <li><strong>5种基础图表类型</strong> - 线图、柱状图、饼图、散点图</li>
+                        <li><strong>静态数据展示</strong> - 清晰的图表布局和设计</li>
+                        <li><strong>响应式设计</strong> - 适配不同屏幕尺寸</li>
+                        <li><strong>鼠标交互</strong> - 悬停显示数据详情</li>
+                    </ul>
+                </div>
+                
+                <!-- 基础图表导航 -->
+                <div class="chart-nav">
+                    <button class="chart-nav-btn" id="chapter3-prevBasicBtn" onclick="chapter3PrevBasicChart()">
+                        ← 上一张图表
+                    </button>
+                    <div class="chart-counter">
+                        <span id="chapter3-currentBasicChart">1</span> / <span id="chapter3-totalBasicCharts">5</span>
+                    </div>
+                    <button class="chart-nav-btn" id="chapter3-nextBasicBtn" onclick="chapter3NextBasicChart()">
+                        下一张图表 →
+                    </button>
+                </div>
+                
+                <!-- 基础图表内容 -->
+                <div class="chapter3-chart-section" id="chapter3-basicChart1">
+                    <div class="chart-title">📈 正弦余弦函数曲线</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chapter3-sinCosChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chapter3-chart-section" id="chapter3-basicChart2">
+                    <div class="chart-title">🎬 电影票房排行</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chapter3-movieChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chapter3-chart-section" id="chapter3-basicChart3">
+                    <div class="chart-title">💳 支付宝月账单</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chapter3-alipayChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chapter3-chart-section" id="chapter3-basicChart4">
+                    <div class="chart-title">🚗 汽车速度分析</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chapter3-carChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chapter3-chart-section" id="chapter3-basicChart5">
+                    <div class="chart-title">📚 英语成绩对比</div>
+                    <div class="chart-wrapper">
+                        <canvas id="chapter3-englishChart"></canvas>
+                    </div>
+                </div>
             </div>
             
-            <div class="single-chart">
-                <div class="chart-container">
-                    <div class="chart-title">第三章完整交互式图表平台</div>
-                    <iframe src="chapter3-merged.html" style="width: 100%; height: 800px; border: none; border-radius: 10px;"></iframe>
+            <!-- 交互式图表部分 -->
+            <div class="chapter3-content-section" id="chapter3-interactive-section">
+                <div class="description">
+                    <h3>💡 交互式可视化核心技术特点</h3>
+                    <ul>
+                        <li><strong>Plotly.js 库</strong> - 专业级交互式图表库</li>
+                        <li><strong>动态数据更新</strong> - 实时数据流可视化</li>
+                        <li><strong>用户交互控件</strong> - 滑块、下拉菜单、按钮交互</li>
+                        <li><strong>实时数据刷新</strong> - 自动更新图表数据</li>
+                        <li><strong>多维度筛选</strong> - 动态数据过滤和筛选</li>
+                        <li><strong>动画效果</strong> - 平滑过渡和动态变化</li>
+                    </ul>
+                </div>
+                
+                <!-- 交互式控件区域 -->
+                <div class="controls">
+                    <h3>🎛️ 交互控制面板</h3>
+                    <div class="control-group">
+                        <span class="control-label">数据点数量:</span>
+                        <input type="range" id="chapter3-dataPoints" min="10" max="100" value="50" class="control-input">
+                        <span id="chapter3-pointsValue">50</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">图表类型:</span>
+                        <select id="chapter3-chartType" class="control-input">
+                            <option value="line">折线图</option>
+                            <option value="bar">柱状图</option>
+                            <option value="scatter">散点图</option>
+                            <option value="area">面积图</option>
+                        </select>
+                        <button class="control-button" onclick="chapter3UpdateCharts()">更新图表</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">动画速度:</span>
+                        <input type="range" id="chapter3-animationSpeed" min="1" max="10" value="5" class="control-input">
+                        <span id="chapter3-speedValue">5</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">数据范围:</span>
+                        <input type="range" id="chapter3-dataRange" min="1" max="100" value="50" class="control-input">
+                        <span id="chapter3-rangeValue">50</span>
+                    </div>
+                </div>
+                
+                <!-- 交互式图表区域 -->
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📊 动态折线图 - 实时数据流</div>
+                        <div id="chapter3-dynamicLineChart" style="height: 350px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">🎯 交互式散点图 - 数据筛选</div>
+                        <div id="chapter3-interactiveScatter" style="height: 350px;"></div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="chart-container">
+                        <div class="chart-title">📈 实时柱状图 - 动态更新</div>
+                        <div id="chapter3-liveBarChart" style="height: 350px;"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">🌐 多图表联动</div>
+                        <div id="chapter3-linkedCharts" style="height: 350px;"></div>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    <h3>🔄 使用说明</h3>
+                    <ul>
+                        <li><strong>数据点数量</strong>：调整图表中显示的数据点数量</li>
+                        <li><strong>图表类型</strong>：选择不同的图表类型进行展示</li>
+                        <li><strong>动画速度</strong>：控制图表更新的动画速度</li>
+                        <li><strong>数据范围</strong>：调整数据的数值范围</li>
+                        <li><strong>实时交互</strong>：所有控件都会实时影响图表显示</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -531,6 +666,11 @@
             
             // 为当前按钮添加active类
             event.target.classList.add('active');
+            
+            // 如果是第三章，初始化第三章内容
+            if (sectionId === 'chapter3') {
+                initializeChapter3();
+            }
         }
 
         // 第四章内部标签页切换
@@ -1132,6 +1272,12 @@
             Plotly.Plots.resize('chapter2BoxPlotChart');
             Plotly.Plots.resize('chapter2RadarChart');
             Plotly.Plots.resize('chapter2ErrorBarChart');
+            
+            // 第三章图表响应式调整
+            Plotly.Plots.resize('chapter3-dynamicLineChart');
+            Plotly.Plots.resize('chapter3-interactiveScatter');
+            Plotly.Plots.resize('chapter3-liveBarChart');
+            Plotly.Plots.resize('chapter3-linkedCharts');
         });
 
         // 第二章标签页切换功能
@@ -1513,6 +1659,321 @@
         };
 
         Plotly.newPlot('chapter2ErrorBarChart', errorBarData, errorBarLayout);
+        
+        // ========== 第三章功能 ==========
+        
+        // 第三章数据
+        let chapter3Data = {
+            points: 50,
+            type: 'line',
+            speed: 5,
+            range: 50
+        };
+        
+        // 第三章内部导航功能
+        function showChapter3Section(section) {
+            // 隐藏所有内容区域
+            document.querySelectorAll('.chapter3-content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 移除所有导航按钮的激活状态
+            document.querySelectorAll('#chapter3 .nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的内容区域
+            document.getElementById('chapter3-' + section + '-section').classList.add('active');
+            
+            // 设置导航按钮激活状态
+            event.target.classList.add('active');
+            
+            // 初始化内容
+            if (section === 'basic') {
+                chapter3ResetBasicCharts();
+            } else {
+                chapter3UpdateCharts();
+            }
+        }
+        
+        // 第三章基础图表导航功能
+        let chapter3CurrentBasicChartIndex = 0;
+        
+        function chapter3UpdateBasicNavigation() {
+            const basicCharts = document.querySelectorAll('#chapter3-basic-section .chapter3-chart-section');
+            const totalBasicCharts = basicCharts.length;
+            
+            // 更新按钮状态
+            document.getElementById('chapter3-prevBasicBtn').disabled = chapter3CurrentBasicChartIndex === 0;
+            document.getElementById('chapter3-nextBasicBtn').disabled = chapter3CurrentBasicChartIndex === totalBasicCharts - 1;
+            
+            // 更新计数器
+            document.getElementById('chapter3-currentBasicChart').textContent = chapter3CurrentBasicChartIndex + 1;
+            document.getElementById('chapter3-totalBasicCharts').textContent = totalBasicCharts;
+            
+            // 显示/隐藏图表
+            basicCharts.forEach((chart, index) => {
+                chart.style.display = index === chapter3CurrentBasicChartIndex ? 'block' : 'none';
+            });
+        }
+        
+        function chapter3NextBasicChart() {
+            const basicCharts = document.querySelectorAll('#chapter3-basic-section .chapter3-chart-section');
+            if (chapter3CurrentBasicChartIndex < basicCharts.length - 1) {
+                chapter3CurrentBasicChartIndex++;
+                chapter3UpdateBasicNavigation();
+            }
+        }
+        
+        function chapter3PrevBasicChart() {
+            if (chapter3CurrentBasicChartIndex > 0) {
+                chapter3CurrentBasicChartIndex--;
+                chapter3UpdateBasicNavigation();
+            }
+        }
+        
+        function chapter3ResetBasicCharts() {
+            chapter3CurrentBasicChartIndex = 0;
+            chapter3UpdateBasicNavigation();
+        }
+        
+        // 第三章基础图表初始化
+        function chapter3InitBasicCharts() {
+            // 正弦余弦函数曲线
+            const sinCosCtx = document.getElementById('chapter3-sinCosChart').getContext('2d');
+            new Chart(sinCosCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
+                    datasets: [
+                        {
+                            label: 'sin(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'cos(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 电影票房排行
+            const movieCtx = document.getElementById('chapter3-movieChart').getContext('2d');
+            new Chart(movieCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长'],
+                    datasets: [{
+                        label: '票房（亿元）',
+                        data: [50.03, 46.86, 42.5, 31.7, 29.12],
+                        backgroundColor: '#27ae60',
+                        borderColor: '#2c3e50',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 支付宝月账单
+            const alipayCtx = document.getElementById('chapter3-alipayChart').getContext('2d');
+            new Chart(alipayCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 8],
+                        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            
+            // 汽车速度分析
+            const carCtx = document.getElementById('chapter3-carChart').getContext('2d');
+            new Chart(carCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '速度与制动距离',
+                        data: [
+                            {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
+                            {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}
+                        ],
+                        backgroundColor: '#e67e22',
+                        borderColor: '#d35400',
+                        borderWidth: 2,
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 英语成绩对比
+            const englishCtx = document.getElementById('chapter3-englishChart').getContext('2d');
+            new Chart(englishCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1班', '2班', '3班', '4班', '5班'],
+                    datasets: [
+                        {
+                            label: '上学期',
+                            data: [85, 78, 92, 88, 76],
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        },
+                        {
+                            label: '下学期',
+                            data: [88, 82, 95, 91, 80],
+                            backgroundColor: '#e74c3c',
+                            borderColor: '#c0392b',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+        
+        // 第三章交互式图表功能
+        function chapter3UpdateCharts() {
+            chapter3Data.type = document.getElementById('chapter3-chartType').value;
+            chapter3UpdateDynamicLineChart();
+            chapter3UpdateInteractiveScatter();
+            chapter3UpdateLiveBarChart();
+            chapter3UpdateLinkedCharts();
+        }
+        
+        function chapter3UpdateDynamicLineChart() {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < chapter3Data.points; i++) {
+                x.push(i);
+                y.push(Math.sin(i * chapter3Data.range / 50) * 20 + Math.random() * 5);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                type: chapter3Data.type,
+                mode: chapter3Data.type === 'scatter' ? 'markers' : 'lines+markers',
+                line: { color: '#27ae60', width: 3 }
+            }];
+            
+            Plotly.newPlot('chapter3-dynamicLineChart', data);
+        }
+        
+        function chapter3UpdateInteractiveScatter() {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < chapter3Data.points; i++) {
+                x.push(Math.random() * chapter3Data.range);
+                y.push(Math.random() * chapter3Data.range);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { size: 10, color: '#3498db', opacity: 0.7 }
+            }];
+            
+            Plotly.newPlot('chapter3-interactiveScatter', data);
+        }
+        
+        function chapter3UpdateLiveBarChart() {
+            const categories = ['项目A', '项目B', '项目C', '项目D', '项目E'];
+            const values = categories.map(() => Math.random() * chapter3Data.range);
+            
+            const data = [{
+                x: categories,
+                y: values,
+                type: 'bar',
+                marker: { color: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'] }
+            }];
+            
+            Plotly.newPlot('chapter3-liveBarChart', data);
+        }
+        
+        function chapter3UpdateLinkedCharts() {
+            const x = Array.from({length: chapter3Data.points}, (_, i) => i);
+            const y1 = x.map(i => Math.sin(i * 0.1) * chapter3Data.range / 2 + chapter3Data.range / 2);
+            const y2 = x.map(i => Math.cos(i * 0.1) * chapter3Data.range / 2 + chapter3Data.range / 2);
+            
+            const data = [
+                { x: x, y: y1, type: 'scatter', mode: 'lines', name: '数据集1', line: { color: '#e74c3c', width: 3 } },
+                { x: x, y: y2, type: 'scatter', mode: 'lines', name: '数据集2', line: { color: '#3498db', width: 3, dash: 'dash' } }
+            ];
+            
+            Plotly.newPlot('chapter3-linkedCharts', data);
+        }
+        
+        // 第三章初始化函数
+        function initializeChapter3() {
+            // 初始化控件事件
+            document.getElementById('chapter3-dataPoints').addEventListener('input', function() {
+                document.getElementById('chapter3-pointsValue').textContent = this.value;
+                chapter3Data.points = parseInt(this.value);
+                chapter3UpdateCharts();
+            });
+            
+            document.getElementById('chapter3-animationSpeed').addEventListener('input', function() {
+                document.getElementById('chapter3-speedValue').textContent = this.value;
+                chapter3Data.speed = parseInt(this.value);
+            });
+            
+            document.getElementById('chapter3-dataRange').addEventListener('input', function() {
+                document.getElementById('chapter3-rangeValue').textContent = this.value;
+                chapter3Data.range = parseInt(this.value);
+                chapter3UpdateCharts();
+            });
+            
+            // 初始化基础图表
+            chapter3InitBasicCharts();
+            chapter3ResetBasicCharts();
+            
+            // 初始化交互式图表
+            chapter3UpdateCharts();
+        }
+        
+        // 页面加载时初始化第三章
+        if (document.getElementById('chapter3')) {
+            initializeChapter3();
+        }
+        
     </script>
 </body>
 </html>
