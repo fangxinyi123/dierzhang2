@@ -16,17 +16,18 @@
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             min-height: 100vh;
-            padding: 0;
+            padding: 20px;
+            margin: 0;
         }
         
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            width: 100%;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin: 20px;
+            margin: 0 auto;
+            max-width: 1400px;
         }
         
         .header {
@@ -47,123 +48,74 @@
             opacity: 0.9;
         }
         
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .nav-btn {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-        }
-        
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-        }
-        
-        .nav-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .chart-indicator {
-            text-align: center;
-            font-size: 1.3em;
-            color: #2c3e50;
-            font-weight: bold;
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
         }
         
         .chart-container {
-            padding: 40px;
+            padding: 20px;
             background: white;
-            margin: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            min-height: 700px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            overflow: hidden;
         }
         
         .chart-title {
             text-align: center;
             color: #2c3e50;
-            font-size: 2em;
-            margin-bottom: 30px;
+            font-size: 1.5em;
+            margin-bottom: 20px;
             font-weight: bold;
-            padding: 0 20px;
-        }
-        
-        .chart-description {
-            background: #f8f9fa;
-            padding: 25px;
-            margin: 25px 0;
-            border-radius: 12px;
-            border-left: 5px solid #27ae60;
-            width: 100%;
-            max-width: 900px;
-        }
-        
-        .chart-description h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-        
-        .chart-description p {
-            line-height: 1.7;
-            color: #555;
-            font-size: 1.1em;
         }
         
         .chart-content {
             width: 100%;
-            height: 600px;
-            margin: 25px 0;
+            height: 400px;
+            flex: 1;
+        }
+        
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .description p {
+            line-height: 1.6;
+            color: #555;
+            font-size: 1.1em;
         }
         
         @media (max-width: 768px) {
-            .container {
-                margin: 10px;
+            .data-section {
+                grid-template-columns: 1fr;
             }
             
             .header h1 {
                 font-size: 2em;
             }
             
-            .navigation {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
-            
             .chart-container {
-                padding: 25px;
-                margin: 10px;
-                min-height: 600px;
+                padding: 15px;
+                min-height: 450px;
             }
             
             .chart-content {
-                height: 450px;
-            }
-            
-            .chart-title {
-                font-size: 1.6em;
-                margin-bottom: 20px;
+                height: 350px;
             }
         }
     </style>
@@ -172,343 +124,304 @@
     <div class="container">
         <div class="header">
             <h1>📊 第三章 - 基础图表交互式平台</h1>
-            <p>5种基础图表类型的平铺展示与切换浏览</p>
+            <p>5种基础图表类型的平铺展示与交互式浏览</p>
         </div>
         
-        <div class="navigation">
-            <button class="nav-btn" id="prevBtn" onclick="prevChart()">← 上一张图表</button>
-            <div class="chart-indicator" id="chartIndicator">图表 1/5 - 正弦余弦函数</div>
-            <button class="nav-btn" id="nextBtn" onclick="nextChart()">下一张图表 →</button>
+        <div class="description">
+            <h3>📋 第三章核心技术要点</h3>
+            <p>第三章展示了基于Chart.js的5种基础交互式图表，包括正弦余弦函数曲线、电影票房排行、支付宝月账单、汽车速度分析和英语成绩对比等实用案例。每个图表都支持鼠标悬停、缩放、数据查看等交互功能。</p>
         </div>
         
-        <div class="chart-container">
-            <div class="chart-title" id="currentChartTitle">正弦余弦函数曲线（区间[-π, π]）</div>
-            
-            <div class="chart-description">
-                <h3>📋 图表说明</h3>
-                <p id="chartDescription">展示正弦函数(sin(x))和余弦函数(cos(x))在区间[-π, π]内的图像。正弦函数为红色实线，余弦函数为蓝色实线，可以清晰看到两个函数的周期性变化和相位关系。</p>
+        <div class="data-section">
+            <div class="chart-container">
+                <div class="chart-title">📈 正弦余弦函数曲线</div>
+                <div class="chart-content">
+                    <canvas id="sinCosChart"></canvas>
+                </div>
             </div>
             
-            <div class="chart-content">
-                <canvas id="currentChart"></canvas>
+            <div class="chart-container">
+                <div class="chart-title">🎬 电影票房排行</div>
+                <div class="chart-content">
+                    <canvas id="movieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="chart-container">
+                <div class="chart-title">💳 支付宝月账单</div>
+                <div class="chart-content">
+                    <canvas id="alipayChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">🚗 汽车速度分析</div>
+                <div class="chart-content">
+                    <canvas id="carChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="chart-container">
+                <div class="chart-title">📚 英语成绩对比</div>
+                <div class="chart-content">
+                    <canvas id="englishChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 图表数据定义
-        const charts = [
-            {
-                title: "正弦余弦函数曲线（区间[-π, π]）",
-                description: "展示正弦函数(sin(x))和余弦函数(cos(x))在区间[-π, π]内的图像。正弦函数为红色实线，余弦函数为蓝色实线，可以清晰看到两个函数的周期性变化和相位关系。",
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
-                    datasets: [
-                        {
-                            label: 'sin(x)',
-                            data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
-                            borderColor: '#e74c3c',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'cos(x)',
-                            data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'x值（弧度）',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '函数值',
-                                font: {size: 14, weight: 'bold'}
-                            },
-                            suggestedMin: -1.5,
-                            suggestedMax: 1.5
+        // 正弦余弦函数曲线
+        const sinCosCtx = document.getElementById('sinCosChart').getContext('2d');
+        const sinCosChart = new Chart(sinCosCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
+                datasets: [
+                    {
+                        label: 'sin(x)',
+                        data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'cos(x)',
+                        data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'x值（弧度）',
+                            font: {size: 14, weight: 'bold'}
                         }
                     },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {size: 14}
-                            }
+                    y: {
+                        title: {
+                            display: true,
+                            text: '函数值',
+                            font: {size: 14, weight: 'bold'}
+                        },
+                        suggestedMin: -1.5,
+                        suggestedMax: 1.5
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {size: 14}
                         }
                     }
                 }
+            }
+        });
+
+        // 电影票房排行
+        const movieCtx = document.getElementById('movieChart').getContext('2d');
+        const movieChart = new Chart(movieCtx, {
+            type: 'bar',
+            data: {
+                labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长', '疯狂的外星人', '飞驰人生', '烈火英雄', '少年的你', '速度与激情：特别行动'],
+                datasets: [{
+                    label: '票房（亿元）',
+                    data: [50.03, 46.86, 42.5, 31.7, 29.12, 22.13, 17.28, 17.07, 15.58, 14.34],
+                    backgroundColor: '#27ae60',
+                    borderColor: '#2c3e50',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
             },
-            {
-                title: "2019年内地电影票房前15名",
-                description: "展示2019年内地电影票房前15名的横向条形图，数据来源于公开票房统计。票房数据以亿元为单位，可以直观比较各电影的票房表现。",
-                type: 'bar',
-                data: {
-                    labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长', '疯狂的外星人', '飞驰人生', '烈火英雄', '少年的你', '速度与激情：特别行动', '蜘蛛侠：英雄远征', '扫毒2', '大黄蜂', '比悲伤更悲伤的故事', '攀登者'],
-                    datasets: [{
-                        label: '票房（亿元）',
-                        data: [50.03, 46.86, 42.5, 31.7, 29.12, 22.13, 17.28, 17.07, 15.58, 14.34, 14.18, 13.12, 11.48, 9.56, 10.98],
-                        backgroundColor: '#27ae60',
-                        borderColor: '#2c3e50',
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '票房（亿元）',
+                            font: {size: 14, weight: 'bold'}
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '电影名称',
+                            font: {size: 14, weight: 'bold'}
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {size: 14}
+                        }
+                    }
+                }
+            }
+        });
+
+        // 支付宝月账单
+        const alipayCtx = document.getElementById('alipayChart').getContext('2d');
+        const alipayChart = new Chart(alipayCtx, {
+            type: 'pie',
+            data: {
+                labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费', '其他'],
+                datasets: [{
+                    data: [35, 25, 15, 10, 8, 7],
+                    backgroundColor: [
+                        '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#34495e'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: {size: 14}
+                        }
+                    }
+                }
+            }
+        });
+
+        // 汽车速度分析
+        const carCtx = document.getElementById('carChart').getContext('2d');
+        const carChart = new Chart(carCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: '速度与制动距离',
+                    data: [
+                        {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
+                        {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}, {x: 90, y: 125}
+                    ],
+                    backgroundColor: '#e67e22',
+                    borderColor: '#d35400',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 12
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '速度 (km/h)',
+                            font: {size: 14, weight: 'bold'}
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '制动距离 (米)',
+                            font: {size: 14, weight: 'bold'}
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {size: 14}
+                        }
+                    }
+                }
+            }
+        });
+
+        // 英语成绩对比
+        const englishCtx = document.getElementById('englishChart').getContext('2d');
+        const englishChart = new Chart(englishCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1班', '2班', '3班', '4班', '5班', '6班'],
+                datasets: [
+                    {
+                        label: '上学期',
+                        data: [85, 78, 92, 88, 76, 90],
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
                         borderWidth: 2,
                         borderRadius: 5
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '票房（亿元）',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '电影名称',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        }
                     },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {size: 14}
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                title: "支付宝月账单消费比例",
-                description: "展示支付宝月账单各消费类别的比例关系，使用饼图直观显示各项消费占总消费的百分比。包含购物、餐饮、交通、娱乐等主要消费类别。",
-                type: 'pie',
-                data: {
-                    labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费', '其他'],
-                    datasets: [{
-                        data: [35, 25, 15, 10, 8, 7],
-                        backgroundColor: [
-                            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#34495e'
-                        ],
-                        borderWidth: 3,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                font: {size: 14}
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                title: "汽车速度与制动距离关系",
-                description: "展示汽车速度与制动距离之间的相关性分析。横轴为汽车速度(km/h)，纵轴为制动距离(米)，可以观察速度增加对制动距离的影响趋势。",
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: '速度与制动距离',
-                        data: [
-                            {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
-                            {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}, {x: 90, y: 125}
-                        ],
-                        backgroundColor: '#e67e22',
-                        borderColor: '#d35400',
+                    {
+                        label: '下学期',
+                        data: [88, 82, 95, 91, 80, 93],
+                        backgroundColor: '#e74c3c',
+                        borderColor: '#c0392b',
                         borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 12
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '速度 (km/h)',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '制动距离 (米)',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {size: 14}
-                            }
-                        }
+                        borderRadius: 5
                     }
-                }
+                ]
             },
-            {
-                title: "高二年级各班英语平均成绩对比",
-                description: "展示高二年级各班英语平均成绩的对比分析，使用分组柱状图显示不同班级的成绩差异。包含6个班级的平均分数据对比。",
-                type: 'bar',
-                data: {
-                    labels: ['1班', '2班', '3班', '4班', '5班', '6班'],
-                    datasets: [
-                        {
-                            label: '上学期',
-                            data: [85, 78, 92, 88, 76, 90],
-                            backgroundColor: '#3498db',
-                            borderColor: '#2980b9',
-                            borderWidth: 2,
-                            borderRadius: 5
-                        },
-                        {
-                            label: '下学期',
-                            data: [88, 82, 95, 91, 80, 93],
-                            backgroundColor: '#e74c3c',
-                            borderColor: '#c0392b',
-                            borderWidth: 2,
-                            borderRadius: 5
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '班级',
-                                font: {size: 14, weight: 'bold'}
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '平均分数',
-                                font: {size: 14, weight: 'bold'}
-                            },
-                            suggestedMin: 70,
-                            suggestedMax: 100
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '班级',
+                            font: {size: 14, weight: 'bold'}
                         }
                     },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {size: 14}
-                            }
+                    y: {
+                        title: {
+                            display: true,
+                            text: '平均分数',
+                            font: {size: 14, weight: 'bold'}
+                        },
+                        suggestedMin: 70,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {size: 14}
                         }
                     }
                 }
-            }
-        ];
-        
-        let currentChartIndex = 0;
-        let currentChartInstance = null;
-        
-        // 初始化显示第一个图表
-        function initChart() {
-            displayChart(currentChartIndex);
-            updateNavigation();
-        }
-        
-        // 显示指定索引的图表
-        function displayChart(index) {
-            const chart = charts[index];
-            document.getElementById('currentChartTitle').textContent = chart.title;
-            document.getElementById('chartDescription').textContent = chart.description;
-            document.getElementById('chartIndicator').textContent = `图表 ${index + 1}/${charts.length} - ${chart.title.split(' - ')[0] || chart.title}`;
-            
-            // 销毁现有图表实例
-            if (currentChartInstance) {
-                currentChartInstance.destroy();
-            }
-            
-            // 创建新图表实例
-            const ctx = document.getElementById('currentChart').getContext('2d');
-            currentChartInstance = new Chart(ctx, {
-                type: chart.type,
-                data: chart.data,
-                options: chart.options
-            });
-        }
-        
-        // 上一张图表
-        function prevChart() {
-            if (currentChartIndex > 0) {
-                currentChartIndex--;
-                displayChart(currentChartIndex);
-                updateNavigation();
-            }
-        }
-        
-        // 下一张图表
-        function nextChart() {
-            if (currentChartIndex < charts.length - 1) {
-                currentChartIndex++;
-                displayChart(currentChartIndex);
-                updateNavigation();
-            }
-        }
-        
-        // 更新导航按钮状态
-        function updateNavigation() {
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            prevBtn.disabled = currentChartIndex === 0;
-            nextBtn.disabled = currentChartIndex === charts.length - 1;
-        }
-        
-        // 键盘导航支持
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'ArrowLeft') {
-                prevChart();
-            } else if (event.key === 'ArrowRight') {
-                nextChart();
             }
         });
-        
+
         // 响应式调整
         window.addEventListener('resize', function() {
-            if (currentChartInstance) {
-                currentChartInstance.resize();
-            }
+            sinCosChart.resize();
+            movieChart.resize();
+            alipayChart.resize();
+            carChart.resize();
+            englishChart.resize();
         });
-        
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', initChart);
     </script>
 </body>
 </html>
