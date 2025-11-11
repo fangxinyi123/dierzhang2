@@ -16,106 +16,94 @@
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
             margin: 0;
         }
         
         .container {
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin: 0 auto;
-            max-width: 1400px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
         
         .header {
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             color: white;
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
+            margin-bottom: 0;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 3em;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .header p {
-            font-size: 1.2em;
+            font-size: 1.4em;
             opacity: 0.9;
         }
         
-        .data-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
+        .description {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            margin: 0;
+            border-bottom: 3px solid #27ae60;
         }
         
-        .chart-container {
-            padding: 20px;
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .description p {
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.2em;
+        }
+        
+        .chart-section {
+            padding: 40px 20px;
             background: white;
-            margin: 10px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            margin: 0;
         }
         
         .chart-title {
             text-align: center;
             color: #2c3e50;
-            font-size: 1.5em;
-            margin-bottom: 20px;
+            font-size: 2.2em;
+            margin-bottom: 30px;
             font-weight: bold;
-        }
-        
-        .chart-content {
-            width: 100%;
-            height: 400px;
-            flex: 1;
-        }
-        
-        .description {
-            background: #f8f9fa;
             padding: 20px;
-            margin: 20px;
+            background: #f8f9fa;
             border-radius: 10px;
-            border-left: 4px solid #27ae60;
+            margin: 20px 0;
         }
         
-        .description h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .description p {
-            line-height: 1.6;
-            color: #555;
-            font-size: 1.1em;
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            margin: 30px 0;
+            padding: 0;
+            background: white;
         }
         
         @media (max-width: 768px) {
-            .data-section {
-                grid-template-columns: 1fr;
-            }
-            
             .header h1 {
-                font-size: 2em;
+                font-size: 2.2em;
             }
             
             .chart-container {
-                padding: 15px;
-                min-height: 450px;
+                height: 450px;
+                margin: 20px 0;
             }
             
-            .chart-content {
-                height: 350px;
+            .chart-title {
+                font-size: 1.8em;
+                margin: 15px 0;
             }
         }
     </style>
@@ -132,44 +120,38 @@
             <p>第三章展示了基于Chart.js的5种基础交互式图表，包括正弦余弦函数曲线、电影票房排行、支付宝月账单、汽车速度分析和英语成绩对比等实用案例。每个图表都支持鼠标悬停、缩放、数据查看等交互功能。</p>
         </div>
         
-        <div class="data-section">
+        <div class="chart-section">
+            <div class="chart-title">📈 正弦余弦函数曲线</div>
             <div class="chart-container">
-                <div class="chart-title">📈 正弦余弦函数曲线</div>
-                <div class="chart-content">
-                    <canvas id="sinCosChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <div class="chart-title">🎬 电影票房排行</div>
-                <div class="chart-content">
-                    <canvas id="movieChart"></canvas>
-                </div>
+                <canvas id="sinCosChart"></canvas>
             </div>
         </div>
         
-        <div class="data-section">
+        <div class="chart-section">
+            <div class="chart-title">🎬 电影票房排行</div>
             <div class="chart-container">
-                <div class="chart-title">💳 支付宝月账单</div>
-                <div class="chart-content">
-                    <canvas id="alipayChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <div class="chart-title">🚗 汽车速度分析</div>
-                <div class="chart-content">
-                    <canvas id="carChart"></canvas>
-                </div>
+                <canvas id="movieChart"></canvas>
             </div>
         </div>
         
-        <div class="data-section">
+        <div class="chart-section">
+            <div class="chart-title">💳 支付宝月账单</div>
             <div class="chart-container">
-                <div class="chart-title">📚 英语成绩对比</div>
-                <div class="chart-content">
-                    <canvas id="englishChart"></canvas>
-                </div>
+                <canvas id="alipayChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">🚗 汽车速度分析</div>
+            <div class="chart-container">
+                <canvas id="carChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">📚 英语成绩对比</div>
+            <div class="chart-container">
+                <canvas id="englishChart"></canvas>
             </div>
         </div>
     </div>
