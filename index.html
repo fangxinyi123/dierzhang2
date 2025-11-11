@@ -228,11 +228,12 @@
     <div class="container">
         <div class="header">
             <h1>📊 数据可视化综合平台</h1>
-            <p>第二章：基础图表与第四章：图表样式和颜色配置的完美结合</p>
+            <p>第二章：基础图表 + 第三章：交互图表 + 第四章：图表样式的完整集成</p>
         </div>
         
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="showSection('chapter2')">第二章：基础图表</button>
+            <button class="nav-tab" onclick="showSection('chapter3')">第三章：交互图表</button>
             <button class="nav-tab" onclick="showSection('chapter4')">第四章：图表样式</button>
             <button class="nav-tab" onclick="showSection('combined')">整合视图</button>
         </div>
@@ -336,6 +337,33 @@
                         <div class="chart-title">📏 误差棒图 - 数据波动</div>
                         <div id="chapter2ErrorBarChart" style="height: 400px;"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第三章内容 -->
+        <div id="chapter3" class="chart-section">
+            <div class="chapter2-intro" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
+                <h2>📊 第三章 - 交互式图表可视化</h2>
+                <p>基于Chart.js的交互式数据可视化展示</p>
+            </div>
+            
+            <div class="description">
+                <h3>📋 第三章核心技术要点</h3>
+                <ul>
+                    <li><strong>正弦余弦函数曲线</strong> - 展示数学函数在区间[-π, π]内的图像</li>
+                    <li><strong>电影票房排行</strong> - 2019年内地电影票房前15名横向比较</li>
+                    <li><strong>支付宝月账单</strong> - 各消费类别比例关系的饼图展示</li>
+                    <li><strong>汽车速度分析</strong> - 速度与制动距离的相关性分析</li>
+                    <li><strong>英语成绩对比</strong> - 高二年级各班英语成绩的分组柱状图</li>
+                    <li><strong>交互式功能</strong> - 支持鼠标悬停、缩放、数据查看等交互功能</li>
+                </ul>
+            </div>
+            
+            <div class="single-chart">
+                <div class="chart-container">
+                    <div class="chart-title">第三章完整交互式图表平台</div>
+                    <iframe src="chapter3.html" style="width: 100%; height: 600px; border: none; border-radius: 10px;"></iframe>
                 </div>
             </div>
         </div>
@@ -449,8 +477,8 @@
         <!-- 整合视图 -->
         <div id="combined" class="chart-section">
             <div class="chapter2-intro" style="background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);">
-                <h2>🌐 整合视图 - 第二章与第四章对比展示</h2>
-                <p>同时查看基础图表和高级样式配置的完美结合</p>
+                <h2>🌐 整合视图 - 第二、三、四章完整展示</h2>
+                <p>综合展示基础图表、交互图表和样式配置的完整数据可视化平台</p>
             </div>
             
             <div class="data-section">
@@ -459,6 +487,13 @@
                     <iframe src="data-visualization-10-charts.html" style="width: 100%; height: 400px; border: none;"></iframe>
                 </div>
                 
+                <div class="chart-container">
+                    <div class="chart-title">📈 第三章交互图表</div>
+                    <iframe src="chapter3.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                </div>
+            </div>
+            
+            <div class="data-section">
                 <div class="chart-container">
                     <div class="chart-title">🎨 第四章样式图表</div>
                     <iframe src="chapter4.html" style="width: 100%; height: 400px; border: none;"></iframe>
@@ -469,9 +504,10 @@
                 <h3>🔄 整合说明</h3>
                 <ul>
                     <li><strong>第二章</strong>：提供了基础的图表类型和数据分析方法</li>
+                    <li><strong>第三章</strong>：展示了交互式图表功能和实际应用场景</li>
                     <li><strong>第四章</strong>：展示了图表样式、颜色配置和高级视觉效果</li>
-                    <li><strong>整合优势</strong>：结合了基础的图表功能和高级的视觉效果</li>
-                    <li><strong>应用场景</strong>：适用于数据分析、业务报告、学术研究等多种场景</li>
+                    <li><strong>整合优势</strong>：全面覆盖数据可视化的基础知识、交互功能和视觉设计</li>
+                    <li><strong>应用场景</strong>：适用于数据分析、业务报告、学术研究、教学演示等多种场景</li>
                 </ul>
             </div>
         </div>
