@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第7章 数据可视化平台</title>
+    <title>第7章 - 3D可视化技术</title>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         * {
@@ -47,72 +47,48 @@
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
             gap: 30px;
             margin-bottom: 30px;
         }
 
         .chart-container {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .chart-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
         .chart-title {
             color: #2c3e50;
             font-size: 1.4em;
-            margin-bottom: 15px;
-            text-align: center;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
         .chart-description {
             color: #7f8c8d;
             margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.9em;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .plot-area {
             width: 100%;
-            height: 400px;
+            height: 450px;
             border: 1px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #fafafa;
         }
 
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 400px;
-            font-size: 1.1em;
-            color: #666;
-        }
-
         .controls {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
+            margin-top: 30px;
         }
 
         .btn {
@@ -120,20 +96,32 @@
             color: white;
             border: none;
             padding: 12px 25px;
+            margin: 0 10px;
             border-radius: 25px;
-            font-size: 1em;
             cursor: pointer;
-            margin: 5px;
+            font-size: 16px;
+            font-weight: bold;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn:active {
             transform: translateY(0);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            padding: 20px;
+            background: #ffeaea;
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            margin: 10px 0;
         }
 
         @media (max-width: 768px) {
@@ -144,26 +132,30 @@
             h1 {
                 font-size: 2em;
             }
+            
+            .plot-area {
+                height: 350px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>第7章 数据可视化平台</h1>
-            <p class="subtitle">基于matplotlib的3D图表、动画和统计地图实现</p>
+            <h1>🌐 第7章 数据可视化平台</h1>
+            <p class="subtitle">3D可视化技术 - 立体数据展示与分析</p>
         </header>
 
         <div class="charts-grid">
             <div class="chart-container">
-                <h2 class="chart-title">实例1：三维空间的星星</h2>
-                <p class="chart-description">使用3D散点图在三维空间中绘制不同颜色的星星，根据z值大小着色</p>
+                <h2 class="chart-title">实例1：3D散点图</h2>
+                <p class="chart-description">展示三维空间中的数据点分布，支持旋转和缩放交互</p>
                 <div id="chart1" class="plot-area"></div>
             </div>
 
             <div class="chart-container">
-                <h2 class="chart-title">实例2：三维空间闪烁的星星</h2>
-                <p class="chart-description">动画效果展示星星在三维空间中闪烁，颜色在白色和紫色间变化</p>
+                <h2 class="chart-title">实例2：3D表面图</h2>
+                <p class="chart-description">展示三维函数表面，用于可视化连续数据分布</p>
                 <div id="chart2" class="plot-area"></div>
             </div>
 
@@ -175,9 +167,9 @@
         </div>
 
         <div class="controls">
-            <button class="btn" onclick="refreshAllCharts()">刷新所有图表</button>
-            <button class="btn" onclick="toggleAnimation()">切换动画</button>
-            <button class="btn" onclick="resetView()">重置视图</button>
+            <button class="btn" onclick="refreshAllCharts()">🔄 刷新所有图表</button>
+            <button class="btn" onclick="toggleAnimation()">🎬 切换动画</button>
+            <button class="btn" onclick="resetView()">🔍 重置视图</button>
         </div>
     </div>
 
@@ -194,9 +186,9 @@
                 if (typeof Plotly !== 'undefined' && Plotly.newPlot) {
                     callback();
                 } else if (attempts < maxAttempts) {
-                    setTimeout(check, 500);
+                    setTimeout(check, 200);
                 } else {
-                    showError('chart1', 'Plotly加载失败，请刷新页面重试');
+                    console.error('Plotly加载超时');
                 }
             }
             check();
@@ -204,106 +196,58 @@
 
         // 显示错误信息
         function showError(chartId, message) {
-            const container = document.getElementById(chartId);
-            container.innerHTML = `<div class="error-message">${message}</div>`;
+            const chartElement = document.getElementById(chartId);
+            if (chartElement) {
+                chartElement.innerHTML = `<div class="error-message">❌ ${message}</div>`;
+            }
         }
 
-        // 实例1：3D散点图星星
+        // 实例1：3D散点图
         function createChart1() {
             try {
-                // 生成随机数据（模拟教材中的数据）
-                const n = 30;
-                const x = Array.from({length: n}, () => Math.floor(Math.random() * 40));
-                const y = Array.from({length: n}, () => Math.floor(Math.random() * 40));
-                const z = Array.from({length: n}, () => Math.floor(Math.random() * 40));
+                // 生成3D散点数据
+                const nPoints = 100;
+                const x = [];
+                const y = [];
+                const z = [];
+                const colors = [];
                 
-                // 根据z值确定颜色
-                const colors = z.map(z_val => {
-                    if (z_val <= 10) return '#FFD700';  // 黄色
-                    else if (z_val < 20) return '#C71585';  // 紫红色
-                    else return '#008B8B';  // 深青色
-                });
-
-                const traces = [];
-                
-                // 为每个点创建一个真正的五角星
-                for (let i = 0; i < n; i++) {
-                    const cx = x[i], cy = y[i], cz = z[i];
-                    const color = colors[i];
-                    const size = 1.8; // 星星的大小
-                    
-                    // 五角星的十个顶点（包括外顶点和内顶点）
-                    let starPointsX = [], starPointsY = [], starPointsZ = [];
-                    
-                    for (let j = 0; j < 10; j++) {
-                        let angle, radius;
-                        if (j % 2 === 0) {
-                            // 外顶点
-                            angle = (j * 36 - 90) * Math.PI / 180;
-                            radius = size;
-                        } else {
-                            // 内顶点
-                            angle = (j * 36 - 90) * Math.PI / 180;
-                            radius = size * 0.4;
-                        }
-                        
-                        // 创建面对观察者的五角星：主要在XZ平面展开，Y轴保持中心
-                        starPointsX.push(cx + radius * Math.cos(angle)); // X轴展开
-                        starPointsY.push(cy); // Y轴保持中心位置，星星垂直立着
-                        starPointsZ.push(cz + radius * Math.sin(angle)); // Z轴展开，形成垂直平面
-                    }
-                    
-                    // 闭合五角星
-                    starPointsX.push(starPointsX[0]);
-                    starPointsY.push(starPointsY[0]);
-                    starPointsZ.push(starPointsZ[0]);
-                    
-                    const trace = {
-                        x: starPointsX,
-                        y: starPointsY,
-                        z: starPointsZ,
-                        mode: 'lines',
-                        type: 'scatter3d',
-                        line: {
-                            color: color,
-                            width: 4
-                        },
-                        hoverinfo: 'none',
-                        showlegend: false
-                    };
-                    
-                    traces.push(trace);
+                for (let i = 0; i < nPoints; i++) {
+                    x.push(Math.random() * 10);
+                    y.push(Math.random() * 10);
+                    z.push(Math.random() * 10 + 2);
+                    colors.push(Math.random());
                 }
 
-                // 添加中心点用于悬停信息
-                const centerTrace = {
+                const trace = {
                     x: x,
                     y: y,
                     z: z,
                     mode: 'markers',
-                    type: 'scatter3d',
                     marker: {
-                        size: 3,
+                        size: 8,
                         color: colors,
-                        symbol: 'circle',
-                        opacity: 0
+                        colorscale: 'Viridis',
+                        opacity: 0.8,
+                        colorbar: {
+                            title: '数值',
+                            titleside: 'right'
+                        }
                     },
-                    text: z.map((z_val, i) => `星${i+1}<br>x: ${x[i]}<br>y: ${y[i]}<br>z: ${z_val}`),
-                    hovertemplate: '%{text}<extra></extra>',
-                    showlegend: false
+                    type: 'scatter3d',
+                    text: '数据点',
+                    hovertemplate: 'X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<extra></extra>'
                 };
-                
-                traces.push(centerTrace);
 
                 const layout = {
                     title: {
-                        text: '3D散点图 - 星星分布',
+                        text: '3D散点图示例',
                         font: {size: 16}
                     },
                     scene: {
-                        xaxis: {title: 'x轴', range: [0, 40]},
-                        yaxis: {title: 'y轴', range: [0, 40]},
-                        zaxis: {title: 'z轴', range: [0, 40]},
+                        xaxis: {title: 'X轴'},
+                        yaxis: {title: 'Y轴'},
+                        zaxis: {title: 'Z轴'},
                         camera: {
                             eye: {x: 1.5, y: 1.5, z: 1.5}
                         }
@@ -316,135 +260,76 @@
                 const config = {
                     responsive: true,
                     displayModeBar: true,
-                    displaylogo: false,
-                    modeBarButtonsToRemove: ['pan3d', 'select3d', 'lasso3d']
+                    displaylogo: false
                 };
 
-                Plotly.newPlot('chart1', traces, layout, config);
+                Plotly.newPlot('chart1', [trace], layout, config);
             } catch (error) {
                 console.error('创建图表1失败:', error);
                 showError('chart1', '创建图表失败：' + error.message);
             }
         }
 
-        // 实例2：闪烁的3D星星
+        // 实例2：3D表面图
         function createChart2() {
             try {
-                // 使用教材中的固定坐标
-                const xx = [13, 5, 25, 13, 9, 19, 3, 39, 13, 27];
-                const yy = [4, 38, 16, 26, 7, 19, 28, 10, 17, 18];
-                const zz = [7, 19, 6, 12, 25, 19, 23, 25, 10, 15];
+                // 生成3D表面数据
+                const size = 30;
+                const x = [];
+                const y = [];
+                const z = [];
 
-                let frame = 0;
-                
-                function updateChart() {
-                    const color = frame % 2 === 0 ? '#C71585' : '#FFFFFF';
-                    
-                    const traces = [];
-                    
-                    // 为每个点创建一个真正的五角星
-                    for (let i = 0; i < xx.length; i++) {
-                        const cx = xx[i], cy = yy[i], cz = zz[i];
-                        const size = 2.5; // 星星的大小
-                        
-                        // 五角星的十个顶点（包括外顶点和内顶点）
-                        let starPointsX = [], starPointsY = [], starPointsZ = [];
-                        
-                        for (let j = 0; j < 10; j++) {
-                            let angle, radius;
-                            if (j % 2 === 0) {
-                                // 外顶点
-                                angle = (j * 36 - 90) * Math.PI / 180;
-                                radius = size;
-                            } else {
-                                // 内顶点
-                                angle = (j * 36 - 90) * Math.PI / 180;
-                                radius = size * 0.4;
-                            }
-                            
-                            // 创建面对观察者的五角星：主要在XZ平面展开，Y轴保持中心
-                            starPointsX.push(cx + radius * Math.cos(angle)); // X轴展开
-                            starPointsY.push(cy); // Y轴保持中心位置，星星垂直立着
-                            starPointsZ.push(cz + radius * Math.sin(angle)); // Z轴展开，形成垂直平面
-                        }
-                        
-                        // 闭合五角星
-                        starPointsX.push(starPointsX[0]);
-                        starPointsY.push(starPointsY[0]);
-                        starPointsZ.push(starPointsZ[0]);
-                        
-                        const trace = {
-                            x: starPointsX,
-                            y: starPointsY,
-                            z: starPointsZ,
-                            mode: 'lines',
-                            type: 'scatter3d',
-                            line: {
-                                color: color,
-                                width: 5
-                            },
-                            hoverinfo: 'none',
-                            showlegend: false
-                        };
-                        
-                        traces.push(trace);
+                for (let i = 0; i < size; i++) {
+                    x[i] = [];
+                    y[i] = [];
+                    z[i] = [];
+                    for (let j = 0; j < size; j++) {
+                        const xVal = (i - size/2) / 4;
+                        const yVal = (j - size/2) / 4;
+                        x[i][j] = xVal;
+                        y[i][j] = yVal;
+                        z[i][j] = Math.sin(Math.sqrt(xVal*xVal + yVal*yVal));
                     }
-
-                    // 添加中心点用于悬停信息
-                    const centerTrace = {
-                        x: xx,
-                        y: yy,
-                        z: zz,
-                        mode: 'markers',
-                        type: 'scatter3d',
-                        marker: {
-                            size: 3,
-                            color: color,
-                            symbol: 'circle',
-                            opacity: 0
-                        },
-                        text: xx.map((x_val, i) => `闪烁星${i+1}<br>x: ${x_val}<br>y: ${yy[i]}<br>z: ${zz[i]}`),
-                        hovertemplate: '%{text}<extra></extra>',
-                        showlegend: false
-                    };
-                    
-                    traces.push(centerTrace);
-
-                    const layout = {
-                        title: {
-                            text: '3D散点图 - 闪烁的星星',
-                            font: {size: 16}
-                        },
-                        scene: {
-                            xaxis: {title: 'x轴', range: [0, 40]},
-                            yaxis: {title: 'y轴', range: [0, 40]},
-                            zaxis: {title: 'z轴', range: [0, 40]},
-                            camera: {
-                                eye: {x: 1.5, y: 1.5, z: 1.5}
-                            }
-                        },
-                        margin: {l: 0, r: 0, t: 40, b: 0},
-                        paper_bgcolor: 'rgba(0,0,0,0)',
-                        plot_bgcolor: 'rgba(0,0,0,0)'
-                    };
-
-                    const config = {
-                        responsive: true,
-                        displayModeBar: false
-                    };
-
-                    Plotly.react('chart2', traces, layout, config);
-                    frame++;
                 }
 
-                // 初始化
-                updateChart();
-                
-                // 设置动画
-                if (isAnimating) {
-                    animationFrame = setInterval(updateChart, 1000);
-                }
+                const trace = {
+                    x: x[0],
+                    y: x.map(row => row[0]),
+                    z: z,
+                    type: 'surface',
+                    colorscale: 'Jet',
+                    showscale: true,
+                    colorbar: {
+                        title: 'Z值',
+                        titleside: 'right'
+                    }
+                };
 
+                const layout = {
+                    title: {
+                        text: '3D表面图示例',
+                        font: {size: 16}
+                    },
+                    scene: {
+                        xaxis: {title: 'X轴'},
+                        yaxis: {title: 'Y轴'},
+                        zaxis: {title: 'Z轴'},
+                        camera: {
+                            eye: {x: 1.5, y: 1.5, z: 1.5}
+                        }
+                    },
+                    margin: {l: 0, r: 0, t: 40, b: 0},
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)'
+                };
+
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false
+                };
+
+                Plotly.newPlot('chart2', [trace], layout, config);
             } catch (error) {
                 console.error('创建图表2失败:', error);
                 showError('chart2', '创建图表失败：' + error.message);
@@ -550,50 +435,65 @@
 
         // 切换动画
         function toggleAnimation() {
-            isAnimating = !isAnimating;
             if (isAnimating) {
-                createChart2();
-            } else {
                 if (animationFrame) {
                     clearInterval(animationFrame);
                     animationFrame = null;
                 }
+                isAnimating = false;
+            } else {
+                isAnimating = true;
+                let angle = 0;
+                
+                animationFrame = setInterval(() => {
+                    angle += 2;
+                    const camera = {
+                        eye: {
+                            x: 1.5 * Math.cos(angle * Math.PI / 180),
+                            y: 1.5 * Math.sin(angle * Math.PI / 180),
+                            z: 1.5
+                        }
+                    };
+                    
+                    Plotly.relayout('chart1', {'scene.camera': camera});
+                    Plotly.relayout('chart2', {'scene.camera': camera});
+                }, 100);
             }
         }
 
         // 重置视图
         function resetView() {
-            const charts = ['chart1', 'chart2', 'chart3'];
-            charts.forEach(chartId => {
-                try {
-                    const div = document.getElementById(chartId);
-                    if (div && div.data) {
-                        Plotly.relayout(chartId, {
-                            'scene.camera': {eye: {x: 1.5, y: 1.5, z: 1.5}},
-                            'geo.projection.rotation': {lon: 0, lat: 0}
-                        });
-                    }
-                } catch (error) {
-                    console.warn('重置视图失败:', chartId, error);
-                }
-            });
+            const defaultCamera = {
+                eye: {x: 1.5, y: 1.5, z: 1.5}
+            };
+            
+            Plotly.relayout('chart1', {'scene.camera': defaultCamera});
+            Plotly.relayout('chart2', {'scene.camera': defaultCamera});
+            Plotly.relayout('chart3', {});
         }
 
-        // 页面加载完成后初始化
+        // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
-            waitForPlotly(function() {
+            // 确保Plotly已加载
+            if (typeof Plotly === 'undefined') {
+                setTimeout(() => {
+                    initializeCharts();
+                }, 1000);
+            } else {
+                initializeCharts();
+            }
+        });
+
+        function initializeCharts() {
+            try {
                 createChart1();
                 createChart2();
                 createChart3();
-            });
-        });
-
-        // 页面卸载时清理
-        window.addEventListener('beforeunload', function() {
-            if (animationFrame) {
-                clearInterval(animationFrame);
+                console.log('所有图表初始化完成');
+            } catch (error) {
+                console.error('图表初始化失败:', error);
             }
-        });
+        }
     </script>
 </body>
 </html>
