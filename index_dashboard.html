@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化综合平台 - 章节导航中心</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 章节网格布局 */
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* 章节卡片样式 */
+        .chapter-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        .chapter-card:nth-child(1) { animation-delay: 0.1s; }
+        .chapter-card:nth-child(2) { animation-delay: 0.2s; }
+        .chapter-card:nth-child(3) { animation-delay: 0.3s; }
+        .chapter-card:nth-child(4) { animation-delay: 0.4s; }
+        .chapter-card:nth-child(5) { animation-delay: 0.5s; }
+        .chapter-card:nth-child(6) { animation-delay: 0.6s; }
+        .chapter-card:nth-child(7) { animation-delay: 0.7s; }
+
+        /* 章节头部 */
+        .chapter-header {
+            padding: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chapter-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+            z-index: 1;
+        }
+
+        .chapter-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chapter-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chapter-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 章节内容 */
+        .chapter-content {
+            padding: 25px;
+        }
+
+        .chapter-description {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .feature-item {
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .feature-item::before {
+            content: '✓';
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* 章节标签 */
+        .chapter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 2px solid #3498db;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        /* 第2章 - 红色主题 */
+        .chapter-2 .chapter-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        /* 第3章 - 绿色主题 */
+        .chapter-3 .chapter-header {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        /* 第4章 - 橙色主题 */
+        .chapter-4 .chapter-header {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+
+        /* 第5章 - 蓝紫色主题 */
+        .chapter-5 .chapter-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        /* 第6章 - 深蓝色主题 */
+        .chapter-6 .chapter-header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+        }
+
+        /* 第7章 - 紫色主题 */
+        .chapter-7 .chapter-header {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        /* 第8章 - 黄色主题 */
+        .chapter-8 .chapter-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 50px;
+            padding: 30px;
+            animation: fadeIn 2s ease;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* 动画 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .chapters-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats {
+                gap: 20px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* 悬浮效果增强 */
+        .chapter-card {
+            position: relative;
+        }
+
+        .chapter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .chapter-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="main-title">📊 数据可视化综合平台</h1>
+            <p class="subtitle">Chapter 2-8 完整学习资源导航</p>
+            <p class="description">
+                从基础图表到高级可视化技术的完整学习路径，涵盖Chart.js、Plotly等专业工具，
+                帮助你掌握数据可视化的核心技能和最佳实践。
+            </p>
+        </header>
+
+        <!-- 统计信息 -->
+        <section class="stats">
+            <div class="stat-item">
+                <div class="stat-number">7</div>
+                <div class="stat-label">完整章节</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">实用案例</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">20+</div>
+                <div class="stat-label">图表类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">可交互</div>
+            </div>
+        </section>
+
+        <!-- 章节网格 -->
+        <main class="chapters-grid">
+            <!-- 第2章 -->
+            <article class="chapter-card chapter-2" onclick="openChapter('chapter2.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 2 章</div>
+                    <h2 class="chapter-title">基础图表数据可视化</h2>
+                    <p class="chapter-subtitle">10种基础图表类型完整展示</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        掌握数据可视化的基础知识，学习折线图、柱形图、饼图等10种常用图表的创建和应用场景。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">折线图、柱形图、条形图</li>
+                        <li class="feature-item">堆积面积图、直方图</li>
+                        <li class="feature-item">饼图、散点图、箱型图</li>
+                        <li class="feature-item">雷达图、误差棒图</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">Chart.js</span>
+                        <span class="tag">基础图表</span>
+                        <span class="tag">数据展示</span>
+                        <span class="tag">可视化入门</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter2.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter2')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第3章 -->
+            <article class="chapter-card chapter-3" onclick="openChapter('chapter3.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 3 章</div>
+                    <h2 class="chapter-title">数据可视化综合平台</h2>
+                    <p class="chapter-subtitle">基础图表与交互式可视化的完美结合</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        深入学习交互式可视化技术，掌握动态图表、实时数据更新和用户交互功能的实现方法。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">5种基础图表导航展示</li>
+                        <li class="feature-item">交互式控制面板</li>
+                        <li class="feature-item">动态数据更新</li>
+                        <li class="feature-item">多图表联动功能</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">交互式</span>
+                        <span class="tag">动态图表</span>
+                        <span class="tag">实时更新</span>
+                        <span class="tag">用户控制</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter3.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter3')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第4章 -->
+            <article class="chapter-card chapter-4" onclick="openChapter('chapter4.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 4 章</div>
+                    <h2 class="chapter-title">Python数据可视化基础</h2>
+                    <p class="chapter-subtitle">5个实用案例深度解析</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        通过实际案例学习Python数据可视化，包括图书采购、汇率走势、产品销售等真实场景的数据分析。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">图书采购数据可视化</li>
+                        <li class="feature-item">汇率走势双折线图</li>
+                        <li class="feature-item">气温变化趋势分析</li>
+                        <li class="feature-item">分形图案绘制</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">Python</span>
+                        <span class="tag">实际案例</span>
+                        <span class="tag">数据分析</span>
+                        <span class="tag">图表设计</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter4.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter4')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第5章 -->
+            <article class="chapter-card chapter-5" onclick="openChapter('chapter5.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 5 章</div>
+                    <h2 class="chapter-title">综合案例分析</h2>
+                    <p class="chapter-subtitle">5个真实业务场景可视化方案</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        综合运用所学技能，解决真实的业务问题，包括销售分析、用户行为分析、气象数据等复杂场景。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">产品销售额对比分析</li>
+                        <li class="feature-item">宠物人群比例统计</li>
+                        <li class="feature-item">抖音用户增长分析</li>
+                        <li class="feature-item">汽车销售数据挖掘</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">商业分析</span>
+                        <span class="tag">用户行为</span>
+                        <span class="tag">数据挖掘</span>
+                        <span class="tag">综合应用</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter5.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter5')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第6章 -->
+            <article class="chapter-card chapter-6" onclick="openChapter('chapter6.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 6 章</div>
+                    <h2 class="chapter-title">坐标轴高级设置</h2>
+                    <p class="chapter-subtitle">Matplotlib坐标轴系统深入解析</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        深入理解坐标轴系统，学习刻度定制、轴脊控制、深圳风速案例等专业可视化技巧。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">坐标轴组件详解</li>
+                        <li class="feature-item">刻度位置与格式化</li>
+                        <li class="feature-item">轴脊显示与隐藏</li>
+                        <li class="feature-item">深圳风速案例研究</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">Matplotlib</span>
+                        <span class="tag">坐标轴</span>
+                        <span class="tag">高级技巧</span>
+                        <span class="tag">专业应用</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter6.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter6')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第7章 -->
+            <article class="chapter-card chapter-7" onclick="openChapter('chapter7.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 7 章</div>
+                    <h2 class="chapter-title">3D可视化技术</h2>
+                    <p class="chapter-subtitle">三维数据展示与交互</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        探索三维数据可视化技术，学习3D立体图表、空间数据展示和高级交互功能的实现方法。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">3D立体五角星</li>
+                        <li class="feature-item">空间数据可视化</li>
+                        <li class="feature-item">三维交互功能</li>
+                        <li class="feature-item">立体图表设计</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">3D可视化</span>
+                        <span class="tag">立体图表</span>
+                        <span class="tag">空间数据</span>
+                        <span class="tag">高级交互</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter7.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter7')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 第8章 -->
+            <article class="chapter-card chapter-8" onclick="openChapter('chapter8.html')">
+                <div class="chapter-header">
+                    <div class="chapter-number">第 8 章</div>
+                    <h2 class="chapter-title">高级数据可视化</h2>
+                    <p class="chapter-subtitle">10种高级图表技术探索</p>
+                </div>
+                <div class="chapter-content">
+                    <p class="chapter-description">
+                        掌握最前沿的数据可视化技术，包括等高线图、桑基图、树状图等高级图表的实现与应用。
+                    </p>
+                    <ul class="feature-list">
+                        <li class="feature-item">等高线图与矢量场</li>
+                        <li class="feature-item">甘特图与项目管理</li>
+                        <li class="feature-item">桑基图与流向分析</li>
+                        <li class="feature-item">树状图与层级数据</li>
+                    </ul>
+                    <div class="chapter-tags">
+                        <span class="tag">高级图表</span>
+                        <span class="tag">专业可视化</span>
+                        <span class="tag">复杂图表</span>
+                        <span class="tag">前沿技术</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="chapter8.html" class="btn-primary" onclick="event.stopPropagation()">开始学习</a>
+                        <button class="btn-secondary" onclick="event.stopPropagation(); showPreview('chapter8')">预览内容</button>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <!-- 底部 -->
+        <footer class="footer">
+            <p>📚 数据可视化综合平台 - Chapter 2-8 完整学习资源</p>
+            <p>从基础到高级的专业数据可视化学习路径</p>
+            <p>💡 点击任意章节卡片即可开始学习，所有图表支持实时交互和自定义</p>
+        </footer>
+    </div>
+
+    <script>
+        // 打开章节页面
+        function openChapter(url) {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        }
+
+        // 显示加载动画
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // 显示预览（模拟功能）
+        function showPreview(chapterId) {
+            const chapterInfo = {
+                'chapter2': {
+                    title: '第2章 - 基础图表数据可视化',
+                    content: '本章介绍10种基础图表类型，包括折线图、柱形图、饼图等，是数据可视化的入门基础。'
+                },
+                'chapter3': {
+                    title: '第3章 - 数据可视化综合平台',
+                    content: '深入学习交互式可视化技术，掌握动态图表和用户交互功能的实现。'
+                },
+                'chapter4': {
+                    title: '第4章 - Python数据可视化基础',
+                    content: '通过5个实际案例学习Python数据可视化的实战应用。'
+                },
+                'chapter5': {
+                    title: '第5章 - 综合案例分析',
+                    content: '综合运用所学技能解决真实业务问题的高级案例分析。'
+                },
+                'chapter6': {
+                    title: '第6章 - 坐标轴高级设置',
+                    content: '深入理解Matplotlib坐标轴系统，掌握专业可视化技巧。'
+                },
+                'chapter7': {
+                    title: '第7章 - 3D可视化技术',
+                    content: '探索三维数据可视化技术，学习立体图表和空间数据展示。'
+                },
+                'chapter8': {
+                    title: '第8章 - 高级数据可视化',
+                    content: '掌握最前沿的数据可视化技术，包括高级图表和专业应用。'
+                }
+            };
+
+            const info = chapterInfo[chapterId];
+            if (info) {
+                // 创建一个简单的提示框
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                    z-index: 10000;
+                    max-width: 500px;
+                    animation: fadeInUp 0.3s ease;
+                `;
+                
+                modal.innerHTML = `
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">${info.title}</h3>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">${info.content}</p>
+                    <button onclick="this.parentElement.remove()" style="
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">关闭</button>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // 点击背景关闭
+                setTimeout(() => {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            modal.remove();
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为所有章节卡片添加键盘导航
+            const cards = document.querySelectorAll('.chapter-card');
+            cards.forEach((card, index) => {
+                card.setAttribute('tabindex', '0');
+                card.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+
+            // 隐藏加载动画
+            hideLoading();
+        });
+
+        // 添加页面可见性变化监听
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                hideLoading();
+            }
+        });
+
+        // 键盘快捷键支持
+        document.addEventListener('keydown', function(e) {
+            // ESC键关闭任何模态框
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('[style*="position: fixed"]');
+                modals.forEach(modal => modal.remove());
+            }
+            
+            // 数字键2-8快速跳转到对应章节
+            if (e.key >= '2' && e.key <= '8') {
+                const chapterNumber = e.key;
+                const fileName = `chapter${chapterNumber}.html`;
+                openChapter(fileName);
+            }
+        });
+    </script>
+</body>
+</html>
