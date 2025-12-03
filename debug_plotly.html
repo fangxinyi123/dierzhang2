@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plotly调试</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Plotly调试页面</h1>
+    <div id="test1" style="width:80%;height:400px;border:2px solid red;margin:20px;"></div>
+    <div id="test2" style="width:80%;height:400px;border:2px solid blue;margin:20px;"></div>
+    <button onclick="testBasic()">测试基本图表</button>
+    <button onclick="test3D()">测试3D图表</button>
+    <button onclick="testMap()">测试地图</button>
+    
+    <script>
+        console.log('页面开始加载...');
+        
+        function testBasic() {
+            console.log('测试基本图表...');
+            try {
+                var data = [{
+                    x: [1, 2, 3, 4],
+                    y: [10, 15, 13, 17],
+                    type: 'scatter'
+                }];
+                
+                var layout = {
+                    title: '基本测试图表'
+                };
+                
+                Plotly.newPlot('test1', data, layout)
+                    .then(() => {
+                        console.log('基本图表创建成功');
+                    })
+                    .catch(err => {
+                        console.error('基本图表创建失败:', err);
+                    });
+            } catch (error) {
+                console.error('测试基本图表出错:', error);
+            }
+        }
+        
+        function test3D() {
+            console.log('测试3D图表...');
+            try {
+                var data = [{
+                    x: [1, 2, 3, 4],
+                    y: [2, 3, 4, 5],
+                    z: [5, 6, 7, 8],
+                    type: 'scatter3d',
+                    mode: 'markers',
+                    marker: {
+                        size: 8,
+                        color: 'red',
+                        symbol: 'star'
+                    }
+                }];
+                
+                var layout = {
+                    title: '3D测试图表',
+                    scene: {
+                        xaxis: {title: 'X'},
+                        yaxis: {title: 'Y'},
+                        zaxis: {title: 'Z'}
+                    }
+                };
+                
+                Plotly.newPlot('test2', data, layout)
+                    .then(() => {
+                        console.log('3D图表创建成功');
+                    })
+                    .catch(err => {
+                        console.error('3D图表创建失败:', err);
+                    });
+            } catch (error) {
+                console.error('测试3D图表出错:', error);
+            }
+        }
+        
+        function testMap() {
+            console.log('测试地图...');
+            try {
+                var data = [{
+                    type: 'scattergeo',
+                    locationmode: 'USA-states',
+                    lon: [-74.0, -87.6],
+                    lat: [40.7, 41.9],
+                    mode: 'markers',
+                    marker: {
+                        size: 20,
+                        color: 'blue'
+                    },
+                    text: ['纽约', '芝加哥']
+                }];
+                
+                var layout = {
+                    title: '地图测试',
+                    geo: {
+                        scope: 'usa',
+                        projection: {type: 'albers usa'},
+                        showland: true,
+                        landcolor: '#f0f0f0'
+                    }
+                };
+                
+                Plotly.newPlot('test2', data, layout)
+                    .then(() => {
+                        console.log('地图创建成功');
+                    })
+                    .catch(err => {
+                        console.error('地图创建失败:', err);
+                    });
+            } catch (error) {
+                console.error('测试地图出错:', error);
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', function() {
+            console.log('窗口加载完成');
+            
+            if (typeof Plotly === 'undefined') {
+                console.error('Plotly未定义!');
+                alert('Plotly库未加载，请检查网络连接');
+                return;
+            }
+            
+            console.log('Plotly版本:', Plotly.version || '未知');
+            
+            setTimeout(() => {
+                testBasic();
+            }, 1000);
+        });
+        
+        // 检查脚本加载状态
+        var script = document.querySelector('script[src*="plotly"]');
+        if (script) {
+            script.onload = function() {
+                console.log('Plotly脚本加载完成');
+            };
+            script.onerror = function() {
+                console.error('Plotly脚本加载失败');
+                alert('Plotly脚本加载失败，请检查网络连接');
+            };
+        }
+    </script>
+</body>
+</html>

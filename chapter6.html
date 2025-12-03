@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第六章 - 坐标轴高级设置</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+        
+        .nav-tab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #2c3e50;
+        }
+        
+        .chart-section {
+            display: none;
+            padding: 20px;
+        }
+        
+        .chart-section.active {
+            display: block;
+        }
+        
+        .chart-container {
+            padding: 15px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        
+        .chart-container div[style*="height"] {
+            flex: 1;
+            min-height: 350px;
+            width: 100%;
+        }
+        
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .description {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .description ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .description li {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .chapter-intro {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .chart-container {
+                min-height: 400px;
+            }
+            
+            .chart-container div[style*="height"] {
+                min-height: 300px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .chart-container {
+                min-height: 350px;
+            }
+            
+            .chart-container div[style*="height"] {
+                min-height: 250px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .data-section {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+            }
+            
+            .nav-tab {
+                margin: 3px 0;
+                width: 95%;
+                font-size: 1em;
+                padding: 8px 16px;
+            }
+            
+            .chart-container {
+                margin: 5px;
+                padding: 10px;
+                min-height: 300px;
+            }
+            
+            .chart-container div[style*="height"] {
+                min-height: 200px;
+            }
+            
+            .chart-title {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+            
+            .description {
+                margin: 10px;
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .chart-section {
+                padding: 10px;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+            }
+            
+            .chart-container div[style*="height"] {
+                min-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 第六章 - 坐标轴高级设置</h1>
+            <p>坐标轴概述、刻度定制、轴脊隐藏等高级功能的数据可视化展示</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('axis-overview', this)">坐标轴概述</button>
+            <button class="nav-tab" onclick="showSection('custom-ticks', this)">定制刻度</button>
+            <button class="nav-tab" onclick="showSection('hide-spines', this)">隐藏轴脊</button>
+            <button class="nav-tab" onclick="showSection('case-study-1', this)">深圳风速案例(一)</button>
+            <button class="nav-tab" onclick="showSection('case-study-2', this)">深圳风速案例(二)</button>
+            <button class="nav-tab" onclick="showSection('case-study-3', this)">正余弦函数案例</button>
+        </div>
+        
+        <!-- 坐标轴概述 -->
+        <div id="axis-overview" class="chart-section active">
+            <div class="chapter-intro">
+                <h2>📐 6.1 坐标轴概述</h2>
+                <p>Matplotlib坐标轴系统的基础知识和轴组件介绍</p>
+            </div>
+            
+            <div class="description">
+                <h3>📋 坐标轴核心概念</h3>
+                <ul>
+                    <li><strong>轴脊（Spines）</strong> - 图表的四条边框线：上、下、左、右</li>
+                    <li><strong>刻度（Ticks）</strong> - 坐标轴上的标记点，包括主刻度和次刻度</li>
+                    <li><strong>刻度标签（Tick Labels）</strong> - 刻度对应的文字说明</li>
+                    <li><strong>轴标签（Axis Labels）</strong> - 坐标轴的名称说明</li>
+                    <li><strong>网格线（Grid）</strong> - 辅助读数的水平或垂直线</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📊 基础坐标轴结构展示</div>
+                    <div id="basicAxisChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🎯 轴脊组件标识</div>
+                    <div id="spineChart" style="height: 400px;"></div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📍 任意位置添加坐标轴</div>
+                    <div id="customPositionChart" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 定制刻度 -->
+        <div id="custom-ticks" class="chart-section">
+            <div class="chapter-intro">
+                <h2>⚙️ 6.2 定制刻度</h2>
+                <p>刻度位置、格式和样式的自定义配置</p>
+            </div>
+            
+            <div class="description">
+                <h3>🔧 刻度定制技术要点</h3>
+                <ul>
+                    <li><strong>刻度位置设置</strong> - 使用Locator类设置刻度出现的位置</li>
+                    <li><strong>刻度格式化</strong> - 使用Formatter类设置刻度标签的显示格式</li>
+                    <li><strong>主次刻度</strong> - 主刻度和次刻度的分别配置</li>
+                    <li><strong>时间刻度</strong> - 日期时间数据的专用刻度处理</li>
+                    <li><strong>刻度样式</strong> - 刻度线的方向、长度、宽度和颜色</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🕐 时间刻度格式化</div>
+                    <div id="timeTickChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🎨 刻度样式定制</div>
+                    <div id="tickStyleChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 隐藏轴脊 -->
+        <div id="hide-spines" class="chart-section">
+            <div class="chapter-intro">
+                <h2>👻 6.3 隐藏轴脊</h2>
+                <p>轴脊的显示和隐藏控制，实现更简洁的图表效果</p>
+            </div>
+            
+            <div class="description">
+                <h3>🎭 轴脊隐藏技巧</h3>
+                <ul>
+                    <li><strong>全部隐藏</strong> - 使用axis('off')隐藏所有轴脊和刻度</li>
+                    <li><strong>部分隐藏</strong> - 选择性隐藏特定的轴脊线</li>
+                    <li><strong>颜色设置</strong> - 将轴脊颜色设为'none'实现隐藏</li>
+                    <li><strong>边框优化</strong> - 针对不同图表类型优化轴脊显示</li>
+                    <li><strong>刻度同步</strong> - 轴脊隐藏时相应的刻度处理</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🔲 隐藏全部轴脊</div>
+                    <div id="hideAllSpinesChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">📐 部分轴脊隐藏</div>
+                    <div id="hidePartSpinesChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 深圳风速案例(一) -->
+        <div id="case-study-1" class="chart-section">
+            <div class="chapter-intro">
+                <h2>🌊 6.4.3 实例1：深圳市24小时的平均风速</h2>
+                <p>基础时间序列数据可视化实例</p>
+            </div>
+            
+            <div class="description">
+                <h3>📈 案例技术特点</h3>
+                <ul>
+                    <li><strong>时间序列处理</strong> - 24小时连续数据的x轴时间格式化</li>
+                    <li><strong>刻度间隔控制</strong> - 每2小时显示一个时间刻度</li>
+                    <li><strong>标签旋转</strong> - 45度角旋转避免标签重叠</li>
+                    <li><strong>刻度样式</strong> - 自定义刻度线的方向、长度和宽度</li>
+                    <li><strong>数据标注</strong> - 风速数据的清晰可视化展示</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🌆 深圳市24小时的平均风速（基础版）</div>
+                    <div id="shenzhenWindChart" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 深圳风速案例(二) -->
+        <div id="case-study-2" class="chart-section">
+            <div class="chapter-intro">
+                <h2>👻 6.4.3 实例2：深圳市24小时的平均风速（隐藏部分轴脊）</h2>
+                <p>隐藏轴脊技术的时间序列可视化实例</p>
+            </div>
+            
+            <div class="description">
+                <h3>📈 隐藏轴脊技术特点</h3>
+                <ul>
+                    <li><strong>轴脊隐藏</strong> - 隐藏上轴脊和右轴脊，使图表更简洁</li>
+                    <li><strong>刻度方向</strong> - 刻度线向内（direction='in'）</li>
+                    <li><strong>时间格式化</strong> - 使用DateFormatter设置时间显示格式</li>
+                    <li><strong>刻度定位器</strong> - 使用HourLocator设置刻度间隔</li>
+                    <li><strong>标签旋转</strong> - x轴标签45度旋转避免重叠</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🌆 深圳市24小时平均风速（隐藏轴脊版）</div>
+                    <div id="shenzhenWindChart2" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 正余弦函数案例 -->
+        <div id="case-study-3" class="chart-section">
+            <div class="chapter-intro">
+                <h2>🌊 6.5 正余弦函数可视化案例</h2>
+                <p>数学函数的坐标轴高级设置实例</p>
+            </div>
+            
+            <div class="description">
+                <h3>📈 数学函数技术特点</h3>
+                <ul>
+                    <li><strong>函数曲线</strong> - 正弦和余弦函数的平滑曲线绘制</li>
+                    <li><strong>π刻度标记</strong> - 使用π符号标记x轴重要位置</li>
+                    <li><strong>精度控制</strong> - 高精度函数值计算和显示</li>
+                    <li><strong>相位关系</strong> - 正余弦函数相位差的可视化对比</li>
+                    <li><strong>特殊点标注</strong> - 关键数学点的标记和说明</li>
+                </ul>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">📐 正弦和余弦函数对比</div>
+                    <div id="sineCosineChart" style="height: 500px;"></div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <div class="chart-container">
+                    <div class="chart-title">🎯 π刻度详细展示</div>
+                    <div id="piTickChart" style="height: 400px;"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🔢 函数关键点标注</div>
+                    <div id="keyPointsChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主标签页切换功能
+        function showSection(sectionId, buttonElement) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.chart-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('.nav-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签页
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 为当前按钮添加active类
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+        }
+
+        // 坐标轴概述图表
+        function initializeAxisOverviewCharts() {
+            // 基础坐标轴结构
+            var basicAxisData = [
+                {
+                    x: [0, 1, 2, 3, 4, 5],
+                    y: [1, 4, 2, 3, 5, 2],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '数据线',
+                    line: { color: '#3498db', width: 3 },
+                    marker: { size: 8, color: '#3498db' }
+                }
+            ];
+            
+            var basicAxisLayout = {
+                title: {
+                    text: '基础坐标轴结构',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'X轴标签',
+                    gridcolor: 'rgba(128,128,128,0.3)',
+                    zeroline: true,
+                    zerolinecolor: '#e74c3c',
+                    zerolinewidth: 2
+                },
+                yaxis: {
+                    title: 'Y轴标签', 
+                    gridcolor: 'rgba(128,128,128,0.3)',
+                    zeroline: true,
+                    zerolinecolor: '#e74c3c',
+                    zerolinewidth: 2
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: true,
+                margin: { t: 60, b: 60, l: 80, r: 60 }
+            };
+            
+            Plotly.newPlot('basicAxisChart', basicAxisData, basicAxisLayout);
+
+            // 轴脊组件标识
+            var spineData = [
+                {
+                    x: [0, 10],
+                    y: [0, 10],
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: '数据点',
+                    marker: { size: 10, color: '#e74c3c' }
+                }
+            ];
+            
+            var spineLayout = {
+                title: {
+                    text: '四条轴脊标识',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'X轴',
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showspikes: true,
+                    spikethickness: 2
+                },
+                yaxis: {
+                    title: 'Y轴',
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showspikes: true,
+                    spikethickness: 2
+                },
+                shapes: [
+                    {
+                        type: 'line',
+                        xref: 'paper',
+                        yref: 'paper',
+                        x0: 0,
+                        y0: 0,
+                        x1: 1,
+                        y1: 0,
+                        line: {
+                            color: '#2c3e50',
+                            width: 4
+                        },
+                        name: '下轴脊'
+                    },
+                    {
+                        type: 'line',
+                        xref: 'paper',
+                        yref: 'paper',
+                        x0: 0,
+                        y0: 1,
+                        x1: 1,
+                        y1: 1,
+                        line: {
+                            color: '#e74c3c',
+                            width: 4
+                        },
+                        name: '上轴脊'
+                    },
+                    {
+                        type: 'line',
+                        xref: 'paper',
+                        yref: 'paper',
+                        x0: 0,
+                        y0: 0,
+                        x1: 0,
+                        y1: 1,
+                        line: {
+                            color: '#27ae60',
+                            width: 4
+                        },
+                        name: '左轴脊'
+                    },
+                    {
+                        type: 'line',
+                        xref: 'paper',
+                        yref: 'paper',
+                        x0: 1,
+                        y0: 0,
+                        x1: 1,
+                        y1: 1,
+                        line: {
+                            color: '#f39c12',
+                            width: 4
+                        },
+                        name: '右轴脊'
+                    }
+                ],
+                annotations: [
+                    {
+                        x: 0.5,
+                        y: -0.15,
+                        xref: 'paper',
+                        yref: 'paper',
+                        text: '下轴脊 (Bottom Spine)',
+                        showarrow: false,
+                        font: { color: '#2c3e50', size: 12 }
+                    },
+                    {
+                        x: 0.5,
+                        y: 1.15,
+                        xref: 'paper',
+                        yref: 'paper',
+                        text: '上轴脊 (Top Spine)',
+                        showarrow: false,
+                        font: { color: '#e74c3c', size: 12 }
+                    },
+                    {
+                        x: -0.15,
+                        y: 0.5,
+                        xref: 'paper',
+                        yref: 'paper',
+                        text: '左轴脊',
+                        showarrow: false,
+                        font: { color: '#27ae60', size: 12 },
+                        textangle: -90
+                    },
+                    {
+                        x: 1.15,
+                        y: 0.5,
+                        xref: 'paper',
+                        yref: 'paper',
+                        text: '右轴脊',
+                        showarrow: false,
+                        font: { color: '#f39c12', size: 12 },
+                        textangle: 90
+                    }
+                ],
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 80, b: 80, l: 100, r: 100 }
+            };
+            
+            Plotly.newPlot('spineChart', spineData, spineLayout);
+
+            // 任意位置添加坐标轴
+            var customData = [
+                {
+                    x: [1, 2, 3, 4, 5],
+                    y: [2, 3, 2, 4, 3],
+                    xaxis: 'x1',
+                    yaxis: 'y1',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '子图1',
+                    line: { color: '#3498db', width: 3 },
+                    marker: { size: 6 }
+                },
+                {
+                    x: [1, 2, 3, 4, 5],
+                    y: [3, 2, 4, 2, 3],
+                    xaxis: 'x2',
+                    yaxis: 'y2',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '子图2',
+                    line: { color: '#e74c3c', width: 3 },
+                    marker: { size: 6 }
+                }
+            ];
+            
+            var customLayout = {
+                title: {
+                    text: '任意位置坐标轴示例',
+                    font: {size: 16}
+                },
+                xaxis1: {
+                    domain: [0.1, 0.4],
+                    anchor: 'y1',
+                    title: '子图1 X轴'
+                },
+                yaxis1: {
+                    domain: [0.6, 0.9],
+                    anchor: 'x1',
+                    title: '子图1 Y轴'
+                },
+                xaxis2: {
+                    domain: [0.6, 0.9],
+                    anchor: 'y2',
+                    title: '子图2 X轴'
+                },
+                yaxis2: {
+                    domain: [0.1, 0.4],
+                    anchor: 'x2',
+                    title: '子图2 Y轴'
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: true,
+                margin: { t: 60, b: 60, l: 80, r: 80 }
+            };
+            
+            Plotly.newPlot('customPositionChart', customData, customLayout);
+        }
+
+        // 定制刻度图表
+        function initializeCustomTicksCharts() {
+            // 时间刻度格式化
+            var hours = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+            var temperature = [18, 17, 16, 15, 16, 20, 25, 28, 26, 22, 20, 19];
+            
+            var timeData = [
+                {
+                    x: hours,
+                    y: temperature,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '温度变化',
+                    line: { color: '#e74c3c', width: 3 },
+                    marker: { size: 8, color: '#e74c3c' }
+                }
+            ];
+            
+            var timeLayout = {
+                title: {
+                    text: '24小时温度变化 - 时间刻度格式化',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: '时间 (HH:MM)',
+                    tickangle: -45,
+                    tickmode: 'array',
+                    tickvals: hours,
+                    ticktext: hours,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    dtick: 2
+                },
+                yaxis: {
+                    title: '温度 (°C)',
+                    gridcolor: 'rgba(128,128,128,0.2)'
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 100, l: 80, r: 60 }
+            };
+            
+            Plotly.newPlot('timeTickChart', timeData, timeLayout);
+
+            // 刻度样式定制
+            var x = [1, 2, 3, 4, 5];
+            var styleData = [
+                {
+                    x: x,
+                    y: [2, 3, 4, 3, 2],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '自定义刻度样式',
+                    line: { color: '#27ae60', width: 3 },
+                    marker: { size: 8, color: '#27ae60' }
+                }
+            ];
+            
+            var styleLayout = {
+                title: {
+                    text: '刻度样式自定义',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'X轴 - 自定义刻度',
+                    tickcolor: '#e74c3c',
+                    tickwidth: 3,
+                    ticklen: 10,
+                    tickangle: 45,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    zeroline: true,
+                    zerolinecolor: '#3498db',
+                    zerolinewidth: 2
+                },
+                yaxis: {
+                    title: 'Y轴 - 自定义刻度',
+                    tickcolor: '#27ae60',
+                    tickwidth: 3,
+                    ticklen: 10,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    zeroline: true,
+                    zerolinecolor: '#f39c12',
+                    zerolinewidth: 2
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 80, l: 80, r: 60 }
+            };
+            
+            Plotly.newPlot('tickStyleChart', styleData, styleLayout);
+        }
+
+        // 隐藏轴脊图表
+        function initializeHideSpinesCharts() {
+            // 隐藏全部轴脊
+            var hideAllData = [
+                {
+                    x: [0.5],
+                    y: [0.5],
+                    type: 'scatter',
+                    mode: 'markers',
+                    marker: {
+                        size: 50,
+                        color: '#e74c3c',
+                        symbol: 'hexagon'
+                    },
+                    showlegend: false
+                }
+            ];
+            
+            var hideAllLayout = {
+                title: {
+                    text: '隐藏全部轴脊示例',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false,
+                    showline: false,
+                    ticks: ''
+                },
+                yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false,
+                    showline: false,
+                    ticks: ''
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 60, l: 60, r: 60 },
+                annotations: [
+                    {
+                        x: 0.5,
+                        y: 0.5,
+                        text: '无轴脊效果',
+                        showarrow: false,
+                        font: { size: 20, color: '#2c3e50' }
+                    }
+                ]
+            };
+            
+            Plotly.newPlot('hideAllSpinesChart', hideAllData, hideAllLayout);
+
+            // 部分轴脊隐藏
+            var hidePartData = [
+                {
+                    x: [1, 2, 3, 4, 5],
+                    y: [3, 2, 4, 3, 5],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '数据线',
+                    line: { color: '#3498db', width: 3 },
+                    marker: { size: 8, color: '#3498db' }
+                }
+            ];
+            
+            var hidePartLayout = {
+                title: {
+                    text: '部分轴脊隐藏示例',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'X轴',
+                    showgrid: true,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    zeroline: false,
+                    showline: false,  // 隐藏X轴线
+                    ticks: 'outside',
+                    tickcolor: '#3498db'
+                },
+                yaxis: {
+                    title: 'Y轴',
+                    showgrid: true,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    zeroline: false,
+                    showline: true,   // 显示Y轴线
+                    linecolor: '#e74c3c',
+                    linewidth: 3,
+                    ticks: 'outside',
+                    tickcolor: '#e74c3c'
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 60, l: 80, r: 60 }
+            };
+            
+            Plotly.newPlot('hidePartSpinesChart', hidePartData, hidePartLayout);
+        }
+
+        // 深圳风速案例(一)图表 - 基础版本
+        function initializeCaseStudy1Charts() {
+            // 深圳风速数据
+            var windHours = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '24:00'];
+            var windSpeed = [7, 9, 11, 14, 8, 15, 22, 11, 10, 11, 11, 13, 8];
+            
+            var windData = [
+                {
+                    x: windHours,
+                    y: windSpeed,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '平均风速',
+                    line: {
+                        color: '#3498db',
+                        width: 3
+                    },
+                    marker: {
+                        size: 10,
+                        color: '#3498db',
+                        symbol: 'circle'
+                    }
+                }
+            ];
+            
+            var windLayout = {
+                title: {
+                    text: '深圳市24小时的平均风速',
+                    font: {size: 18}
+                },
+                xaxis: {
+                    title: '时间',
+                    tickangle: -45,
+                    tickmode: 'array',
+                    tickvals: windHours,
+                    ticktext: windHours,
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#3498db',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    showline: true,
+                    linewidth: 2,
+                    linecolor: '#3498db'
+                },
+                yaxis: {
+                    title: '平均风速 (km/h)',
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e74c3c',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [0, 25],
+                    showline: true,
+                    linewidth: 2,
+                    linecolor: '#e74c3c'
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 80, b: 100, l: 100, r: 60 },
+                annotations: [
+                    {
+                        x: '12:00',
+                        y: 22,
+                        xref: 'x',
+                        yref: 'y',
+                        text: '最高风速: 22 km/h',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 2,
+                        arrowcolor: '#e74c3c',
+                        bgcolor: 'rgba(255,255,255,0.8)',
+                        bordercolor: '#e74c3c',
+                        borderwidth: 1
+                    }
+                ]
+            };
+            
+            Plotly.newPlot('shenzhenWindChart', windData, windLayout);
+        }
+
+        // 深圳风速案例(二)图表 - 隐藏部分轴脊版本
+        function initializeCaseStudy2Charts() {
+            // 深圳风速数据
+            var windHours = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '24:00'];
+            var windSpeed = [7, 9, 11, 14, 8, 15, 22, 11, 10, 11, 11, 13, 8];
+            
+            var windData2 = [
+                {
+                    x: windHours,
+                    y: windSpeed,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: '平均风速',
+                    line: {
+                        color: '#e74c3c',
+                        width: 3
+                    },
+                    marker: {
+                        size: 8,
+                        color: '#FF9900',
+                        symbol: 'triangle-up'
+                    }
+                }
+            ];
+            
+            var windLayout2 = {
+                title: {
+                    text: '深圳市24小时的平均风速（隐藏部分轴脊）',
+                    font: {size: 18}
+                },
+                xaxis: {
+                    title: '时间（h）',
+                    tickangle: -45,
+                    tickmode: 'array',
+                    tickvals: windHours,
+                    ticktext: windHours,
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e74c3c',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    showline: true,  // 只显示下轴脊
+                    linewidth: 2,
+                    linecolor: '#2c3e50',
+                    ticks: 'inside',  // 刻度线向内
+                    mirror: false    // 不显示上轴脊
+                },
+                yaxis: {
+                    title: '平均风速(km/h)',
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e74c3c',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [0, 25],
+                    showline: true,  // 只显示左轴脊
+                    linewidth: 2,
+                    linecolor: '#2c3e50',
+                    ticks: 'inside',  // 刻度线向内
+                    mirror: false    // 不显示右轴脊
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 80, b: 100, l: 100, r: 60 },
+                showlegend: true,
+                legend: {
+                    x: 0.05,
+                    y: 0.95,
+                    bgcolor: 'rgba(255,255,255,0.8)',
+                    bordercolor: '#2c3e50',
+                    borderwidth: 1
+                }
+            };
+            
+            Plotly.newPlot('shenzhenWindChart2', windData2, windLayout2);
+        }
+
+        // 正余弦函数案例图表
+        function initializeCaseStudy3Charts() {
+            // 生成x轴数据
+            var xValues = [];
+            var sineValues = [];
+            var cosineValues = [];
+            
+            for (var i = 0; i <= 360; i += 2) {
+                var radians = i * Math.PI / 180;
+                xValues.push(radians);
+                sineValues.push(Math.sin(radians));
+                cosineValues.push(Math.cos(radians));
+            }
+            
+            // 正余弦对比图
+            var sineCosineData = [
+                {
+                    x: xValues,
+                    y: sineValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'sin(x)',
+                    line: {
+                        color: '#3498db',
+                        width: 3
+                    }
+                },
+                {
+                    x: xValues,
+                    y: cosineValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'cos(x)',
+                    line: {
+                        color: '#e74c3c',
+                        width: 3
+                    }
+                }
+            ];
+            
+            var sineCosineLayout = {
+                title: {
+                    text: '正弦和余弦函数对比 (0-2π)',
+                    font: {size: 18}
+                },
+                xaxis: {
+                    title: 'x (弧度)',
+                    tickmode: 'array',
+                    tickvals: [0, Math.PI/2, Math.PI, 3*Math.PI/2, 2*Math.PI],
+                    ticktext: ['0', 'π/2', 'π', '3π/2', '2π'],
+                    tickfont: {
+                        size: 14,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#3498db',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [0, 2*Math.PI]
+                },
+                yaxis: {
+                    title: '函数值',
+                    tickvals: [-1, -0.5, 0, 0.5, 1],
+                    ticktext: ['-1', '-0.5', '0', '0.5', '1'],
+                    tickfont: {
+                        size: 14,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e74c3c',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [-1.2, 1.2]
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 80, b: 80, l: 80, r: 60 },
+                showlegend: true,
+                legend: {
+                    x: 0.05,
+                    y: 0.95,
+                    bgcolor: 'rgba(255,255,255,0.8)',
+                    bordercolor: '#2c3e50',
+                    borderwidth: 1
+                }
+            };
+            
+            Plotly.newPlot('sineCosineChart', sineCosineData, sineCosineLayout);
+
+            // π刻度详细展示
+            var piTickData = [
+                {
+                    x: xValues,
+                    y: sineValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'sin(x)',
+                    line: {
+                        color: '#9b59b6',
+                        width: 3
+                    }
+                }
+            ];
+            
+            var piTickLayout = {
+                title: {
+                    text: 'π刻度标记详细展示',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'x (弧度)',
+                    tickmode: 'array',
+                    tickvals: [0, Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2, 2*Math.PI/3, 3*Math.PI/4, 5*Math.PI/6, Math.PI],
+                    ticktext: ['0', 'π/6', 'π/4', 'π/3', 'π/2', '2π/3', '3π/4', '5π/6', 'π'],
+                    tickangle: -45,
+                    tickfont: {
+                        size: 11,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#9b59b6',
+                    tickwidth: 2,
+                    ticklen: 5,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [0, Math.PI]
+                },
+                yaxis: {
+                    title: 'sin(x)',
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#27ae60',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [-0.1, 1.1]
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 100, l: 80, r: 60 }
+            };
+            
+            Plotly.newPlot('piTickChart', piTickData, piTickLayout);
+
+            // 函数关键点标注
+            var keyPointsData = [
+                {
+                    x: xValues,
+                    y: sineValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'sin(x)',
+                    line: {
+                        color: '#e67e22',
+                        width: 3
+                    },
+                    showlegend: false
+                },
+                {
+                    x: [0, Math.PI/2, Math.PI, 3*Math.PI/2, 2*Math.PI],
+                    y: [0, 1, 0, -1, 0],
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: '关键点',
+                    marker: {
+                        size: 10,
+                        color: '#e74c3c',
+                        symbol: 'circle'
+                    }
+                }
+            ];
+            
+            var keyPointsLayout = {
+                title: {
+                    text: '正弦函数关键点标注',
+                    font: {size: 16}
+                },
+                xaxis: {
+                    title: 'x (弧度)',
+                    tickmode: 'array',
+                    tickvals: [0, Math.PI/2, Math.PI, 3*Math.PI/2, 2*Math.PI],
+                    ticktext: ['0', 'π/2', 'π', '3π/2', '2π'],
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e67e22',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [0, 2*Math.PI]
+                },
+                yaxis: {
+                    title: 'sin(x)',
+                    tickvals: [-1, -0.5, 0, 0.5, 1],
+                    ticktext: ['-1', '-0.5', '0', '0.5', '1'],
+                    tickfont: {
+                        size: 12,
+                        color: '#2c3e50'
+                    },
+                    tickcolor: '#e74c3c',
+                    tickwidth: 2,
+                    ticklen: 6,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                    showgrid: true,
+                    range: [-1.2, 1.2]
+                },
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 60, b: 80, l: 80, r: 60 },
+                annotations: [
+                    {
+                        x: 0,
+                        y: 0,
+                        xref: 'x',
+                        yref: 'y',
+                        text: '(0, 0)',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 1,
+                        arrowcolor: '#2c3e50',
+                        bgcolor: 'rgba(255,255,255,0.8)',
+                        bordercolor: '#2c3e50',
+                        borderwidth: 1
+                    },
+                    {
+                        x: Math.PI/2,
+                        y: 1,
+                        xref: 'x',
+                        yref: 'y',
+                        text: '(π/2, 1)',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 1,
+                        arrowcolor: '#2c3e50',
+                        bgcolor: 'rgba(255,255,255,0.8)',
+                        bordercolor: '#2c3e50',
+                        borderwidth: 1
+                    },
+                    {
+                        x: Math.PI,
+                        y: 0,
+                        xref: 'x',
+                        yref: 'y',
+                        text: '(π, 0)',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 1,
+                        arrowcolor: '#2c3e50',
+                        bgcolor: 'rgba(255,255,255,0.8)',
+                        bordercolor: '#2c3e50',
+                        borderwidth: 1
+                    },
+                    {
+                        x: 3*Math.PI/2,
+                        y: -1,
+                        xref: 'x',
+                        yref: 'y',
+                        text: '(3π/2, -1)',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 1,
+                        arrowcolor: '#2c3e50',
+                        bgcolor: 'rgba(255,255,255,0.8)',
+                        bordercolor: '#2c3e50',
+                        borderwidth: 1
+                    }
+                ]
+            };
+            
+            Plotly.newPlot('keyPointsChart', keyPointsData, keyPointsLayout);
+        }
+
+        // 初始化所有图表
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAxisOverviewCharts();
+            initializeCustomTicksCharts();
+            initializeHideSpinesCharts();
+            initializeCaseStudy1Charts();
+            initializeCaseStudy2Charts();
+            initializeCaseStudy3Charts();
+            
+            // 响应式重绘
+            window.addEventListener('resize', function() {
+                Plotly.Plots.resize('basicAxisChart');
+                Plotly.Plots.resize('spineChart');
+                Plotly.Plots.resize('customPositionChart');
+                Plotly.Plots.resize('timeTickChart');
+                Plotly.Plots.resize('tickStyleChart');
+                Plotly.Plots.resize('hideAllSpinesChart');
+                Plotly.Plots.resize('hidePartSpinesChart');
+                Plotly.Plots.resize('shenzhenWindChart');
+                Plotly.Plots.resize('shenzhenWindChart2');
+                Plotly.Plots.resize('sineCosineChart');
+                Plotly.Plots.resize('piTickChart');
+                Plotly.Plots.resize('keyPointsChart');
+            });
+        });
+    </script>
+</body>
+</html>

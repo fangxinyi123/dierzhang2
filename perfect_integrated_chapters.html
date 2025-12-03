@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化综合平台 - 第2-8章完整版</title>
+    
+    <!-- 加载所需的图表库 -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+        }
+
+        .main-title h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .chapter-tabs {
+            display: flex;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .chapter-tab {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+            border: none;
+            color: #495057;
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .chapter-tab:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chapter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chapter-content {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .chapter-content.active {
+            display: block;
+        }
+
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 第二章样式 */
+        .ch2-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ch2-header h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .ch2-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ch2-nav-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .ch2-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .ch2-nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .ch2-chart-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .ch2-chart-container {
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ch2-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .ch2-chart-description {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .ch2-chart-description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .ch2-chart-description p {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .ch2-chart-content {
+            width: 100%;
+            height: 500px;
+            margin: 20px 0;
+        }
+
+        /* 第三章样式 */
+        .ch3-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .ch3-header h2 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .ch3-section-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .ch3-nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .ch3-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch3-nav-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #27ae60;
+            border-color: #ffffff;
+        }
+
+        .ch3-content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .ch3-content-section.active {
+            display: block;
+        }
+
+        .ch3-chart-container {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .ch3-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: bold;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .ch3-chart-wrapper {
+            width: 100%;
+            height: 500px;
+        }
+
+        .ch3-controls {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .ch3-control-group {
+            margin: 18px 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ch3-control-label {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 120px;
+        }
+
+        .ch3-chart-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .ch3-chart-nav-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .ch3-chart-nav-btn:hover:not(:disabled) {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .ch3-chart-nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .ch3-chart-counter {
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #eaeaea;
+        }
+
+        /* 第四章样式 */
+        .ch4-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ch4-tab-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .ch4-tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch4-tab-button.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .ch4-content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .ch4-tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .ch4-tab-content.active {
+            display: block;
+        }
+
+        .ch4-chart-container {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ch4-chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .ch4-chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .ch4-control-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .ch4-control-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        /* 第五章样式 */
+        .ch5-nav-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .ch5-nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .ch5-nav-tab {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .ch5-nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .ch5-nav-tab.active {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            transform: scale(1.05);
+        }
+
+        .ch5-content-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+
+        .ch5-section {
+            display: none;
+        }
+
+        .ch5-section.active {
+            display: block;
+        }
+
+        .ch5-chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: 500px;
+            position: relative;
+        }
+
+        .ch5-multi-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ch5-multi-chart .ch5-chart-container {
+            height: 400px;
+        }
+
+        .ch5-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .ch5-control-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .ch5-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .ch5-info-panel {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ch5-info-item {
+            display: inline-block;
+            margin-right: 30px;
+            font-weight: bold;
+        }
+
+        .ch5-info-value {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        /* 第六章样式 */
+        .ch6-nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ch6-nav-tab {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .ch6-nav-tab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .ch6-nav-tab.active {
+            background: #2c3e50;
+        }
+
+        .ch6-chart-section {
+            display: none;
+            padding: 20px;
+        }
+
+        .ch6-chart-section.active {
+            display: block;
+        }
+
+        .ch6-chart-container {
+            padding: 15px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ch6-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        /* 第八章样式 */
+        .ch8-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+        }
+
+        .ch8-nav {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .ch8-nav-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .ch8-nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .ch8-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch8-nav-btn:disabled {
+            background: rgba(100, 100, 100, 0.5);
+            cursor: not-allowed;
+        }
+
+        .ch8-chart-counter {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .ch8-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .ch8-chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-height: 450px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .ch8-chart-container.active {
+            display: block;
+        }
+
+        .ch8-chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ch8-chart-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .ch8-chart-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .ch8-chart-area {
+            width: 100%;
+            height: 400px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        /* 通用样式 */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            min-height: 450px;
+        }
+
+        .chart-title {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .plot-area {
+            width: 100%;
+            height: 400px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .ch2-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .ch3-section-nav {
+                justify-content: center;
+            }
+            
+            .ch8-nav-buttons {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="main-title">
+                <h1>数据可视化综合平台</h1>
+                <p>第2-8章完整教程</p>
+            </div>
+        </div>
+
+        <div class="chapter-tabs">
+            <button class="chapter-tab active" onclick="switchChapter('chapter2', this)">第二章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter3', this)">第三章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter4', this)">第四章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter5', this)">第五章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter6', this)">第六章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter7', this)">第七章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter8', this)">第八章</button>
+        </div>
+
+        <!-- 第二章 -->
+        <section id="chapter2" class="chapter-content active">
+            <div class="ch2-header">
+                <h2>📈 第二章 - 基础图表数据可视化</h2>
+                <p>10种基础图表类型的平铺展示与切换浏览</p>
+            </div>
+            
+            <div class="ch2-nav">
+                <button class="ch2-nav-btn" id="ch2-prevBtn" onclick="prevChart_ch2()">← 上一张图表</button>
+                <div class="ch2-chart-indicator" id="ch2-chartIndicator">图表 1/10 - 折线图</div>
+                <button class="ch2-nav-btn" id="ch2-nextBtn" onclick="nextChart_ch2()">下一张图表 →</button>
+            </div>
+
+            <div class="ch2-chart-container">
+                <div class="ch2-chart-title" id="ch2-currentChartTitle">折线图 - 月度销售趋势</div>
+                
+                <div class="ch2-chart-description">
+                    <h3>📋 图表说明</h3>
+                    <p id="ch2-chartDescription">折线图用于显示数据随时间或其他连续变量的变化趋势。图中展示了月度销售数据，可以清晰看到销售额的季节性波动和年度增长趋势。</p>
+                </div>
+                
+                <div class="ch2-chart-content" id="ch2-currentChart"></div>
+            </div>
+        </section>
+
+        <!-- 第三章 -->
+        <section id="chapter3" class="chapter-content">
+            <div class="ch3-header">
+                <h2>第三章 - 数据可视化综合平台</h2>
+                <p>基础图表展示与交互式可视化</p>
+            </div>
+            
+            <div class="ch3-section-nav">
+                <button class="ch3-nav-btn active" onclick="switchSection_ch3('basic', this)">基础图表展示</button>
+                <button class="ch3-nav-btn" onclick="switchSection_ch3('interactive', this)">交互式可视化</button>
+            </div>
+
+            <!-- 基础图表展示部分 -->
+            <div id="ch3-basic-section" class="ch3-content-section active">
+                <div class="ch3-chart-nav">
+                    <button class="ch3-chart-nav-btn" id="ch3-prevBtn" onclick="prevBasicChart_ch3()">← 上一张</button>
+                    <div class="ch3-chart-counter" id="ch3-chartCounter">1 / 5</div>
+                    <button class="ch3-chart-nav-btn" id="ch3-nextBtn" onclick="nextBasicChart_ch3()">下一张 →</button>
+                </div>
+                
+                <div id="ch3-basic-chart-container" class="ch3-chart-container">
+                    <div class="ch3-chart-title" id="ch3-basic-chart-title">正弦余弦函数</div>
+                    <div class="ch3-chart-wrapper">
+                        <canvas id="ch3-current-basic-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交互式可视化部分 -->
+            <div id="ch3-interactive-section" class="ch3-content-section">
+                <div class="ch3-controls">
+                    <h3>控制面板</h3>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">数据点数量:</label>
+                        <input type="range" id="ch3-dataPoints" min="10" max="100" value="50" class="ch3-control-label">
+                        <span id="ch3-pointsValue">50</span>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">图表类型:</label>
+                        <select id="ch3-chartType" class="ch3-control-label">
+                            <option value="line">折线图</option>
+                            <option value="bar">柱状图</option>
+                            <option value="scatter">散点图</option>
+                            <option value="area">面积图</option>
+                        </select>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">动画速度:</label>
+                        <input type="range" id="ch3-animationSpeed" min="1" max="10" value="5" class="ch3-control-label">
+                        <span id="ch3-speedValue">5</span>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">数据范围:</label>
+                        <input type="range" id="ch3-dataRange" min="10" max="100" value="50" class="ch3-control-label">
+                        <span id="ch3-rangeValue">50</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="chart-container">
+                        <div class="chart-title">动态折线图</div>
+                        <div id="ch3-dynamicLineChart" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">交互式散点图</div>
+                        <div id="ch3-interactiveScatter" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">实时柱状图</div>
+                        <div id="ch3-liveBarChart" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">多图表联动</div>
+                        <div id="ch3-linkedCharts" class="plot-area"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四章 -->
+        <section id="chapter4" class="chapter-content">
+            <div class="ch4-tabs">
+                <button class="ch4-tab-button active" onclick="switchTab_ch4('instance1', this)">实例1：图书采购</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance2', this)">实例2：汇率走势</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance3', this)">实例3：产品销售额</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance4', this)">实例4：气温走势</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance5', this)">实例5：彩色雪花</button>
+            </div>
+
+            <div class="ch4-content-area">
+                <div id="ch4-instance1" class="ch4-tab-content active">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">图书采购数据 - 堆叠柱形图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance1-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchChartType_ch4('instance1')">切换图表类型</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance2" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">汇率走势 - 双折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance2-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchLineType_ch4('instance2')">切换线型</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance3" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">产品销售额 - 多系列折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance3-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchMarkerStyle_ch4('instance3')">切换标记样式</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance4" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">气温走势 - 双折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance4-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance5" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">彩色雪花 - Koch分形动画</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance5-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="toggleAnimation_ch4()">切换动画</button>
+                            <input type="color" id="ch4-snowColor" value="#3498db" onchange="changeSnowColor_ch4()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第五章 -->
+        <section id="chapter5" class="chapter-content">
+            <div class="ch5-nav-container">
+                <div class="ch5-nav-tabs">
+                    <button class="ch5-nav-tab active" onclick="showSection_ch5('example1')">实例1：产品销售额分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example2')">实例2：宠物人群比例分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example3')">实例3：抖音用户分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example4')">实例4：气温降水蒸发量</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example5')">实例5：汽车销售情况</button>
+                </div>
+            </div>
+            
+            <div class="ch5-content-area">
+                <!-- 实例1 -->
+                <div class="ch5-section active" id="ch5-example1">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例1：某工厂产品A与产品B去年的销售额分析</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">数据类型: <span class="ch5-info-value">月度销售额</span></div>
+                        <div class="ch5-info-item">产品数量: <span class="ch5-info-value">2个产品</span></div>
+                        <div class="ch5-info-item">时间范围: <span class="ch5-info-value">12个月</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品A与产品B月度销售额对比</div>
+                            <canvas id="ch5-example1-line"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品A销售额分布</div>
+                            <canvas id="ch5-example1-pie1"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品B销售额分布</div>
+                            <canvas id="ch5-example1-pie2"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample1_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="toggleAnimation1_ch5()">切换动画</button>
+                    </div>
+                </div>
+                
+                <!-- 实例2 -->
+                <div class="ch5-section" id="ch5-example2">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例2：部分国家养猫与养狗人群比例分析</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">国家数量: <span class="ch5-info-value">12个国家</span></div>
+                        <div class="ch5-info-item">宠物类型: <span class="ch5-info-value">猫、狗</span></div>
+                        <div class="ch5-info-item">数据指标: <span class="ch5-info-value">人群比例(%)</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">各国养猫人群比例</div>
+                            <canvas id="ch5-example2-cats"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">各国养狗人群比例</div>
+                            <canvas id="ch5-example2-dogs"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample2_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="sortData_ch5()">排序显示</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第六章 -->
+        <section id="chapter6" class="chapter-content">
+            <div class="ch6-nav-tabs">
+                <button class="ch6-nav-tab active" onclick="showSection_ch6('axis-overview', this)">坐标轴概述</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('custom-ticks', this)">定制刻度</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('hide-spines', this)">隐藏轴脊</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-1', this)">深圳风速案例(一)</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-2', this)">深圳风速案例(二)</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-3', this)">正余弦函数案例</button>
+            </div>
+            
+            <div id="ch6-axis-overview" class="ch6-chart-section active">
+                <div class="ch6-chart-container">
+                    <div class="ch6-chart-title">基础坐标轴结构展示</div>
+                    <div id="ch6-basicAxisChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第七章 -->
+        <section id="chapter7" class="chapter-content">
+            <h2 class="chapter-title">第七章：3D可视化</h2>
+            <div class="chart-container">
+                <div class="chart-title">3D立着五角星</div>
+                <div id="ch7-chart" class="plot-area"></div>
+            </div>
+        </section>
+
+        <!-- 第八章 -->
+        <section id="chapter8" class="chapter-content">
+            <div class="ch8-header">
+                <h1>第8章数据可视化平台</h1>
+                <div class="subtitle">探索高级数据可视化技术的综合展示平台</div>
+                
+                <div class="ch8-nav">
+                    <div class="ch8-nav-buttons">
+                        <button class="ch8-nav-btn" id="ch8-prevBtn" onclick="showPrevChart_ch8()">
+                            ← 上一张
+                        </button>
+                        <div class="ch8-chart-counter" id="ch8-counter">1 / 10</div>
+                        <button class="ch8-nav-btn" id="ch8-nextBtn" onclick="showNextChart_ch8()">
+                            下一张 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ch8-charts-grid">
+                <!-- 等高线图 -->
+                <div class="ch8-chart-container active" id="ch8-chart-0">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">1</span>
+                        等高线图 (8.1)
+                    </div>
+                    <div class="ch8-chart-description">
+                        等高线图用于表示三维数据在二维平面上的投影，通过等值线展示数据的高度分布特征。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-contour-chart"></div>
+                </div>
+                
+                <!-- 其他图表容器 -->
+                <div class="ch8-chart-container" id="ch8-chart-1">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">2</span>
+                        矢量场流线图 (8.2)
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-streamplot-chart"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentChapter = 'chapter2';
+        let ch2CurrentChartIndex = 0;
+        let ch3CurrentBasicChartIndex = 0;
+        let ch3CurrentSection = 'basic';
+        let ch4CurrentInstance = 'instance1';
+        let ch5CurrentSection = 'example1';
+        let ch6CurrentSection = 'axis-overview';
+        let ch8CurrentChartIndex = 0;
+        let ch4Charts = {};
+        let ch5Charts = {};
+
+        // 第二章图表数据（完整版）
+        const ch2Charts = [
+            {
+                title: "折线图 - 月度销售趋势",
+                description: "折线图用于显示数据随时间或其他连续变量的变化趋势。图中展示了月度销售数据，可以清晰看到销售额的季节性波动和年度增长趋势。",
+                data: [{
+                    x: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    y: [4500, 5200, 4800, 6200, 5800, 7100, 6500, 7300, 6800, 7500, 8200, 9000],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: {color: '#e74c3c', width: 3},
+                    marker: {size: 6, color: '#e74c3c'}
+                }],
+                layout: {
+                    title: '年度销售趋势',
+                    xaxis: {title: '月份'},
+                    yaxis: {title: '销售额(万元)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "柱形图 - 产品销量对比",
+                description: "柱形图通过垂直柱子的高度来比较不同类别的数据。图中展示了五种产品的销量对比，直观反映各产品的市场表现。",
+                data: [{
+                    x: ['产品A', '产品B', '产品C', '产品D', '产品E'],
+                    y: [4500, 3200, 2800, 5200, 3800],
+                    type: 'bar',
+                    marker: {color: '#3498db'}
+                }],
+                layout: {
+                    title: '产品销量对比',
+                    xaxis: {title: '产品名称'},
+                    yaxis: {title: '销量(件)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            }
+        ];
+
+        // 第三章基础图表数据
+        const ch3BasicCharts = [
+            {
+                title: '正弦余弦函数',
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
+                    datasets: [
+                        {
+                            label: 'sin(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'cos(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                }
+            },
+            {
+                title: '电影票房排行',
+                type: 'bar',
+                data: {
+                    labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长'],
+                    datasets: [{
+                        label: '票房（亿元）',
+                        data: [50.03, 46.86, 42.5, 31.7, 29.12],
+                        backgroundColor: '#27ae60',
+                        borderColor: '#2c3e50',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                }
+            },
+            {
+                title: '支付宝月账单',
+                type: 'pie',
+                data: {
+                    labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 8],
+                        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                }
+            },
+            {
+                title: '汽车速度分析',
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '速度与制动距离',
+                        data: [
+                            {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
+                            {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}
+                        ],
+                        backgroundColor: '#e67e22',
+                        borderColor: '#d35400',
+                        borderWidth: 2,
+                        pointRadius: 8
+                    }]
+                }
+            },
+            {
+                title: '英语成绩对比',
+                type: 'bar',
+                data: {
+                    labels: ['1班', '2班', '3班', '4班', '5班'],
+                    datasets: [
+                        {
+                            label: '上学期',
+                            data: [85, 78, 92, 88, 76],
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        },
+                        {
+                            label: '下学期',
+                            data: [88, 82, 95, 91, 80],
+                            backgroundColor: '#e74c3c',
+                            borderColor: '#c0392b',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }
+                    ]
+                }
+            }
+        ];
+
+        // 章节切换函数
+        function switchChapter(chapterId, tabElement) {
+            // 隐藏当前章节
+            document.querySelectorAll('.chapter-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.chapter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的章节
+            document.getElementById(chapterId).classList.add('active');
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
+            currentChapter = chapterId;
+            
+            // 初始化对应章节的图表
+            setTimeout(() => {
+                initializeChapter(chapterId);
+            }, 100);
+        }
+
+        // 初始化章节
+        function initializeChapter(chapterId) {
+            switch(chapterId) {
+                case 'chapter2':
+                    initChapter2();
+                    break;
+                case 'chapter3':
+                    initChapter3();
+                    break;
+                case 'chapter4':
+                    initChapter4();
+                    break;
+                case 'chapter5':
+                    initChapter5();
+                    break;
+                case 'chapter6':
+                    initChapter6();
+                    break;
+                case 'chapter7':
+                    initChapter7();
+                    break;
+                case 'chapter8':
+                    initChapter8();
+                    break;
+            }
+        }
+
+        // ========== 第二章函数 ==========
+        function initChapter2() {
+            displayChart_ch2(ch2CurrentChartIndex);
+            updateNavigation_ch2();
+        }
+
+        function displayChart_ch2(index) {
+            const chart = ch2Charts[index];
+            document.getElementById('ch2-currentChartTitle').textContent = chart.title;
+            document.getElementById('ch2-chartDescription').textContent = chart.description;
+            document.getElementById('ch2-chartIndicator').textContent = `图表 ${index + 1}/${ch2Charts.length} - ${chart.title.split(' - ')[0]}`;
+            
+            Plotly.newPlot('ch2-currentChart', chart.data, chart.layout, {
+                displayModeBar: true,
+                displaylogo: false,
+                responsive: true
+            });
+        }
+
+        function prevChart_ch2() {
+            if (ch2CurrentChartIndex > 0) {
+                ch2CurrentChartIndex--;
+                displayChart_ch2(ch2CurrentChartIndex);
+                updateNavigation_ch2();
+            }
+        }
+
+        function nextChart_ch2() {
+            if (ch2CurrentChartIndex < ch2Charts.length - 1) {
+                ch2CurrentChartIndex++;
+                displayChart_ch2(ch2CurrentChartIndex);
+                updateNavigation_ch2();
+            }
+        }
+
+        function updateNavigation_ch2() {
+            const prevBtn = document.getElementById('ch2-prevBtn');
+            const nextBtn = document.getElementById('ch2-nextBtn');
+            
+            prevBtn.disabled = ch2CurrentChartIndex === 0;
+            nextBtn.disabled = ch2CurrentChartIndex === ch2Charts.length - 1;
+        }
+
+        // ========== 第三章函数 ==========
+        function initChapter3() {
+            initBasicCharts_ch3();
+            initInteractiveCharts_ch3();
+        }
+
+        function switchSection_ch3(section, tabElement) {
+            // 隐藏所有部分
+            document.querySelectorAll('.ch3-content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.ch3-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的部分
+            document.getElementById(`ch3-${section}-section`).classList.add('active');
+            tabElement.classList.add('active');
+            
+            ch3CurrentSection = section;
+        }
+
+        function initBasicCharts_ch3() {
+            displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+            updateBasicNavigation_ch3();
+        }
+
+        function displayBasicChart_ch3(index) {
+            const chart = ch3BasicCharts[index];
+            document.getElementById('ch3-basic-chart-title').textContent = chart.title;
+            document.getElementById('ch3-chartCounter').textContent = `${index + 1} / ${ch3BasicCharts.length}`;
+            
+            // 清除之前的图表
+            const canvas = document.getElementById('ch3-current-basic-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // 销毁之前的图表实例
+            if (ch3BasicCharts.currentChart) {
+                ch3BasicCharts.currentChart.destroy();
+            }
+            
+            // 创建新图表
+            ch3BasicCharts.currentChart = new Chart(ctx, {
+                type: chart.type,
+                data: chart.data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: chart.type === 'pie' ? {} : {
+                        x: { title: { display: true, text: chart.title.includes('票房') ? '电影名称' : chart.title.includes('速度') ? '速度(km/h)' : chart.title.includes('成绩') ? '班级' : 'X轴' } },
+                        y: { title: { display: true, text: chart.title.includes('票房') ? '票房(亿元)' : chart.title.includes('速度') ? '制动距离(m)' : chart.title.includes('成绩') ? '平均分' : 'Y轴' } }
+                    }
+                }
+            });
+        }
+
+        function prevBasicChart_ch3() {
+            if (ch3CurrentBasicChartIndex > 0) {
+                ch3CurrentBasicChartIndex--;
+                displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+                updateBasicNavigation_ch3();
+            }
+        }
+
+        function nextBasicChart_ch3() {
+            if (ch3CurrentBasicChartIndex < ch3BasicCharts.length - 1) {
+                ch3CurrentBasicChartIndex++;
+                displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+                updateBasicNavigation_ch3();
+            }
+        }
+
+        function updateBasicNavigation_ch3() {
+            const prevBtn = document.getElementById('ch3-prevBtn');
+            const nextBtn = document.getElementById('ch3-nextBtn');
+            
+            prevBtn.disabled = ch3CurrentBasicChartIndex === 0;
+            nextBtn.disabled = ch3CurrentBasicChartIndex === ch3BasicCharts.length - 1;
+        }
+
+        function initInteractiveCharts_ch3() {
+            // 初始化控件
+            const dataPointsInput = document.getElementById('ch3-dataPoints');
+            const chartTypeSelect = document.getElementById('ch3-chartType');
+            const animationSpeedInput = document.getElementById('ch3-animationSpeed');
+            const dataRangeInput = document.getElementById('ch3-dataRange');
+            
+            dataPointsInput.addEventListener('input', function() {
+                document.getElementById('ch3-pointsValue').textContent = this.value;
+                updateInteractiveCharts_ch3();
+            });
+            
+            animationSpeedInput.addEventListener('input', function() {
+                document.getElementById('ch3-speedValue').textContent = this.value;
+                updateInteractiveCharts_ch3();
+            });
+            
+            dataRangeInput.addEventListener('input', function() {
+                document.getElementById('ch3-rangeValue').textContent = this.value;
+                updateInteractiveCharts_ch3();
+            });
+            
+            chartTypeSelect.addEventListener('change', updateInteractiveCharts_ch3);
+            
+            updateInteractiveCharts_ch3();
+        }
+
+        function updateInteractiveCharts_ch3() {
+            const points = parseInt(document.getElementById('ch3-dataPoints').value);
+            const range = parseInt(document.getElementById('ch3-dataRange').value);
+            
+            // 动态折线图
+            updateDynamicLineChart_ch3(points, range);
+            
+            // 交互式散点图
+            updateInteractiveScatter_ch3(points, range);
+            
+            // 实时柱状图
+            updateLiveBarChart_ch3(range);
+            
+            // 多图表联动
+            updateLinkedCharts_ch3(points, range);
+        }
+
+        function updateDynamicLineChart_ch3(points, range) {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < points; i++) {
+                x.push(i);
+                y.push(Math.sin(i * range / 50) * 20 + Math.random() * 5);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: '#27ae60', width: 3 }
+            }];
+            
+            const layout = { title: '动态折线图 - 实时数据流' };
+            Plotly.newPlot('ch3-dynamicLineChart', data, layout, {responsive: true});
+        }
+
+        function updateInteractiveScatter_ch3(points, range) {
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < points; i++) {
+                x.push(Math.random() * range);
+                y.push(Math.random() * range);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { size: 10, color: '#3498db', opacity: 0.7 }
+            }];
+            
+            Plotly.newPlot('ch3-interactiveScatter', data, {responsive: true});
+        }
+
+        function updateLiveBarChart_ch3(range) {
+            const categories = ['项目A', '项目B', '项目C', '项目D', '项目E'];
+            const values = categories.map(() => Math.random() * range);
+            
+            const data = [{
+                x: categories,
+                y: values,
+                type: 'bar',
+                marker: { color: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'] }
+            }];
+            
+            Plotly.newPlot('ch3-liveBarChart', data, {responsive: true});
+        }
+
+        function updateLinkedCharts_ch3(points, range) {
+            const x = Array.from({length: points}, (_, i) => i);
+            const y1 = x.map(i => Math.sin(i * 0.1) * range / 2 + range / 2);
+            const y2 = x.map(i => Math.cos(i * 0.1) * range / 2 + range / 2);
+            
+            const data = [
+                { x: x, y: y1, type: 'scatter', mode: 'lines', name: '数据集1', line: { color: '#e74c3c', width: 3 } },
+                { x: x, y: y2, type: 'scatter', mode: 'lines', name: '数据集2', line: { color: '#3498db', width: 3, dash: 'dash' } }
+            ];
+            
+            Plotly.newPlot('ch3-linkedCharts', data, {responsive: true});
+        }
+
+        // ========== 第四章函数 ==========
+        function initChapter4() {
+            initInstance1_ch4();
+            initInstance2_ch4();
+            initInstance3_ch4();
+            initInstance4_ch4();
+            initInstance5_ch4();
+        }
+
+        function switchTab_ch4(instance, tabElement) {
+            // 隐藏所有内容
+            document.querySelectorAll('.ch4-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.ch4-tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的内容
+            document.getElementById(`ch4-${instance}`).classList.add('active');
+            tabElement.classList.add('active');
+            
+            ch4CurrentInstance = instance;
+        }
+
+        function initInstance1_ch4() {
+            const ctx = document.getElementById('ch4-instance1-chart').getContext('2d');
+            ch4Charts.instance1 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '小说',
+                            data: [65, 59, 80, 81, 56, 55],
+                            backgroundColor: '#FF6384'
+                        },
+                        {
+                            label: '科技',
+                            data: [28, 48, 40, 19, 86, 27],
+                            backgroundColor: '#36A2EB'
+                        },
+                        {
+                            label: '教育',
+                            data: [45, 25, 35, 51, 32, 22],
+                            backgroundColor: '#FFCE56'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true }
+                    }
+                }
+            });
+        }
+
+        function initInstance2_ch4() {
+            const ctx = document.getElementById('ch4-instance2-chart').getContext('2d');
+            ch4Charts.instance2 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '美元',
+                            data: [6.5, 6.3, 6.4, 6.2, 6.1, 6.0],
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: '欧元',
+                            data: [7.2, 7.1, 7.3, 7.0, 6.9, 6.8],
+                            borderColor: '#36A2EB',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function initInstance3_ch4() {
+            const ctx = document.getElementById('ch4-instance3-chart').getContext('2d');
+            ch4Charts.instance3 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '产品A',
+                            data: [120, 150, 180, 200, 170, 220],
+                            borderColor: '#FF6384',
+                            pointStyle: 'circle'
+                        },
+                        {
+                            label: '产品B',
+                            data: [100, 130, 160, 180, 150, 190],
+                            borderColor: '#36A2EB',
+                            pointStyle: 'triangle'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function initInstance4_ch4() {
+            const ctx = document.getElementById('ch4-instance4-chart').getContext('2d');
+            ch4Charts.instance4 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '最高温度',
+                            data: [5, 8, 15, 20, 25, 30],
+                            borderColor: '#FF6384',
+                            tension: 0.4
+                        },
+                        {
+                            label: '最低温度',
+                            data: [-5, -2, 5, 10, 15, 20],
+                            borderColor: '#36A2EB',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function initInstance5_ch4() {
+            const ctx = document.getElementById('ch4-instance5-chart').getContext('2d');
+            ch4Charts.instance5 = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '2', '3', '4', '5', '6'],
+                    datasets: [{
+                        label: '雪花',
+                        data: [0, 50, 100, 50, 0, 50],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // ========== 第五章函数 ==========
+        function initChapter5() {
+            initExample1_ch5();
+            initExample2_ch5();
+        }
+
+        function showSection_ch5(sectionName) {
+            // 更新导航标签状态
+            document.querySelectorAll('.ch5-nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.ch5-section').forEach(section => section.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`ch5-${sectionName}`).classList.add('active');
+            
+            // 初始化对应的图表
+            setTimeout(() => {
+                switch(sectionName) {
+                    case 'example1':
+                        initExample1_ch5();
+                        break;
+                    case 'example2':
+                        initExample2_ch5();
+                        break;
+                }
+            }, 100);
+        }
+
+        function initExample1_ch5() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const productA = [20, 28, 23, 16, 29, 36, 39, 33, 31, 19, 21, 25];
+            const productB = [17, 22, 39, 26, 35, 23, 25, 27, 29, 38, 28, 20];
+            
+            // 折线图
+            const lineCtx = document.getElementById('ch5-example1-line');
+            if (lineCtx) {
+                if (ch5Charts.example1Line) ch5Charts.example1Line.destroy();
+                ch5Charts.example1Line = new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '产品A',
+                            data: productA,
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.1
+                        }, {
+                            label: '产品B',
+                            data: productB,
+                            borderColor: '#36A2EB',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 饼图1
+            const pie1Ctx = document.getElementById('ch5-example1-pie1');
+            if (pie1Ctx) {
+                if (ch5Charts.example1Pie1) ch5Charts.example1Pie1.destroy();
+                ch5Charts.example1Pie1 = new Chart(pie1Ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: productA,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 饼图2
+            const pie2Ctx = document.getElementById('ch5-example1-pie2');
+            if (pie2Ctx) {
+                if (ch5Charts.example1Pie2) ch5Charts.example1Pie2.destroy();
+                ch5Charts.example1Pie2 = new Chart(pie2Ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: productB,
+                            backgroundColor: [
+                                '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF',
+                                '#FF9F40', '#36A2EB', '#C9CBCF', '#4BC0C0', '#36A2EB', '#FF6384', '#FFCE56'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        function initExample2_ch5() {
+            const countries = ['中国', '加拿大', '巴西', '澳大利亚', '日本', '墨西哥', '俄罗斯', '韩国', '瑞士', '土耳其', '英国', '美国'];
+            const cats = [19, 33, 28, 29, 14, 24, 57, 6, 26, 15, 27, 39];
+            const dogs = [25, 33, 58, 39, 15, 64, 29, 23, 22, 11, 27, 50];
+            
+            // 养猫人群比例
+            const catsCtx = document.getElementById('ch5-example2-cats');
+            if (catsCtx) {
+                if (ch5Charts.example2Cats) ch5Charts.example2Cats.destroy();
+                ch5Charts.example2Cats = new Chart(catsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: countries,
+                        datasets: [{
+                            label: '养猫人群比例',
+                            data: cats,
+                            backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 养狗人群比例
+            const dogsCtx = document.getElementById('ch5-example2-dogs');
+            if (dogsCtx) {
+                if (ch5Charts.example2Dogs) ch5Charts.example2Dogs.destroy();
+                ch5Charts.example2Dogs = new Chart(dogsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: countries,
+                        datasets: [{
+                            label: '养狗人群比例',
+                            data: dogs,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        // ========== 第六章函数 ==========
+        function initChapter6() {
+            const data = [{
+                x: [1, 2, 3, 4, 5],
+                y: [1, 4, 9, 16, 25],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: '基础坐标轴',
+                line: {color: '#FF6B6B', width: 3}
+            }];
+            
+            const layout = {
+                title: '基础坐标轴示例',
+                xaxis: {title: 'X轴'},
+                yaxis: {title: 'Y轴'}
+            };
+            
+            Plotly.newPlot('ch6-basicAxisChart', data, layout, {responsive: true});
+        }
+
+        function showSection_ch6(section, tabElement) {
+            document.querySelectorAll('.ch6-chart-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.ch6-nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(`ch6-${section}`).classList.add('active');
+            tabElement.classList.add('active');
+            
+            ch6CurrentSection = section;
+        }
+
+        // ========== 第七章函数 ==========
+        function initChapter7() {
+            // 创建立着的五角星
+            const starData = [];
+            const numStars = 50;
+            
+            for (let i = 0; i < numStars; i++) {
+                const size = Math.random() * 5 + 2;
+                const cx = (Math.random() - 0.5) * 40;
+                const cy = (Math.random() - 0.5) * 40;
+                const cz = (Math.random() - 0.5) * 40;
+                
+                const starPointsX = [];
+                const starPointsY = [];
+                const starPointsZ = [];
+                
+                // 创建面对观察者的五角星
+                for (let j = 0; j < 10; j++) {
+                    let angle, radius;
+                    if (j % 2 === 0) {
+                        angle = (j * 36 - 90) * Math.PI / 180;
+                        radius = size;
+                    } else {
+                        angle = (j * 36 - 90) * Math.PI / 180;
+                        radius = size * 0.4;
+                    }
+                    
+                    starPointsX.push(cx + radius * Math.cos(angle));
+                    starPointsY.push(cy);
+                    starPointsZ.push(cz + radius * Math.sin(angle));
+                }
+                
+                starData.push({
+                    x: starPointsX,
+                    y: starPointsY,
+                    z: starPointsZ,
+                    type: 'scatter3d',
+                    mode: 'lines',
+                    line: {
+                        color: `hsl(${Math.random() * 60 + 240}, 70%, 60%)`,
+                        width: 2
+                    },
+                    name: `星${i+1}`
+                });
+            }
+            
+            const layout = {
+                title: '3D立着五角星群',
+                scene: {
+                    xaxis: {title: 'X轴'},
+                    yaxis: {title: 'Y轴'},
+                    zaxis: {title: 'Z轴'},
+                    camera: {
+                        eye: {x: 1.5, y: 1.5, z: 1.5}
+                    }
+                }
+            };
+            
+            Plotly.newPlot('ch7-chart', starData, layout, {responsive: true});
+        }
+
+        // ========== 第八章函数 ==========
+        function initChapter8() {
+            createContourChart_ch8();
+        }
+
+        function showPrevChart_ch8() {
+            if (ch8CurrentChartIndex > 0) {
+                ch8CurrentChartIndex--;
+                showChart_ch8(ch8CurrentChartIndex);
+            }
+        }
+
+        function showNextChart_ch8() {
+            if (ch8CurrentChartIndex < 9) {
+                ch8CurrentChartIndex++;
+                showChart_ch8(ch8CurrentChartIndex);
+            }
+        }
+
+        function showChart_ch8(index) {
+            // 隐藏所有图表
+            document.querySelectorAll('.ch8-chart-container').forEach(chart => {
+                chart.classList.remove('active');
+            });
+            
+            // 显示指定图表
+            document.getElementById(`ch8-chart-${index}`).classList.add('active');
+            
+            // 更新计数器
+            document.getElementById('ch8-counter').textContent = `${index + 1} / 10`;
+            
+            // 更新按钮状态
+            document.getElementById('ch8-prevBtn').disabled = index === 0;
+            document.getElementById('ch8-nextBtn').disabled = index === 9;
+            
+            ch8CurrentChartIndex = index;
+            
+            // 根据索引初始化对应的图表
+            switch(index) {
+                case 0:
+                    createContourChart_ch8();
+                    break;
+                case 1:
+                    createStreamPlot_ch8();
+                    break;
+            }
+        }
+
+        function createContourChart_ch8() {
+            const n = 50;
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < n; i++) {
+                x.push(-2 + i * 4 / n);
+                y.push(-2 + i * 4 / n);
+            }
+            
+            const z = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j < n; j++) {
+                    const x_val = x[j];
+                    const y_val = y[i];
+                    const h = (1 - x_val/2 + Math.pow(x_val, 5) + Math.pow(y_val, 3)) * 
+                              Math.exp(-Math.pow(x_val, 2) - Math.pow(y_val, 2));
+                    row.push(h);
+                }
+                z.push(row);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                z: z,
+                type: 'contour',
+                colorscale: 'Earth'
+            }];
+            
+            const layout = {
+                title: '三维函数的等高线图',
+                xaxis: { title: 'X轴' },
+                yaxis: { title: 'Y轴' },
+                margin: { t: 40, r: 20, b: 40, l: 40 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-contour-chart', data, layout, {responsive: true});
+        }
+
+        function createStreamPlot_ch8() {
+            const n = 15;
+            const arrowData = [];
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const x_val = -3 + j * 6 / n;
+                    const y_val = -3 + i * 6 / n;
+                    
+                    const u = -y_val;
+                    const v = x_val;
+                    
+                    const scale = 0.15;
+                    const x_end = x_val + u * scale;
+                    const y_end = y_val + v * scale;
+                    
+                    arrowData.push({
+                        type: 'scatter',
+                        x: [x_val, x_end],
+                        y: [y_val, y_end],
+                        mode: 'lines',
+                        line: { color: 'blue', width: 2 },
+                        showlegend: false
+                    });
+                }
+            }
+            
+            const layout = {
+                title: '矢量场流线图',
+                xaxis: { title: 'X轴', range: [-3, 3] },
+                yaxis: { title: 'Y轴', range: [-3, 3] },
+                margin: { t: 40, r: 20, b: 40, l: 40 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-streamplot-chart', arrowData, layout, {responsive: true});
+        }
+
+        // ========== 控制函数 ==========
+        function refreshExample1_ch5() {
+            initExample1_ch5();
+        }
+
+        function toggleAnimation1_ch5() {
+            // 动画切换逻辑
+        }
+
+        function refreshExample2_ch5() {
+            initExample2_ch5();
+        }
+
+        function sortData_ch5() {
+            // 排序逻辑
+        }
+
+        // ========== 页面加载初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化第二章...');
+            setTimeout(() => {
+                initChapter2();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

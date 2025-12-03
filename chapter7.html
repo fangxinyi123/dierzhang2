@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7章 数据可视化平台</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-title {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .chart-description {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .plot-area {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>第7章 数据可视化平台</h1>
+            <p class="subtitle">基于matplotlib的3D图表、动画和统计地图实现</p>
+        </header>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h2 class="chart-title">实例1：三维空间的星星</h2>
+                <p class="chart-description">使用3D散点图在三维空间中绘制不同颜色的星星，根据z值大小着色</p>
+                <div id="chart1" class="plot-area"></div>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">实例2：三维空间闪烁的星星</h2>
+                <p class="chart-description">动画效果展示星星在三维空间中闪烁，颜色在白色和紫色间变化</p>
+                <div id="chart2" class="plot-area"></div>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">实例3：美国部分城镇人口分布</h2>
+                <p class="chart-description">使用地图投影展示美国各城镇的人口分布情况，气泡大小表示人口数量</p>
+                <div id="chart3" class="plot-area"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="refreshAllCharts()">刷新所有图表</button>
+            <button class="btn" onclick="toggleAnimation()">切换动画</button>
+            <button class="btn" onclick="resetView()">重置视图</button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let animationFrame = null;
+        let isAnimating = false;
+
+        // 等待Plotly加载完成
+        function waitForPlotly(callback, maxAttempts = 10) {
+            let attempts = 0;
+            function check() {
+                attempts++;
+                if (typeof Plotly !== 'undefined' && Plotly.newPlot) {
+                    callback();
+                } else if (attempts < maxAttempts) {
+                    setTimeout(check, 500);
+                } else {
+                    showError('chart1', 'Plotly加载失败，请刷新页面重试');
+                }
+            }
+            check();
+        }
+
+        // 显示错误信息
+        function showError(chartId, message) {
+            const container = document.getElementById(chartId);
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        // 实例1：3D散点图星星
+        function createChart1() {
+            try {
+                // 生成随机数据（模拟教材中的数据）
+                const n = 30;
+                const x = Array.from({length: n}, () => Math.floor(Math.random() * 40));
+                const y = Array.from({length: n}, () => Math.floor(Math.random() * 40));
+                const z = Array.from({length: n}, () => Math.floor(Math.random() * 40));
+                
+                // 根据z值确定颜色
+                const colors = z.map(z_val => {
+                    if (z_val <= 10) return '#FFD700';  // 黄色
+                    else if (z_val < 20) return '#C71585';  // 紫红色
+                    else return '#008B8B';  // 深青色
+                });
+
+                const traces = [];
+                
+                // 为每个点创建一个真正的五角星
+                for (let i = 0; i < n; i++) {
+                    const cx = x[i], cy = y[i], cz = z[i];
+                    const color = colors[i];
+                    const size = 1.8; // 星星的大小
+                    
+                    // 五角星的十个顶点（包括外顶点和内顶点）
+                    let starPointsX = [], starPointsY = [], starPointsZ = [];
+                    
+                    for (let j = 0; j < 10; j++) {
+                        let angle, radius;
+                        if (j % 2 === 0) {
+                            // 外顶点
+                            angle = (j * 36 - 90) * Math.PI / 180;
+                            radius = size;
+                        } else {
+                            // 内顶点
+                            angle = (j * 36 - 90) * Math.PI / 180;
+                            radius = size * 0.4;
+                        }
+                        
+                        // 创建面对观察者的五角星：主要在XZ平面展开，Y轴保持中心
+                        starPointsX.push(cx + radius * Math.cos(angle)); // X轴展开
+                        starPointsY.push(cy); // Y轴保持中心位置，星星垂直立着
+                        starPointsZ.push(cz + radius * Math.sin(angle)); // Z轴展开，形成垂直平面
+                    }
+                    
+                    // 闭合五角星
+                    starPointsX.push(starPointsX[0]);
+                    starPointsY.push(starPointsY[0]);
+                    starPointsZ.push(starPointsZ[0]);
+                    
+                    const trace = {
+                        x: starPointsX,
+                        y: starPointsY,
+                        z: starPointsZ,
+                        mode: 'lines',
+                        type: 'scatter3d',
+                        line: {
+                            color: color,
+                            width: 4
+                        },
+                        hoverinfo: 'none',
+                        showlegend: false
+                    };
+                    
+                    traces.push(trace);
+                }
+
+                // 添加中心点用于悬停信息
+                const centerTrace = {
+                    x: x,
+                    y: y,
+                    z: z,
+                    mode: 'markers',
+                    type: 'scatter3d',
+                    marker: {
+                        size: 3,
+                        color: colors,
+                        symbol: 'circle',
+                        opacity: 0
+                    },
+                    text: z.map((z_val, i) => `星${i+1}<br>x: ${x[i]}<br>y: ${y[i]}<br>z: ${z_val}`),
+                    hovertemplate: '%{text}<extra></extra>',
+                    showlegend: false
+                };
+                
+                traces.push(centerTrace);
+
+                const layout = {
+                    title: {
+                        text: '3D散点图 - 星星分布',
+                        font: {size: 16}
+                    },
+                    scene: {
+                        xaxis: {title: 'x轴', range: [0, 40]},
+                        yaxis: {title: 'y轴', range: [0, 40]},
+                        zaxis: {title: 'z轴', range: [0, 40]},
+                        camera: {
+                            eye: {x: 1.5, y: 1.5, z: 1.5}
+                        }
+                    },
+                    margin: {l: 0, r: 0, t: 40, b: 0},
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)'
+                };
+
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan3d', 'select3d', 'lasso3d']
+                };
+
+                Plotly.newPlot('chart1', traces, layout, config);
+            } catch (error) {
+                console.error('创建图表1失败:', error);
+                showError('chart1', '创建图表失败：' + error.message);
+            }
+        }
+
+        // 实例2：闪烁的3D星星
+        function createChart2() {
+            try {
+                // 使用教材中的固定坐标
+                const xx = [13, 5, 25, 13, 9, 19, 3, 39, 13, 27];
+                const yy = [4, 38, 16, 26, 7, 19, 28, 10, 17, 18];
+                const zz = [7, 19, 6, 12, 25, 19, 23, 25, 10, 15];
+
+                let frame = 0;
+                
+                function updateChart() {
+                    const color = frame % 2 === 0 ? '#C71585' : '#FFFFFF';
+                    
+                    const traces = [];
+                    
+                    // 为每个点创建一个真正的五角星
+                    for (let i = 0; i < xx.length; i++) {
+                        const cx = xx[i], cy = yy[i], cz = zz[i];
+                        const size = 2.5; // 星星的大小
+                        
+                        // 五角星的十个顶点（包括外顶点和内顶点）
+                        let starPointsX = [], starPointsY = [], starPointsZ = [];
+                        
+                        for (let j = 0; j < 10; j++) {
+                            let angle, radius;
+                            if (j % 2 === 0) {
+                                // 外顶点
+                                angle = (j * 36 - 90) * Math.PI / 180;
+                                radius = size;
+                            } else {
+                                // 内顶点
+                                angle = (j * 36 - 90) * Math.PI / 180;
+                                radius = size * 0.4;
+                            }
+                            
+                            // 创建面对观察者的五角星：主要在XZ平面展开，Y轴保持中心
+                            starPointsX.push(cx + radius * Math.cos(angle)); // X轴展开
+                            starPointsY.push(cy); // Y轴保持中心位置，星星垂直立着
+                            starPointsZ.push(cz + radius * Math.sin(angle)); // Z轴展开，形成垂直平面
+                        }
+                        
+                        // 闭合五角星
+                        starPointsX.push(starPointsX[0]);
+                        starPointsY.push(starPointsY[0]);
+                        starPointsZ.push(starPointsZ[0]);
+                        
+                        const trace = {
+                            x: starPointsX,
+                            y: starPointsY,
+                            z: starPointsZ,
+                            mode: 'lines',
+                            type: 'scatter3d',
+                            line: {
+                                color: color,
+                                width: 5
+                            },
+                            hoverinfo: 'none',
+                            showlegend: false
+                        };
+                        
+                        traces.push(trace);
+                    }
+
+                    // 添加中心点用于悬停信息
+                    const centerTrace = {
+                        x: xx,
+                        y: yy,
+                        z: zz,
+                        mode: 'markers',
+                        type: 'scatter3d',
+                        marker: {
+                            size: 3,
+                            color: color,
+                            symbol: 'circle',
+                            opacity: 0
+                        },
+                        text: xx.map((x_val, i) => `闪烁星${i+1}<br>x: ${x_val}<br>y: ${yy[i]}<br>z: ${zz[i]}`),
+                        hovertemplate: '%{text}<extra></extra>',
+                        showlegend: false
+                    };
+                    
+                    traces.push(centerTrace);
+
+                    const layout = {
+                        title: {
+                            text: '3D散点图 - 闪烁的星星',
+                            font: {size: 16}
+                        },
+                        scene: {
+                            xaxis: {title: 'x轴', range: [0, 40]},
+                            yaxis: {title: 'y轴', range: [0, 40]},
+                            zaxis: {title: 'z轴', range: [0, 40]},
+                            camera: {
+                                eye: {x: 1.5, y: 1.5, z: 1.5}
+                            }
+                        },
+                        margin: {l: 0, r: 0, t: 40, b: 0},
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)'
+                    };
+
+                    const config = {
+                        responsive: true,
+                        displayModeBar: false
+                    };
+
+                    Plotly.react('chart2', traces, layout, config);
+                    frame++;
+                }
+
+                // 初始化
+                updateChart();
+                
+                // 设置动画
+                if (isAnimating) {
+                    animationFrame = setInterval(updateChart, 1000);
+                }
+
+            } catch (error) {
+                console.error('创建图表2失败:', error);
+                showError('chart2', '创建图表失败：' + error.message);
+            }
+        }
+
+        // 实例3：美国人口分布地图
+        function createChart3() {
+            try {
+                // 模拟美国城市数据
+                const cities = [
+                    {name: 'New York', lat: 40.7128, lon: -74.0060, pop: 8419000},
+                    {name: 'Los Angeles', lat: 34.0522, lon: -118.2437, pop: 3980000},
+                    {name: 'Chicago', lat: 41.8781, lon: -87.6298, pop: 2716000},
+                    {name: 'Houston', lat: 29.7604, lon: -95.3698, pop: 2320000},
+                    {name: 'Phoenix', lat: 33.4484, lon: -112.0740, pop: 1680000},
+                    {name: 'Philadelphia', lat: 39.9526, lon: -75.1652, pop: 1584000},
+                    {name: 'San Antonio', lat: 29.4241, lon: -98.4936, pop: 1547000},
+                    {name: 'San Diego', lat: 32.7157, lon: -117.1611, pop: 1424000},
+                    {name: 'Dallas', lat: 32.7767, lon: -96.7970, pop: 1343000},
+                    {name: 'San Jose', lat: 37.3382, lon: -121.8863, pop: 1022000},
+                    {name: 'Austin', lat: 30.2672, lon: -97.7431, pop: 950000},
+                    {name: 'Jacksonville', lat: 30.3322, lon: -81.6557, pop: 911000},
+                    {name: 'Fort Worth', lat: 32.7555, lon: -97.3308, pop: 895000},
+                    {name: 'Columbus', lat: 39.9612, lon: -82.9988, pop: 879000},
+                    {name: 'Charlotte', lat: 35.2271, lon: -80.8431, pop: 885000}
+                ];
+
+                const maxPop = Math.max(...cities.map(c => c.pop));
+                const sizes = cities.map(c => (c.pop / maxPop) * 50);
+
+                const trace = {
+                    type: 'scattergeo',
+                    locationmode: 'USA-states',
+                    lat: cities.map(c => c.lat),
+                    lon: cities.map(c => c.lon),
+                    text: cities.map(c => `${c.name}<br>人口: ${c.pop.toLocaleString()}`),
+                    marker: {
+                        size: sizes,
+                        color: sizes,
+                        colorscale: 'Blues',
+                        colorbar: {
+                            title: '人口数量',
+                            titleside: 'right',
+                            ticksuffix: '万'
+                        },
+                        line: {
+                            color: 'black',
+                            width: 0.5
+                        }
+                    },
+                    hovertemplate: '%{text}<extra></extra>'
+                };
+
+                const layout = {
+                    title: {
+                        text: '2014年美国部分城镇的人口分布情况',
+                        font: {size: 16}
+                    },
+                    geo: {
+                        scope: 'usa',
+                        projection: {
+                            type: 'albers usa'
+                        },
+                        showland: true,
+                        landcolor: '#EAEAEA',
+                        showlakes: true,
+                        lakecolor: '#B3E5FC',
+                        showsubunits: true,
+                        subunitcolor: 'white',
+                        countrycolor: 'white',
+                        coastlinecolor: 'white'
+                    },
+                    margin: {l: 0, r: 0, t: 40, b: 0},
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)'
+                };
+
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false
+                };
+
+                Plotly.newPlot('chart3', [trace], layout, config);
+            } catch (error) {
+                console.error('创建图表3失败:', error);
+                showError('chart3', '创建图表失败：' + error.message);
+            }
+        }
+
+        // 刷新所有图表
+        function refreshAllCharts() {
+            if (animationFrame) {
+                clearInterval(animationFrame);
+                animationFrame = null;
+            }
+            
+            createChart1();
+            createChart2();
+            createChart3();
+        }
+
+        // 切换动画
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                createChart2();
+            } else {
+                if (animationFrame) {
+                    clearInterval(animationFrame);
+                    animationFrame = null;
+                }
+            }
+        }
+
+        // 重置视图
+        function resetView() {
+            const charts = ['chart1', 'chart2', 'chart3'];
+            charts.forEach(chartId => {
+                try {
+                    const div = document.getElementById(chartId);
+                    if (div && div.data) {
+                        Plotly.relayout(chartId, {
+                            'scene.camera': {eye: {x: 1.5, y: 1.5, z: 1.5}},
+                            'geo.projection.rotation': {lon: 0, lat: 0}
+                        });
+                    }
+                } catch (error) {
+                    console.warn('重置视图失败:', chartId, error);
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            waitForPlotly(function() {
+                createChart1();
+                createChart2();
+                createChart3();
+            });
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', function() {
+            if (animationFrame) {
+                clearInterval(animationFrame);
+            }
+        });
+    </script>
+</body>
+</html>

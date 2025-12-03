@@ -1,0 +1,3177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化综合平台 - 第2-8章完整版</title>
+    
+    <!-- 加载所需的图表库 -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+        }
+
+        .main-title h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .chapter-tabs {
+            display: flex;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .chapter-tab {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+            border: none;
+            color: #495057;
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .chapter-tab:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chapter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chapter-content {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .chapter-content.active {
+            display: block;
+        }
+
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 第二章样式 */
+        .ch2-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ch2-header h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .ch2-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ch2-nav-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .ch2-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .ch2-nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .ch2-chart-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .ch2-chart-container {
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ch2-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .ch2-chart-description {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .ch2-chart-description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .ch2-chart-description p {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .ch2-chart-content {
+            width: 100%;
+            height: 500px;
+            margin: 20px 0;
+        }
+
+        /* 第三章样式 */
+        .ch3-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .ch3-header h2 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .ch3-section-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .ch3-nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .ch3-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch3-nav-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #27ae60;
+            border-color: #ffffff;
+        }
+
+        .ch3-content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .ch3-content-section.active {
+            display: block;
+        }
+
+        .ch3-chart-container {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .ch3-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: bold;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .ch3-chart-wrapper {
+            width: 100%;
+            height: 500px;
+        }
+
+        .ch3-controls {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .ch3-control-group {
+            margin: 18px 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ch3-control-label {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 120px;
+        }
+
+        .ch3-chart-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .ch3-chart-nav-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .ch3-chart-nav-btn:hover:not(:disabled) {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .ch3-chart-nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .ch3-chart-counter {
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #eaeaea;
+        }
+
+        /* 第四章样式 */
+        .ch4-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ch4-tab-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .ch4-tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch4-tab-button.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .ch4-content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .ch4-tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .ch4-tab-content.active {
+            display: block;
+        }
+
+        .ch4-chart-container {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ch4-chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .ch4-chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .ch4-control-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .ch4-control-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        /* 第五章样式 */
+        .ch5-nav-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .ch5-nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .ch5-nav-tab {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .ch5-nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .ch5-nav-tab.active {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            transform: scale(1.05);
+        }
+
+        .ch5-content-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+
+        .ch5-section {
+            display: none;
+        }
+
+        .ch5-section.active {
+            display: block;
+        }
+
+        .ch5-chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: 500px;
+            position: relative;
+        }
+
+        .ch5-multi-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .ch5-multi-chart .ch5-chart-container {
+            height: 400px;
+        }
+
+        .ch5-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .ch5-control-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .ch5-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .ch5-info-panel {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ch5-info-item {
+            display: inline-block;
+            margin-right: 30px;
+            font-weight: bold;
+        }
+
+        .ch5-info-value {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        /* 第六章样式 */
+        .ch6-nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: #ecf0f1;
+            padding: 15px;
+            border-bottom: 1px solid #bdc3c7;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ch6-nav-tab {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .ch6-nav-tab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .ch6-nav-tab.active {
+            background: #2c3e50;
+        }
+
+        .ch6-chart-section {
+            display: none;
+            padding: 20px;
+        }
+
+        .ch6-chart-section.active {
+            display: block;
+        }
+
+        .ch6-chart-container {
+            padding: 15px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ch6-chart-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        /* 第七章样式 */
+        .ch7-header {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* 第八章样式 */
+        .ch8-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+        }
+
+        .ch8-nav {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .ch8-nav-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .ch8-nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .ch8-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ch8-nav-btn:disabled {
+            background: rgba(100, 100, 100, 0.5);
+            cursor: not-allowed;
+        }
+
+        .ch8-chart-counter {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .ch8-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .ch8-chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-height: 450px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .ch8-chart-container.active {
+            display: block;
+        }
+
+        .ch8-chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ch8-chart-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .ch8-chart-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .ch8-chart-area {
+            width: 100%;
+            height: 400px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        /* 通用样式 */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            min-height: 450px;
+        }
+
+        .chart-title {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .plot-area {
+            width: 100%;
+            height: 400px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .ch2-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .ch3-section-nav {
+                justify-content: center;
+            }
+            
+            .ch8-nav-buttons {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="main-title">
+                <h1>数据可视化综合平台</h1>
+                <p>第2-8章完整教程</p>
+            </div>
+        </div>
+
+        <div class="chapter-tabs">
+            <button class="chapter-tab active" onclick="switchChapter('chapter2', this)">第二章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter3', this)">第三章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter4', this)">第四章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter5', this)">第五章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter6', this)">第六章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter7', this)">第七章</button>
+            <button class="chapter-tab" onclick="switchChapter('chapter8', this)">第八章</button>
+        </div>
+
+        <!-- 第二章 -->
+        <section id="chapter2" class="chapter-content active">
+            <div class="ch2-header">
+                <h2>📈 第二章 - 基础图表数据可视化</h2>
+                <p>10种基础图表类型的平铺展示与切换浏览</p>
+            </div>
+            
+            <div class="ch2-nav">
+                <button class="ch2-nav-btn" id="ch2-prevBtn" onclick="prevChart_ch2()">← 上一张图表</button>
+                <div class="ch2-chart-indicator" id="ch2-chartIndicator">图表 1/10 - 折线图</div>
+                <button class="ch2-nav-btn" id="ch2-nextBtn" onclick="nextChart_ch2()">下一张图表 →</button>
+            </div>
+
+            <div class="ch2-chart-container">
+                <div class="ch2-chart-title" id="ch2-currentChartTitle">折线图 - 月度销售趋势</div>
+                
+                <div class="ch2-chart-description">
+                    <h3>📋 图表说明</h3>
+                    <p id="ch2-chartDescription">折线图用于显示数据随时间或其他连续变量的变化趋势。图中展示了月度销售数据，可以清晰看到销售额的季节性波动和年度增长趋势。</p>
+                </div>
+                
+                <div class="ch2-chart-content" id="ch2-currentChart"></div>
+            </div>
+        </section>
+
+        <!-- 第三章 -->
+        <section id="chapter3" class="chapter-content">
+            <div class="ch3-header">
+                <h2>第三章 - 数据可视化综合平台</h2>
+                <p>基础图表展示与交互式可视化</p>
+            </div>
+            
+            <div class="ch3-section-nav">
+                <button class="ch3-nav-btn active" onclick="switchSection_ch3('basic', this)">基础图表展示</button>
+                <button class="ch3-nav-btn" onclick="switchSection_ch3('interactive', this)">交互式可视化</button>
+            </div>
+
+            <!-- 基础图表展示部分 -->
+            <div id="ch3-basic-section" class="ch3-content-section active">
+                <div class="ch3-chart-nav">
+                    <button class="ch3-chart-nav-btn" id="ch3-prevBtn" onclick="prevBasicChart_ch3()">← 上一张</button>
+                    <div class="ch3-chart-counter" id="ch3-chartCounter">1 / 5</div>
+                    <button class="ch3-chart-nav-btn" id="ch3-nextBtn" onclick="nextBasicChart_ch3()">下一张 →</button>
+                </div>
+                
+                <div id="ch3-basic-chart-container" class="ch3-chart-container">
+                    <div class="ch3-chart-title" id="ch3-basic-chart-title">正弦余弦函数</div>
+                    <div class="ch3-chart-wrapper">
+                        <canvas id="ch3-current-basic-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交互式可视化部分 -->
+            <div id="ch3-interactive-section" class="ch3-content-section">
+                <div class="ch3-controls">
+                    <h3>控制面板</h3>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">数据点数量:</label>
+                        <input type="range" id="ch3-dataPoints" min="10" max="100" value="50" class="ch3-control-label">
+                        <span id="ch3-pointsValue">50</span>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">图表类型:</label>
+                        <select id="ch3-chartType" class="ch3-control-label">
+                            <option value="line">折线图</option>
+                            <option value="bar">柱状图</option>
+                            <option value="scatter">散点图</option>
+                            <option value="area">面积图</option>
+                        </select>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">动画速度:</label>
+                        <input type="range" id="ch3-animationSpeed" min="1" max="10" value="5" class="ch3-control-label">
+                        <span id="ch3-speedValue">5</span>
+                    </div>
+                    <div class="ch3-control-group">
+                        <label class="ch3-control-label">数据范围:</label>
+                        <input type="range" id="ch3-dataRange" min="10" max="100" value="50" class="ch3-control-label">
+                        <span id="ch3-rangeValue">50</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="chart-container">
+                        <div class="chart-title">动态折线图</div>
+                        <div id="ch3-dynamicLineChart" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">交互式散点图</div>
+                        <div id="ch3-interactiveScatter" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">实时柱状图</div>
+                        <div id="ch3-liveBarChart" class="plot-area"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">多图表联动</div>
+                        <div id="ch3-linkedCharts" class="plot-area"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四章 -->
+        <section id="chapter4" class="chapter-content">
+            <div class="ch4-tabs">
+                <button class="ch4-tab-button active" onclick="switchTab_ch4('instance1', this)">实例1：图书采购</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance2', this)">实例2：汇率走势</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance3', this)">实例3：产品销售额</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance4', this)">实例4：气温走势</button>
+                <button class="ch4-tab-button" onclick="switchTab_ch4('instance5', this)">实例5：彩色雪花</button>
+            </div>
+
+            <div class="ch4-content-area">
+                <div id="ch4-instance1" class="ch4-tab-content active">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">图书采购数据 - 堆叠柱形图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance1-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchChartType_ch4('instance1')">切换图表类型</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance2" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">汇率走势 - 双折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance2-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchLineType_ch4('instance2')">切换线型</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance3" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">产品销售额 - 多系列折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance3-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="switchMarkerStyle_ch4('instance3')">切换标记样式</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance4" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">气温走势 - 双折线图</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance4-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ch4-instance5" class="ch4-tab-content">
+                    <div class="ch4-chart-container">
+                        <div class="ch4-chart-title">彩色雪花 - Koch分形动画</div>
+                        <div class="ch4-chart-wrapper">
+                            <canvas id="ch4-instance5-chart"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="ch4-control-btn" onclick="toggleAnimation_ch4()">切换动画</button>
+                            <input type="color" id="ch4-snowColor" value="#3498db" onchange="changeSnowColor_ch4()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第五章 -->
+        <section id="chapter5" class="chapter-content">
+            <div class="ch5-nav-container">
+                <div class="ch5-nav-tabs">
+                    <button class="ch5-nav-tab active" onclick="showSection_ch5('example1')">实例1：产品销售额分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example2')">实例2：宠物人群比例分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example3')">实例3：抖音用户分析</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example4')">实例4：气温降水蒸发量</button>
+                    <button class="ch5-nav-tab" onclick="showSection_ch5('example5')">实例5：汽车销售情况</button>
+                </div>
+            </div>
+            
+            <div class="ch5-content-area">
+                <!-- 实例1 -->
+                <div class="ch5-section active" id="ch5-example1">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例1：某工厂产品A与产品B去年的销售额分析</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">数据类型: <span class="ch5-info-value">月度销售额</span></div>
+                        <div class="ch5-info-item">产品数量: <span class="ch5-info-value">2个产品</span></div>
+                        <div class="ch5-info-item">时间范围: <span class="ch5-info-value">12个月</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品A与产品B月度销售额对比</div>
+                            <canvas id="ch5-example1-line"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品A销售额分布</div>
+                            <canvas id="ch5-example1-pie1"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">产品B销售额分布</div>
+                            <canvas id="ch5-example1-pie2"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample1_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="toggleAnimation1_ch5()">切换动画</button>
+                    </div>
+                </div>
+                
+                <!-- 实例2 -->
+                <div class="ch5-section" id="ch5-example2">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例2：部分国家养猫与养狗人群比例分析</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">国家数量: <span class="ch5-info-value">12个国家</span></div>
+                        <div class="ch5-info-item">宠物类型: <span class="ch5-info-value">猫、狗</span></div>
+                        <div class="ch5-info-item">数据指标: <span class="ch5-info-value">人群比例(%)</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">各国养猫人群比例</div>
+                            <canvas id="ch5-example2-cats"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">各国养狗人群比例</div>
+                            <canvas id="ch5-example2-dogs"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample2_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="sortData_ch5()">排序显示</button>
+                    </div>
+                </div>
+                
+                <!-- 实例3 -->
+                <div class="ch5-section" id="ch5-example3">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例3：2017年与2018年抖音用户分析</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">对比年份: <span class="ch5-info-value">2017 vs 2018</span></div>
+                        <div class="ch5-info-item">地区分类: <span class="ch5-info-value">5类地区</span></div>
+                        <div class="ch5-info-item">增长指标: <span class="ch5-info-value">用户增长倍数</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">抖音2018vs2017人群增长倍数</div>
+                            <canvas id="ch5-example3-growth"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">2017年抖音用户地区分布</div>
+                            <canvas id="ch5-example3-2017"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">2018年抖音用户地区分布</div>
+                            <canvas id="ch5-example3-2018"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample3_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="compareYears_ch5()">对比分析</button>
+                    </div>
+                </div>
+                
+                <!-- 实例4 -->
+                <div class="ch5-section" id="ch5-example4">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例4：某地区全年平均气温与降水量、蒸发量的关系</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">时间范围: <span class="ch5-info-value">12个月</span></div>
+                        <div class="ch5-info-item">测量指标: <span class="ch5-info-value">气温、降水量、蒸发量</span></div>
+                        <div class="ch5-info-item">图表类型: <span class="ch5-info-value">混合坐标轴</span></div>
+                    </div>
+                    
+                    <div class="ch5-chart-container">
+                        <div class="chart-title">平均气温与降水量、蒸发量的关系</div>
+                        <canvas id="ch5-example4-climate"></canvas>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample4_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="toggleView_ch5()">切换视图</button>
+                    </div>
+                </div>
+                
+                <!-- 实例5 -->
+                <div class="ch5-section" id="ch5-example5">
+                    <h2 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.8em;">实例5：2018年上半年某品牌汽车销售情况</h2>
+                    <div class="ch5-info-panel">
+                        <div class="ch5-info-item">时间范围: <span class="ch5-info-value">2018年上半年</span></div>
+                        <div class="ch5-info-item">地区分布: <span class="ch5-info-value">6个主要城市</span></div>
+                        <div class="ch5-info-item">分析维度: <span class="ch5-info-value">销售额、销量、趋势</span></div>
+                    </div>
+                    
+                    <div class="ch5-multi-chart">
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">2018年上半年某品牌汽车的销售额</div>
+                            <canvas id="ch5-example5-sales"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">分公司某品牌汽车的销量</div>
+                            <canvas id="ch5-example5-count"></canvas>
+                        </div>
+                        <div class="ch5-chart-container">
+                            <div class="chart-title">分公司销量趋势</div>
+                            <canvas id="ch5-example5-trend"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ch5-controls">
+                        <button class="ch5-control-btn" onclick="refreshExample5_ch5()">刷新数据</button>
+                        <button class="ch5-control-btn" onclick="showAnalysis_ch5()">分析报告</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第六章 -->
+        <section id="chapter6" class="chapter-content">
+            <div class="ch6-nav-tabs">
+                <button class="ch6-nav-tab active" onclick="showSection_ch6('axis-overview', this)">坐标轴概述</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('custom-ticks', this)">定制刻度</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('hide-spines', this)">隐藏轴脊</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-1', this)">深圳风速案例(一)</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-2', this)">深圳风速案例(二)</button>
+                <button class="ch6-nav-tab" onclick="showSection_ch6('case-study-3', this)">正余弦函数案例</button>
+            </div>
+            
+            <div id="ch6-axis-overview" class="ch6-chart-section active">
+                <div class="ch6-chart-container">
+                    <div class="ch6-chart-title">基础坐标轴结构展示</div>
+                    <div id="ch6-basicAxisChart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第七章 -->
+        <section id="chapter7" class="chapter-content">
+            <div class="ch7-header">
+                <h2>第七章：3D可视化</h2>
+                <p>三维数据可视化技术展示</p>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">3D立着五角星</div>
+                <div id="ch7-chart" class="plot-area"></div>
+            </div>
+        </section>
+
+        <!-- 第八章 -->
+        <section id="chapter8" class="chapter-content">
+            <div class="ch8-header">
+                <h1>第8章数据可视化平台</h1>
+                <div class="subtitle">探索高级数据可视化技术的综合展示平台</div>
+                
+                <div class="ch8-nav">
+                    <div class="ch8-nav-buttons">
+                        <button class="ch8-nav-btn" id="ch8-prevBtn" onclick="showPrevChart_ch8()">
+                            ← 上一张
+                        </button>
+                        <div class="ch8-chart-counter" id="ch8-counter">1 / 10</div>
+                        <button class="ch8-nav-btn" id="ch8-nextBtn" onclick="showNextChart_ch8()">
+                            下一张 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ch8-charts-grid">
+                <!-- 等高线图 -->
+                <div class="ch8-chart-container active" id="ch8-chart-0">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">1</span>
+                        等高线图 (8.1)
+                    </div>
+                    <div class="ch8-chart-description">
+                        等高线图用于表示三维数据在二维平面上的投影，通过等值线展示数据的高度分布特征。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-contour-chart"></div>
+                </div>
+                
+                <!-- 矢量场流线图 -->
+                <div class="ch8-chart-container" id="ch8-chart-1">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">2</span>
+                        矢量场流线图 (8.2)
+                    </div>
+                    <div class="ch8-chart-description">
+                        矢量场流线图用于可视化向量场的流动方向和强度，广泛应用于流体力学、电磁场等科学计算领域。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-streamplot-chart"></div>
+                </div>
+                
+                <!-- 棉棒图 -->
+                <div class="ch8-chart-container" id="ch8-chart-2">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">3</span>
+                        棉棒图 (8.3)
+                    </div>
+                    <div class="ch8-chart-description">
+                        棉棒图用于展示离散数据点的数值，通过垂直线条连接基线到数据点，适合展示时间序列数据对比。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-stem-chart"></div>
+                </div>
+                
+                <!-- 哑铃图 -->
+                <div class="ch8-chart-container" id="ch8-chart-3">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">4</span>
+                        哑铃图 (8.4)
+                    </div>
+                    <div class="ch8-chart-description">
+                        哑铃图用于比较两个时间点或两组数据的差异，通过连接线展示变化趋势，适合展示前后对比。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-dumbbell-chart"></div>
+                </div>
+                
+                <!-- 甘特图 -->
+                <div class="ch8-chart-container" id="ch8-chart-4">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">5</span>
+                        甘特图 (8.5)
+                    </div>
+                    <div class="ch8-chart-description">
+                        甘特图是项目管理中的重要工具，通过条形图展示项目任务的时间安排、持续时间和依赖关系。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-gantt-chart"></div>
+                </div>
+                
+                <!-- 人口金字塔图 -->
+                <div class="ch8-chart-container" id="ch8-chart-5">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">6</span>
+                        人口金字塔图 (8.6)
+                    </div>
+                    <div class="ch8-chart-description">
+                        人口金字塔图用于展示人口按年龄和性别的分布情况，是人口统计学中的经典图表。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-pyramid-chart"></div>
+                </div>
+                
+                <!-- 漏斗图 -->
+                <div class="ch8-chart-container" id="ch8-chart-6">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">7</span>
+                        漏斗图 (8.7)
+                    </div>
+                    <div class="ch8-chart-description">
+                        漏斗图用于展示数据在不同阶段的递减过程，常用于销售漏斗、转化率分析等场景。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-funnel-chart"></div>
+                </div>
+                
+                <!-- 桑基图 -->
+                <div class="ch8-chart-container" id="ch8-chart-7">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">8</span>
+                        桑基图 (8.8)
+                    </div>
+                    <div class="ch8-chart-description">
+                        桑基图用于展示流量在不同节点间的分配和流动，通过流动带的宽度表示流量大小。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-sankey-chart"></div>
+                </div>
+                
+                <!-- 树状图 -->
+                <div class="ch8-chart-container" id="ch8-chart-8">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">9</span>
+                        树状图 (8.9)
+                    </div>
+                    <div class="ch8-chart-description">
+                        树状图以树形结构展示层级数据，通过节点的连接关系展示数据的层次结构和从属关系。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-tree-chart"></div>
+                </div>
+                
+                <!-- 华夫饼图 -->
+                <div class="ch8-chart-container" id="ch8-chart-9">
+                    <div class="ch8-chart-title">
+                        <span class="ch8-chart-number">10</span>
+                        华夫饼图 (8.10)
+                    </div>
+                    <div class="ch8-chart-description">
+                        华夫饼图通过网格单元的组合展示比例数据，以直观的方式呈现百分比信息。
+                    </div>
+                    <div class="ch8-chart-area" id="ch8-waffle-chart"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentChapter = 'chapter2';
+        let ch2CurrentChartIndex = 0;
+        let ch3CurrentBasicChartIndex = 0;
+
+        // 第三章基础图表数据
+        const ch3BasicCharts = [
+            {
+                title: '正弦余弦函数',
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 101}, (_, i) => (-Math.PI + 2 * Math.PI * i / 100).toFixed(2)),
+                    datasets: [
+                        {
+                            label: 'sin(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.sin(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'cos(x)',
+                            data: Array.from({length: 101}, (_, i) => Math.cos(-Math.PI + 2 * Math.PI * i / 100)),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                }
+            },
+            {
+                title: '电影票房排行',
+                type: 'bar',
+                data: {
+                    labels: ['哪吒之魔童降世', '流浪地球', '复仇者联盟4', '我和我的祖国', '中国机长'],
+                    datasets: [{
+                        label: '票房（亿元）',
+                        data: [50.03, 46.86, 42.5, 31.7, 29.12],
+                        backgroundColor: '#27ae60',
+                        borderColor: '#2c3e50',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                }
+            },
+            {
+                title: '支付宝月账单',
+                type: 'pie',
+                data: {
+                    labels: ['购物消费', '餐饮美食', '交通出行', '娱乐休闲', '生活缴费'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 8],
+                        backgroundColor: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                }
+            },
+            {
+                title: '汽车速度分析',
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '速度与制动距离',
+                        data: [
+                            {x: 20, y: 6}, {x: 30, y: 14}, {x: 40, y: 24}, {x: 50, y: 38}, 
+                            {x: 60, y: 55}, {x: 70, y: 75}, {x: 80, y: 98}
+                        ],
+                        backgroundColor: '#e67e22',
+                        borderColor: '#d35400',
+                        borderWidth: 2,
+                        pointRadius: 8
+                    }]
+                }
+            },
+            {
+                title: '英语成绩对比',
+                type: 'bar',
+                data: {
+                    labels: ['1班', '2班', '3班', '4班', '5班'],
+                    datasets: [
+                        {
+                            label: '上学期',
+                            data: [85, 78, 92, 88, 76],
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 2
+                        },
+                        {
+                            label: '下学期',
+                            data: [88, 82, 95, 91, 79],
+                            backgroundColor: '#2ecc71',
+                            borderColor: '#27ae60',
+                            borderWidth: 2
+                        }
+                    ]
+                }
+            }
+        ];
+        let ch3CurrentSection = 'basic';
+        let ch4CurrentInstance = 'instance1';
+        let ch5CurrentSection = 'example1';
+        let ch6CurrentSection = 'axis-overview';
+        let ch8CurrentChartIndex = 0;
+        let ch4Charts = {};
+        let ch5Charts = {};
+
+        // 第二章图表数据（完整10个图表）
+        const ch2Charts = [
+            {
+                title: "折线图 - 月度销售趋势",
+                description: "折线图用于显示数据随时间或其他连续变量的变化趋势。图中展示了月度销售数据，可以清晰看到销售额的季节性波动和年度增长趋势。",
+                data: [{
+                    x: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    y: [4500, 5200, 4800, 6200, 5800, 7100, 6500, 7300, 6800, 7500, 8200, 9000],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: {color: '#e74c3c', width: 3},
+                    marker: {size: 6, color: '#e74c3c'}
+                }],
+                layout: {
+                    title: '年度销售趋势',
+                    xaxis: {title: '月份'},
+                    yaxis: {title: '销售额(万元)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "柱形图 - 产品销量对比",
+                description: "柱形图通过垂直柱子的高度来比较不同类别的数据。图中展示了五种产品的销量对比，直观反映各产品的市场表现。",
+                data: [{
+                    x: ['产品A', '产品B', '产品C', '产品D', '产品E'],
+                    y: [4500, 3200, 2800, 5200, 3800],
+                    type: 'bar',
+                    marker: {color: '#3498db'}
+                }],
+                layout: {
+                    title: '产品销量对比',
+                    xaxis: {title: '产品名称'},
+                    yaxis: {title: '销量(件)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "条形图 - 地区销售额",
+                description: "条形图是柱形图的横向版本，适合类别名称较长的情况。图中展示了五个主要城市的销售额对比。",
+                data: [{
+                    y: ['北京', '上海', '广州', '深圳', '杭州'],
+                    x: [8500, 9200, 7800, 9600, 6800],
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: {color: '#2ecc71'}
+                }],
+                layout: {
+                    title: '地区销售额',
+                    xaxis: {title: '销售额(万元)'},
+                    yaxis: {title: '地区'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "堆积面积图 - 产品市场份额",
+                description: "堆积面积图显示部分与整体的关系，同时展示随时间变化的趋势。图中展示了线上和线下渠道的市场份额变化。",
+                data: [
+                    {
+                        x: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        y: [1500, 1800, 2000, 2200, 2500, 2800],
+                        type: 'scatter',
+                        mode: 'lines',
+                        fill: 'tozeroy',
+                        name: '线上渠道',
+                        line: {color: '#e74c3c'}
+                    },
+                    {
+                        x: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        y: [800, 950, 1100, 1200, 1300, 1400],
+                        type: 'scatter',
+                        mode: 'lines',
+                        fill: 'tonexty',
+                        name: '线下渠道',
+                        line: {color: '#3498db'}
+                    }
+                ],
+                layout: {
+                    title: '产品市场份额',
+                    xaxis: {title: '月份'},
+                    yaxis: {title: '市场份额(%)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "直方图 - 用户年龄分布",
+                description: "直方图用于展示数值数据的分布情况，将数据分成多个区间并统计每个区间的频数。图中展示了用户年龄的分布特征。",
+                data: [{
+                    x: [22, 25, 28, 30, 32, 35, 28, 26, 24, 29, 31, 33, 27, 26, 25, 30, 32, 34, 29, 27],
+                    type: 'histogram',
+                    marker: {color: '#9b59b6'}
+                }],
+                layout: {
+                    title: '用户年龄分布',
+                    xaxis: {title: '年龄'},
+                    yaxis: {title: '人数'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "饼图 - 产品类别占比",
+                description: "饼图通过扇形面积表示各部分在整体中的比例关系。图中展示了五个产品类别的市场占比情况。",
+                data: [{
+                    values: [35, 25, 20, 15, 5],
+                    labels: ['电子产品', '服装', '食品', '家居', '其他'],
+                    type: 'pie',
+                    marker: {colors: ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6']}
+                }],
+                layout: {
+                    title: '产品类别占比',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "散点图 - 价格与销量关系",
+                description: "散点图用于分析两个变量之间的相关性。图中展示了产品价格与销量之间的关系，帮助分析定价策略。",
+                data: [{
+                    x: [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+                    y: [150, 280, 320, 450, 520, 580, 620, 750, 820, 950],
+                    mode: 'markers',
+                    type: 'scatter',
+                    marker: {size: 12, color: '#e74c3c'}
+                }],
+                layout: {
+                    title: '价格与销量关系',
+                    xaxis: {title: '价格(元)'},
+                    yaxis: {title: '销量(件)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "箱型图 - 收入分布统计",
+                description: "箱型图展示数据的分布特征，包括中位数、四分位数、异常值等。图中对比了技术岗位和销售岗位的收入分布情况。",
+                data: [
+                    {
+                        y: [2500, 2800, 3200, 3500, 3800, 4200, 4500],
+                        type: 'box',
+                        name: '技术岗位',
+                        marker: {color: '#3498db'}
+                    },
+                    {
+                        y: [1800, 2200, 2500, 2800, 3200, 3500],
+                        type: 'box',
+                        name: '销售岗位',
+                        marker: {color: '#2ecc71'}
+                    }
+                ],
+                layout: {
+                    title: '收入分布统计',
+                    yaxis: {title: '月收入(元)'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "雷达图 - 产品多维度评分",
+                description: "雷达图用于多维度数据的比较分析，每个维度从中心向外延伸。图中展示了产品在六个维度的评分情况。",
+                data: [{
+                    type: 'scatterpolar',
+                    r: [4, 5, 3, 4, 5, 4],
+                    theta: ['功能', '设计', '性能', '价格', '服务', '易用性'],
+                    fill: 'toself',
+                    name: '产品A',
+                    marker: {color: '#e74c3c'}
+                }],
+                layout: {
+                    title: '产品多维度评分',
+                    polar: {
+                        radialaxis: {
+                            visible: true,
+                            range: [0, 5]
+                        }
+                    },
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            },
+            {
+                title: "误差棒图 - 实验数据波动",
+                description: "误差棒图显示数据的波动范围和不确定性，误差棒表示数据的标准差或置信区间。图中展示了五个实验数据的测量结果。",
+                data: [{
+                    x: ['实验1', '实验2', '实验3', '实验4', '实验5'],
+                    y: [3.2, 3.8, 3.5, 4.1, 3.9],
+                    type: 'scatter',
+                    mode: 'markers',
+                    error_y: {
+                        type: 'data',
+                        array: [0.3, 0.4, 0.2, 0.5, 0.3],
+                        visible: true
+                    },
+                    marker: {color: '#f39c12', size: 10}
+                }],
+                layout: {
+                    title: '实验数据波动',
+                    xaxis: {title: '实验编号'},
+                    yaxis: {title: '测量值'},
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)'
+                }
+            }
+        ];
+
+        // 章节切换函数
+        function switchChapter(chapterId, tabElement) {
+            // 隐藏当前章节
+            document.querySelectorAll('.chapter-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.chapter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的章节
+            document.getElementById(chapterId).classList.add('active');
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
+            currentChapter = chapterId;
+            
+            // 初始化对应章节的图表
+            setTimeout(() => {
+                initializeChapter(chapterId);
+            }, 100);
+        }
+
+        // 初始化章节
+        function initializeChapter(chapterId) {
+            switch(chapterId) {
+                case 'chapter2':
+                    initChapter2();
+                    break;
+                case 'chapter3':
+                    initChapter3();
+                    break;
+                case 'chapter4':
+                    initChapter4();
+                    break;
+                case 'chapter6':
+                    initChapter6();
+                    break;
+                case 'chapter3':
+                    initChapter3();
+                    break;
+                case 'chapter4':
+                    initChapter4();
+                    break;
+                case 'chapter5':
+                    initChapter5();
+                    break;
+                case 'chapter6':
+                    initChapter6();
+                    break;
+                case 'chapter7':
+                    initChapter7();
+                    break;
+                case 'chapter8':
+                    initChapter8();
+                    break;
+            }
+        }
+
+        // ========== 第二章函数 ==========
+        function initChapter2() {
+            displayChart_ch2(ch2CurrentChartIndex);
+            updateNavigation_ch2();
+        }
+
+        function displayChart_ch2(index) {
+            const chart = ch2Charts[index];
+            document.getElementById('ch2-currentChartTitle').textContent = chart.title;
+            document.getElementById('ch2-chartDescription').textContent = chart.description;
+            document.getElementById('ch2-chartIndicator').textContent = `图表 ${index + 1}/${ch2Charts.length} - ${chart.title.split(' - ')[0]}`;
+            
+            Plotly.newPlot('ch2-currentChart', chart.data, chart.layout, {
+                displayModeBar: true,
+                displaylogo: false,
+                responsive: true
+            });
+        }
+
+        function prevChart_ch2() {
+            if (ch2CurrentChartIndex > 0) {
+                ch2CurrentChartIndex--;
+                displayChart_ch2(ch2CurrentChartIndex);
+                updateNavigation_ch2();
+            }
+        }
+
+        function nextChart_ch2() {
+            if (ch2CurrentChartIndex < ch2Charts.length - 1) {
+                ch2CurrentChartIndex++;
+                displayChart_ch2(ch2CurrentChartIndex);
+                updateNavigation_ch2();
+            }
+        }
+
+        function updateNavigation_ch2() {
+            const prevBtn = document.getElementById('ch2-prevBtn');
+            const nextBtn = document.getElementById('ch2-nextBtn');
+            
+            prevBtn.disabled = ch2CurrentChartIndex === 0;
+            nextBtn.disabled = ch2CurrentChartIndex === ch2Charts.length - 1;
+        }
+
+        // ========== 第五章函数（完整5个实例）==========
+        function initChapter5() {
+            initExample1_ch5();
+            initExample2_ch5();
+            initExample3_ch5();
+            initExample4_ch5();
+            initExample5_ch5();
+        }
+
+        function showSection_ch5(sectionName) {
+            // 更新导航标签状态
+            document.querySelectorAll('.ch5-nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.ch5-section').forEach(section => section.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`ch5-${sectionName}`).classList.add('active');
+            
+            // 初始化对应的图表
+            setTimeout(() => {
+                switch(sectionName) {
+                    case 'example1':
+                        initExample1_ch5();
+                        break;
+                    case 'example2':
+                        initExample2_ch5();
+                        break;
+                    case 'example3':
+                        initExample3_ch5();
+                        break;
+                    case 'example4':
+                        initExample4_ch5();
+                        break;
+                    case 'example5':
+                        initExample5_ch5();
+                        break;
+                }
+            }, 100);
+        }
+
+        function initExample1_ch5() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const productA = [20, 28, 23, 16, 29, 36, 39, 33, 31, 19, 21, 25];
+            const productB = [17, 22, 39, 26, 35, 23, 25, 27, 29, 38, 28, 20];
+            
+            // 折线图
+            const lineCtx = document.getElementById('ch5-example1-line');
+            if (lineCtx) {
+                if (ch5Charts.example1Line) ch5Charts.example1Line.destroy();
+                ch5Charts.example1Line = new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '产品A',
+                            data: productA,
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.1
+                        }, {
+                            label: '产品B',
+                            data: productB,
+                            borderColor: '#36A2EB',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 饼图1
+            const pie1Ctx = document.getElementById('ch5-example1-pie1');
+            if (pie1Ctx) {
+                if (ch5Charts.example1Pie1) ch5Charts.example1Pie1.destroy();
+                ch5Charts.example1Pie1 = new Chart(pie1Ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: productA,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 饼图2
+            const pie2Ctx = document.getElementById('ch5-example1-pie2');
+            if (pie2Ctx) {
+                if (ch5Charts.example1Pie2) ch5Charts.example1Pie2.destroy();
+                ch5Charts.example1Pie2 = new Chart(pie2Ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: productB,
+                            backgroundColor: [
+                                '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF',
+                                '#FF9F40', '#36A2EB', '#C9CBCF', '#4BC0C0', '#36A2EB', '#FF6384', '#FFCE56'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        function initExample2_ch5() {
+            const countries = ['中国', '加拿大', '巴西', '澳大利亚', '日本', '墨西哥', '俄罗斯', '韩国', '瑞士', '土耳其', '英国', '美国'];
+            const cats = [19, 33, 28, 29, 14, 24, 57, 6, 26, 15, 27, 39];
+            const dogs = [25, 33, 58, 39, 15, 64, 29, 23, 22, 11, 27, 50];
+            
+            // 养猫人群比例
+            const catsCtx = document.getElementById('ch5-example2-cats');
+            if (catsCtx) {
+                if (ch5Charts.example2Cats) ch5Charts.example2Cats.destroy();
+                ch5Charts.example2Cats = new Chart(catsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: countries,
+                        datasets: [{
+                            label: '养猫人群比例',
+                            data: cats,
+                            backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 养狗人群比例
+            const dogsCtx = document.getElementById('ch5-example2-dogs');
+            if (dogsCtx) {
+                if (ch5Charts.example2Dogs) ch5Charts.example2Dogs.destroy();
+                ch5Charts.example2Dogs = new Chart(dogsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: countries,
+                        datasets: [{
+                            label: '养狗人群比例',
+                            data: dogs,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        function initExample3_ch5() {
+            const regions = ['一线城市', '二线城市', '三线城市', '四线及以外', '其他国家及地区'];
+            const growth = [51, 73, 99, 132, 45];
+            const data2017 = [21, 35, 22, 19, 3];
+            const data2018 = [13, 32, 27, 27, 1];
+            
+            // 增长倍数
+            const growthCtx = document.getElementById('ch5-example3-growth');
+            if (growthCtx) {
+                if (ch5Charts.example3Growth) ch5Charts.example3Growth.destroy();
+                ch5Charts.example3Growth = new Chart(growthCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: regions,
+                        datasets: [{
+                            label: '增长倍数',
+                            data: growth,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 2017年数据
+            const ctx2017 = document.getElementById('ch5-example3-2017');
+            if (ctx2017) {
+                if (ch5Charts.example32017) ch5Charts.example32017.destroy();
+                ch5Charts.example32017 = new Chart(ctx2017, {
+                    type: 'pie',
+                    data: {
+                        labels: regions,
+                        datasets: [{
+                            data: data2017,
+                            backgroundColor: [
+                                '#2F4F4F', '#FF0000', '#A9A9A9', '#FFD700', '#B0C4DE'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 2018年数据
+            const ctx2018 = document.getElementById('ch5-example3-2018');
+            if (ctx2018) {
+                if (ch5Charts.example32018) ch5Charts.example32018.destroy();
+                ch5Charts.example32018 = new Chart(ctx2018, {
+                    type: 'pie',
+                    data: {
+                        labels: regions,
+                        datasets: [{
+                            data: data2018,
+                            backgroundColor: [
+                                '#2F4F4F', '#FF0000', '#A9A9A9', '#FFD700', '#B0C4DE'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        function initExample4_ch5() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const temperature = [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 33.4, 23.0, 16.5, 12.0, 6.2];
+            const precipitation = [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3];
+            const evaporation = [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3];
+            
+            const ctx = document.getElementById('ch5-example4-climate');
+            if (ctx) {
+                if (ch5Charts.example4Climate) ch5Charts.example4Climate.destroy();
+                ch5Charts.example4Climate = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '蒸发量',
+                            data: evaporation,
+                            backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                            yAxisID: 'y',
+                        }, {
+                            label: '降水量',
+                            data: precipitation,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            yAxisID: 'y',
+                        }, {
+                            label: '平均气温',
+                            data: temperature,
+                            type: 'line',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: '水量 (ml)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: '气温(°C)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            },
+                        }
+                    }
+                });
+            }
+        }
+
+        function initExample5_ch5() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月'];
+            const sales = [2150, 1050, 1560, 1480, 1530, 1490];
+            const cities = ['北京', '上海', '广州', '深圳', '浙江', '山东'];
+            const salesCount = [83775, 62860, 59176, 64205, 48671, 39968];
+            
+            // 销售额
+            const salesCtx = document.getElementById('ch5-example5-sales');
+            if (salesCtx) {
+                if (ch5Charts.example5Sales) ch5Charts.example5Sales.destroy();
+                ch5Charts.example5Sales = new Chart(salesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '销售额(亿元)',
+                            data: sales,
+                            backgroundColor: 'rgba(50, 153, 204, 0.8)',
+                            borderColor: 'rgba(50, 153, 204, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 销量
+            const countCtx = document.getElementById('ch5-example5-count');
+            if (countCtx) {
+                if (ch5Charts.example5Count) ch5Charts.example5Count.destroy();
+                ch5Charts.example5Count = new Chart(countCtx, {
+                    type: 'line',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: '销量(辆)',
+                            data: salesCount,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // 趋势图
+            const trendCtx = document.getElementById('ch5-example5-trend');
+            if (trendCtx) {
+                if (ch5Charts.example5Trend) ch5Charts.example5Trend.destroy();
+                ch5Charts.example5Trend = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: '销量趋势',
+                            data: salesCount,
+                            borderColor: 'rgba(153, 153, 255, 1)',
+                            backgroundColor: 'rgba(153, 153, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        // ========== 第八章函数（完整10个高级图表）==========
+        function initChapter8() {
+            createContourChart_ch8();
+            createStreamPlot_ch8();
+            createStemChart_ch8();
+            createDumbbellChart_ch8();
+            createGanttChart_ch8();
+            createPyramidChart_ch8();
+            createFunnelChart_ch8();
+            createSankeyChart_ch8();
+            createTreeChart_ch8();
+            createWaffleChart_ch8();
+        }
+
+        function showPrevChart_ch8() {
+            if (ch8CurrentChartIndex > 0) {
+                ch8CurrentChartIndex--;
+                showChart_ch8(ch8CurrentChartIndex);
+            }
+        }
+
+        function showNextChart_ch8() {
+            if (ch8CurrentChartIndex < 9) {
+                ch8CurrentChartIndex++;
+                showChart_ch8(ch8CurrentChartIndex);
+            }
+        }
+
+        function showChart_ch8(index) {
+            // 隐藏所有图表
+            document.querySelectorAll('.ch8-chart-container').forEach(chart => {
+                chart.classList.remove('active');
+            });
+            
+            // 显示指定图表
+            document.getElementById(`ch8-chart-${index}`).classList.add('active');
+            
+            // 更新计数器
+            document.getElementById('ch8-counter').textContent = `${index + 1} / 10`;
+            
+            // 更新按钮状态
+            document.getElementById('ch8-prevBtn').disabled = index === 0;
+            document.getElementById('ch8-nextBtn').disabled = index === 9;
+            
+            ch8CurrentChartIndex = index;
+        }
+
+        function createContourChart_ch8() {
+            const n = 50;
+            const x = [];
+            const y = [];
+            
+            for (let i = 0; i < n; i++) {
+                x.push(-2 + i * 4 / n);
+                y.push(-2 + i * 4 / n);
+            }
+            
+            const z = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j < n; j++) {
+                    const x_val = x[j];
+                    const y_val = y[i];
+                    const h = (1 - x_val/2 + Math.pow(x_val, 5) + Math.pow(y_val, 3)) * 
+                              Math.exp(-Math.pow(x_val, 2) - Math.pow(y_val, 2));
+                    row.push(h);
+                }
+                z.push(row);
+            }
+            
+            const data = [{
+                x: x,
+                y: y,
+                z: z,
+                type: 'contour',
+                colorscale: 'Earth'
+            }];
+            
+            const layout = {
+                title: '三维函数的等高线图',
+                xaxis: { title: 'X轴' },
+                yaxis: { title: 'Y轴' },
+                margin: { t: 40, r: 20, b: 40, l: 40 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-contour-chart', data, layout, {responsive: true});
+        }
+
+        function createStreamPlot_ch8() {
+            const n = 15;
+            const arrowData = [];
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const x_val = -3 + j * 6 / n;
+                    const y_val = -3 + i * 6 / n;
+                    
+                    const u = -y_val;
+                    const v = x_val;
+                    
+                    const scale = 0.15;
+                    const x_end = x_val + u * scale;
+                    const y_end = y_val + v * scale;
+                    
+                    arrowData.push({
+                        type: 'scatter',
+                        x: [x_val, x_end],
+                        y: [y_val, y_end],
+                        mode: 'lines',
+                        line: { color: 'blue', width: 2 },
+                        showlegend: false
+                    });
+                }
+            }
+            
+            const layout = {
+                title: '矢量场流线图',
+                xaxis: { title: 'X轴', range: [-3, 3] },
+                yaxis: { title: 'Y轴', range: [-3, 3] },
+                margin: { t: 40, r: 20, b: 40, l: 40 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-streamplot-chart', arrowData, layout, {responsive: true});
+        }
+
+        function createStemChart_ch8() {
+            const brands = ['宝骏310', '宝马i3', '致享', '焕驰', '力帆530', '派力奥', '悦翔V3', '乐风RV', '奥迪A1', '威驰FS', '夏利N7', '启辰R30', '和悦A13RS', '致炫', '赛欧'];
+            const consumption = [5.9, 6.2, 6.7, 7.0, 7.0, 7.1, 7.2, 7.4, 7.5, 7.6, 7.7, 7.7, 7.7, 7.8, 7.9];
+            
+            // 创建垂直线条（stem部分）
+            const stemLines = [];
+            for (let i = 0; i < brands.length; i++) {
+                stemLines.push({
+                    type: 'scatter',
+                    mode: 'lines',
+                    x: [i, i],
+                    y: [0, consumption[i]],
+                    line: {
+                        color: 'blue',
+                        width: 2
+                    },
+                    showlegend: false,
+                    hoverinfo: 'none'
+                });
+            }
+            
+            // 创建数据点（marker部分）
+            const markers = {
+                x: Array.from({length: brands.length}, (_, i) => i),
+                y: consumption,
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    color: 'red',
+                    size: 8,
+                    symbol: 'circle'
+                },
+                text: brands.map((brand, i) => `${brand}: ${consumption[i]} L/km`),
+                hoverinfo: 'text',
+                name: '燃料消耗量'
+            };
+            
+            // 创建基准线
+            const baseline = {
+                type: 'scatter',
+                mode: 'lines',
+                x: [-0.5, brands.length - 0.5],
+                y: [0, 0],
+                line: {
+                    color: 'black',
+                    width: 1
+                },
+                showlegend: false,
+                hoverinfo: 'none'
+            };
+            
+            const layout = {
+                title: '不同品牌轿车的燃料消耗量',
+                xaxis: { 
+                    title: '汽车品牌',
+                    tickmode: 'array',
+                    tickvals: Array.from({length: brands.length}, (_, i) => i),
+                    ticktext: brands,
+                    tickangle: 60
+                },
+                yaxis: { 
+                    title: '燃料消耗量(L/km)',
+                    range: [0, 10]
+                },
+                margin: { t: 40, r: 20, b: 100, l: 60 },
+                height: 400
+            };
+            
+            Plotly.newPlot('ch8-stem-chart', [baseline, ...stemLines, markers], layout, {responsive: true});
+        }
+
+        function createDumbbellChart_ch8() {
+            const cities = ['纽约', '洛杉矶', '芝加哥', '休斯顿', '费城', '凤凰城', '圣地亚哥', '达拉斯'];
+            const pct_2013 = [2.3, 1.8, 3.1, 2.7, 1.9, 2.4, 2.8, 2.2];
+            const pct_2014 = [3.1, 2.5, 2.8, 3.4, 2.8, 3.2, 3.5, 2.9];
+            
+            const trace2013 = {
+                x: pct_2013,
+                y: cities,
+                type: 'scatter',
+                mode: 'markers',
+                name: '2013年',
+                marker: { color: 'blue', size: 10 }
+            };
+            
+            const trace2014 = {
+                x: pct_2014,
+                y: cities,
+                type: 'scatter',
+                mode: 'markers',
+                name: '2014年',
+                marker: { color: 'red', size: 10 }
+            };
+            
+            const lines = [];
+            for (let i = 0; i < cities.length; i++) {
+                lines.push({
+                    x: [pct_2013[i], pct_2014[i]],
+                    y: [cities[i], cities[i]],
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: { color: 'gray', width: 2 },
+                    showlegend: false
+                });
+            }
+            
+            const layout = {
+                title: '2013年与2014年城市人口PCT指标变化',
+                xaxis: { title: '变化率 (%)' },
+                yaxis: { title: '城市' },
+                margin: { t: 40, r: 20, b: 40, l: 80 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-dumbbell-chart', [trace2013, trace2014, ...lines], layout, {responsive: true});
+        }
+
+        function createGanttChart_ch8() {
+            const tasks = ['需求分析', '系统设计', '前端开发', '后端开发', '数据库设计', '测试', '部署上线'];
+            const startDates = [0, 2, 4, 4, 3, 7, 9];
+            const durations = [2, 2, 3, 4, 2, 2, 1];
+            
+            const trace = {
+                x: startDates,
+                y: tasks,
+                width: durations,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: 'rgba(65, 105, 225, 0.8)',
+                    line: {
+                        color: 'rgba(65, 105, 225, 1)',
+                        width: 1
+                    }
+                },
+                text: durations.map(d => d + '周'),
+                textposition: 'inside',
+                textfont: {
+                    color: 'white',
+                    size: 12
+                }
+            };
+            
+            const layout = {
+                title: '项目任务甘特图',
+                xaxis: { 
+                    title: '开始时间 (周)',
+                    range: [-1, 11]
+                },
+                yaxis: { 
+                    title: '任务名称',
+                    autorange: 'reversed'
+                },
+                margin: { t: 40, r: 20, b: 60, l: 80 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-gantt-chart', [trace], layout, {responsive: true});
+        }
+
+        function createPyramidChart_ch8() {
+            const ageGroups = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70+'];
+            const male = [-120000, -95000, -85000, -75000, -68000, -55000, -40000, -25000];
+            const female = [110000, 90000, 80000, 72000, 65000, 52000, 38000, 20000];
+            
+            const maleTrace = {
+                y: ageGroups,
+                x: male,
+                type: 'bar',
+                name: '男',
+                orientation: 'h',
+                marker: { color: 'lightblue' }
+            };
+            
+            const femaleTrace = {
+                y: ageGroups,
+                x: female,
+                type: 'bar',
+                name: '女',
+                orientation: 'h',
+                marker: { color: 'lightpink' }
+            };
+            
+            const layout = {
+                title: '人口金字塔图',
+                xaxis: { title: '人数' },
+                yaxis: { title: '年龄段' },
+                margin: { t: 40, r: 20, b: 40, l: 40 },
+                height: 350,
+                barmode: 'overlay'
+            };
+            
+            Plotly.newPlot('ch8-pyramid-chart', [maleTrace, femaleTrace], layout, {responsive: true});
+        }
+
+        function createFunnelChart_ch8() {
+            const stages = ['访问商品', '加购物车', '生成订单', '支付订单', '完成交易'];
+            const x1 = [1000, 500, 300, 200, 150];
+            const x2 = x1.map(x => (Math.max(...x1) - x) / 2);
+            const x3 = x1.map((x, i) => x + x2[i]);
+            
+            const trace1 = {
+                x: x3,
+                y: stages,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: 'green',
+                    opacity: 0.5
+                },
+                name: '总量',
+                hoverinfo: 'skip'
+            };
+            
+            const trace2 = {
+                x: x2,
+                y: stages,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: 'white',
+                    opacity: 1.0,
+                    line: {
+                        color: 'black',
+                        width: 0.5
+                    }
+                },
+                name: '辅助',
+                hoverinfo: 'skip'
+            };
+            
+            const trace3 = {
+                x: x2,
+                y: stages,
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: 'black',
+                    width: 2
+                },
+                showlegend: false,
+                hoverinfo: 'skip'
+            };
+            
+            const trace4 = {
+                x: x3,
+                y: stages,
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    color: 'black',
+                    width: 2
+                },
+                showlegend: false,
+                hoverinfo: 'skip'
+            };
+            
+            const percentages = x1.map(x => ((x / x1[0]) * 100).toFixed(2) + '%');
+            const trace5 = {
+                x: x2.map((x, i) => x + (x3[i] - x2[i]) / 2),
+                y: stages,
+                type: 'scatter',
+                mode: 'text',
+                text: percentages,
+                textfont: {
+                    size: 14,
+                    color: 'black'
+                },
+                showlegend: false,
+                hoverinfo: 'skip'
+            };
+            
+            const layout = {
+                title: '用户转化漏斗图',
+                xaxis: { 
+                    title: '客户数量',
+                    showticklabels: false
+                },
+                yaxis: { 
+                    title: '',
+                    tickmode: 'array',
+                    tickvals: stages,
+                    ticktext: stages
+                },
+                showlegend: false,
+                margin: { t: 50, r: 80, b: 40, l: 80 },
+                height: 400,
+                barmode: 'overlay'
+            };
+            
+            Plotly.newPlot('ch8-funnel-chart', [trace1, trace2, trace3, trace4, trace5], layout, {responsive: true});
+        }
+
+        function createSankeyChart_ch8() {
+            const data = {
+                type: "sankey",
+                arrangement: "snap",
+                node: {
+                    pad: 15,
+                    thickness: 30,
+                    line: {
+                        color: "black",
+                        width: 0.5
+                    },
+                    label: ["工资", "副业", "生活", "购物", "深造", "运动", "其他", "买书"],
+                    color: ["lightgreen", "lightgreen", "lightcoral", "lightcoral", "lightcoral", "lightcoral", "lightcoral", "lightcoral"]
+                },
+                link: {
+                    source: [0, 0, 0, 0, 0, 1, 1],
+                    target: [2, 3, 4, 5, 6, 2, 7],
+                    value: [0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                    color: "rgba(144, 238, 144, 0.5)"
+                }
+            };
+            
+            const layout = {
+                title: "日常生活开支的桑基图",
+                font: {
+                    size: 12,
+                    family: "Arial, sans-serif"
+                },
+                margin: { t: 50, r: 30, b: 30, l: 30 },
+                height: 400
+            };
+            
+            Plotly.newPlot('ch8-sankey-chart', [data], layout, {responsive: true});
+        }
+
+        function createTreeChart_ch8() {
+            const nodes = [
+                {x: 0, y: 0, text: "根节点", size: 20},
+                {x: -2, y: 1, text: "分支A", size: 15},
+                {x: 2, y: 1, text: "分支B", size: 15},
+                {x: -3, y: 2, text: "叶子A1", size: 10},
+                {x: -1, y: 2, text: "叶子A2", size: 10},
+                {x: 1, y: 2, text: "叶子B1", size: 10},
+                {x: 3, y: 2, text: "叶子B2", size: 10}
+            ];
+            
+            const connections = [
+                {x0: 0, y0: 0, x1: -2, y1: 1},
+                {x0: 0, y0: 0, x1: 2, y1: 1},
+                {x0: -2, y0: 1, x1: -3, y1: 2},
+                {x0: -2, y0: 1, x1: -1, y1: 2},
+                {x0: 2, y0: 1, x1: 1, y1: 2},
+                {x0: 2, y0: 1, x1: 3, y1: 2}
+            ];
+            
+            const lineTraces = connections.map(conn => ({
+                x: [conn.x0, conn.x1],
+                y: [conn.y0, conn.y1],
+                mode: 'lines',
+                line: { color: 'blue', width: 2 },
+                showlegend: false
+            }));
+            
+            const nodeTrace = {
+                x: nodes.map(n => n.x),
+                y: nodes.map(n => n.y),
+                mode: 'markers+text',
+                marker: {
+                    size: nodes.map(n => n.size),
+                    color: 'lightblue'
+                },
+                text: nodes.map(n => n.text),
+                textposition: 'middle center'
+            };
+            
+            const layout = {
+                title: '层次结构树状图',
+                xaxis: { showgrid: false, zeroline: false, showticklabels: false },
+                yaxis: { showgrid: false, zeroline: false, showticklabels: false },
+                margin: { t: 40, r: 20, b: 20, l: 20 },
+                height: 350
+            };
+            
+            Plotly.newPlot('ch8-tree-chart', [...lineTraces, nodeTrace], layout, {responsive: true});
+        }
+
+        function createWaffleChart_ch8() {
+            const gridSize = 10;
+            const totalCells = gridSize * gridSize;
+            const percentage = 95;
+            const filledCells = Math.round(totalCells * percentage / 100);
+            
+            const x = [];
+            const y = [];
+            const colors = [];
+            const text = [];
+            
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const cellIndex = row * gridSize + col;
+                    x.push(col);
+                    y.push(gridSize - row - 1);
+                    
+                    if (cellIndex < filledCells) {
+                        colors.push('#20B2AA');
+                        text.push('');
+                    } else {
+                        colors.push('#D3D3D3');
+                        text.push('');
+                    }
+                }
+            }
+            
+            const trace = {
+                x: x,
+                y: y,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    color: colors,
+                    size: 30,
+                    line: {
+                        color: 'white',
+                        width: 2
+                    }
+                },
+                text: text,
+                hoverinfo: 'none'
+            };
+            
+            const layout = {
+                title: '电影《少年的你》上座率',
+                xaxis: { 
+                    title: '',
+                    range: [-0.5, gridSize - 0.5],
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false
+                },
+                yaxis: { 
+                    title: '',
+                    range: [-0.5, gridSize - 0.5],
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false
+                },
+                margin: { t: 40, r: 20, b: 20, l: 20 },
+                height: 350,
+                showlegend: false
+            };
+            
+            Plotly.newPlot('ch8-waffle-chart', [trace], layout, {responsive: true});
+        }
+
+        // ========== 第三章函数 ==========
+        function initChapter3() {
+            initBasicCharts_ch3();
+            initInteractiveCharts_ch3();
+        }
+
+        function switchSection_ch3(section, tabElement) {
+            // 隐藏所有部分
+            document.querySelectorAll('.ch3-content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.ch3-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的部分
+            document.getElementById(`ch3-${section}-section`).classList.add('active');
+            tabElement.classList.add('active');
+            
+            ch3CurrentSection = section;
+        }
+
+        function initBasicCharts_ch3() {
+            displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+            updateBasicNavigation_ch3();
+        }
+
+        function displayBasicChart_ch3(index) {
+            const chart = ch3BasicCharts[index];
+            document.getElementById('ch3-basic-chart-title').textContent = chart.title;
+            document.getElementById('ch3-chartCounter').textContent = `${index + 1} / ${ch3BasicCharts.length}`;
+            
+            // 清除之前的图表
+            const canvas = document.getElementById('ch3-current-basic-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // 销毁之前的图表实例
+            if (ch3BasicCharts.currentChart) {
+                ch3BasicCharts.currentChart.destroy();
+            }
+            
+            // 创建新图表
+            ch3BasicCharts.currentChart = new Chart(ctx, {
+                type: chart.type,
+                data: chart.data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: chart.type === 'pie' ? {} : {
+                        x: { title: { display: true, text: chart.title.includes('票房') ? '电影名称' : chart.title.includes('速度') ? '速度(km/h)' : chart.title.includes('成绩') ? '班级' : 'X轴' } },
+                        y: { title: { display: true, text: chart.title.includes('票房') ? '票房(亿元)' : chart.title.includes('速度') ? '制动距离(m)' : chart.title.includes('成绩') ? '平均分' : 'Y轴' } }
+                    }
+                }
+            });
+        }
+
+        function prevBasicChart_ch3() {
+            if (ch3CurrentBasicChartIndex > 0) {
+                ch3CurrentBasicChartIndex--;
+                displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+                updateBasicNavigation_ch3();
+            }
+        }
+
+        function nextBasicChart_ch3() {
+            if (ch3CurrentBasicChartIndex < ch3BasicCharts.length - 1) {
+                ch3CurrentBasicChartIndex++;
+                displayBasicChart_ch3(ch3CurrentBasicChartIndex);
+                updateBasicNavigation_ch3();
+            }
+        }
+
+        function updateBasicNavigation_ch3() {
+            const prevBtn = document.getElementById('ch3-prevBtn');
+            const nextBtn = document.getElementById('ch3-nextBtn');
+            
+            prevBtn.disabled = ch3CurrentBasicChartIndex === 0;
+            nextBtn.disabled = ch3CurrentBasicChartIndex === ch3BasicCharts.length - 1;
+        }
+
+        function initInteractiveCharts_ch3() {
+            updateInteractiveCharts_ch3();
+        }
+
+        function updateInteractiveCharts_ch3() {
+            // 动态折线图
+            const dataPoints = parseInt(document.getElementById('ch3-dataPoints').value);
+            const chartType = document.getElementById('ch3-chartType').value;
+            const dataRange = parseInt(document.getElementById('ch3-dataRange').value);
+            
+            const lineData = [];
+            for (let i = 0; i < dataPoints; i++) {
+                lineData.push({
+                    x: i,
+                    y: Math.sin(i / 10) * dataRange + Math.random() * 10
+                });
+            }
+            
+            const scatterData = [];
+            for (let i = 0; i < dataPoints; i++) {
+                scatterData.push({
+                    x: Math.random() * dataRange,
+                    y: Math.random() * dataRange,
+                    size: Math.random() * 20 + 5
+                });
+            }
+            
+            // 创建动态折线图
+            Plotly.newPlot('ch3-dynamicLineChart', [{
+                x: lineData.map(d => d.x),
+                y: lineData.map(d => d.y),
+                type: 'scatter',
+                mode: 'lines',
+                name: '动态数据',
+                line: { color: '#e74c3c' }
+            }], {
+                title: '动态折线图',
+                xaxis: { title: 'X轴' },
+                yaxis: { title: 'Y轴' }
+            });
+            
+            // 创建交互式散点图
+            Plotly.newPlot('ch3-interactiveScatter', [{
+                x: scatterData.map(d => d.x),
+                y: scatterData.map(d => d.y),
+                mode: 'markers',
+                marker: {
+                    size: scatterData.map(d => d.size),
+                    color: scatterData.map(d => d.y),
+                    colorscale: 'Viridis'
+                },
+                name: '散点数据'
+            }], {
+                title: '交互式散点图',
+                xaxis: { title: 'X值' },
+                yaxis: { title: 'Y值' }
+            });
+            
+            // 创建实时柱状图
+            const categories = ['类别A', '类别B', '类别C', '类别D', '类别E'];
+            const barData = categories.map(() => Math.random() * dataRange);
+            
+            Plotly.newPlot('ch3-liveBarChart', [{
+                x: categories,
+                y: barData,
+                type: 'bar',
+                marker: { color: '#3498db' }
+            }], {
+                title: '实时柱状图',
+                yaxis: { title: '数值' }
+            });
+        }
+
+        // ========== 第四章函数 ==========
+        function initChapter4() {
+            initBookChart_ch4();
+            initExchangeChart_ch4();
+            initSalesChart_ch4();
+            initTemperatureChart_ch4();
+            initKochSnowflake_ch4();
+        }
+
+        function switchTab_ch4(tabId, buttonElement) {
+            // 隐藏所有内容
+            document.querySelectorAll('.ch4-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active状态
+            document.querySelectorAll('.ch4-tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的内容
+            document.getElementById(`ch4-${tabId}`).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+
+        function initBookChart_ch4() {
+            const ctx = document.getElementById('ch4-instance1-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['文学', '科技', '教育', '艺术', '历史'],
+                    datasets: [{
+                        label: '地区A',
+                        data: [120, 150, 80, 90, 110],
+                        backgroundColor: '#3498db'
+                    }, {
+                        label: '地区B',
+                        data: [100, 130, 90, 70, 120],
+                        backgroundColor: '#e74c3c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: '采购数量' } }
+                    }
+                }
+            });
+        }
+
+        function initExchangeChart_ch4() {
+            const ctx = document.getElementById('ch4-instance2-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '2017年',
+                        data: [6.8, 6.9, 6.7, 6.8, 6.9, 6.8],
+                        borderColor: '#2ecc71',
+                        tension: 0.1
+                    }, {
+                        label: '2019年',
+                        data: [6.7, 6.8, 6.6, 6.7, 6.8, 6.7],
+                        borderColor: '#f39c12',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: '汇率' } }
+                    }
+                }
+            });
+        }
+
+        function initSalesChart_ch4() {
+            const ctx = document.getElementById('ch4-instance3-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: '产品A',
+                        data: [100, 120, 140, 160],
+                        borderColor: '#9b59b6',
+                        backgroundColor: 'rgba(155, 89, 182, 0.1)'
+                    }, {
+                        label: '产品B',
+                        data: [80, 100, 120, 140],
+                        borderColor: '#1abc9c',
+                        backgroundColor: 'rgba(26, 188, 156, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: '销售额' } }
+                    }
+                }
+            });
+        }
+
+        function initTemperatureChart_ch4() {
+            const ctx = document.getElementById('ch4-instance4-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 15}, (_, i) => `${i+1}日`),
+                    datasets: [{
+                        label: '最高气温',
+                        data: Array.from({length: 15}, () => Math.random() * 10 + 25),
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)'
+                    }, {
+                        label: '最低气温',
+                        data: Array.from({length: 15}, () => Math.random() * 10 + 15),
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: '温度(°C)' } }
+                    }
+                }
+            });
+        }
+
+        function initKochSnowflake_ch4() {
+            drawKochSnowflake_ch4();
+        }
+
+        function drawKochSnowflake_ch4() {
+            const canvas = document.getElementById('ch4-instance5-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            
+            // 绘制简单的雪花图案
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = 100;
+            
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + radius * Math.cos(angle),
+                    centerY + radius * Math.sin(angle)
+                );
+                ctx.stroke();
+            }
+        }
+
+        // ========== 第六章函数 ==========
+        function initChapter6() {
+            initAxisOverview_ch6();
+        }
+
+        function showSection_ch6(sectionId, buttonElement) {
+            document.querySelectorAll('.ch6-chart-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.ch6-nav-tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            document.getElementById(`ch6-${sectionId}`).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+
+        function initAxisOverview_ch6() {
+            const data = [{
+                type: 'scatter',
+                mode: 'lines+markers',
+                x: [1, 2, 3, 4, 5],
+                y: [1, 4, 2, 3, 5],
+                name: '示例数据'
+            }];
+            
+            const layout = {
+                title: '坐标轴示例图表',
+                xaxis: {
+                    title: 'X轴标签',
+                    showgrid: true,
+                    zeroline: true
+                },
+                yaxis: {
+                    title: 'Y轴标签',
+                    showgrid: true,
+                    zeroline: true
+                }
+            };
+            
+            Plotly.newPlot('ch6-basicAxisChart', data, layout);
+        }
+
+        function initChapter7() {
+            // 创建3D五角星
+            const starData = [];
+            const numStars = 50;
+            
+            for (let i = 0; i < numStars; i++) {
+                const size = Math.random() * 5 + 2;
+                const cx = (Math.random() - 0.5) * 40;
+                const cy = (Math.random() - 0.5) * 40;
+                const cz = (Math.random() - 0.5) * 40;
+                
+                const starPointsX = [];
+                const starPointsY = [];
+                const starPointsZ = [];
+                
+                for (let j = 0; j < 10; j++) {
+                    let angle, radius;
+                    if (j % 2 === 0) {
+                        angle = (j * 36 - 90) * Math.PI / 180;
+                        radius = size;
+                    } else {
+                        angle = (j * 36 - 90) * Math.PI / 180;
+                        radius = size * 0.4;
+                    }
+                    
+                    starPointsX.push(cx + radius * Math.cos(angle));
+                    starPointsY.push(cy);
+                    starPointsZ.push(cz + radius * Math.sin(angle));
+                }
+                
+                starData.push({
+                    x: starPointsX,
+                    y: starPointsY,
+                    z: starPointsZ,
+                    type: 'scatter3d',
+                    mode: 'lines',
+                    line: {
+                        color: `hsl(${Math.random() * 60 + 240}, 70%, 60%)`,
+                        width: 2
+                    },
+                    name: `星${i+1}`
+                });
+            }
+            
+            const layout = {
+                title: '3D立着五角星群',
+                scene: {
+                    xaxis: {title: 'X轴'},
+                    yaxis: {title: 'Y轴'},
+                    zaxis: {title: 'Z轴'},
+                    camera: {
+                        eye: {x: 1.5, y: 1.5, z: 1.5}
+                    }
+                }
+            };
+            
+            Plotly.newPlot('ch7-chart', starData, layout, {responsive: true});
+        }
+
+        // ========== 控制函数 ==========
+        function refreshExample1_ch5() {
+            initExample1_ch5();
+        }
+
+        function toggleAnimation1_ch5() {
+            // 动画切换逻辑
+        }
+
+        function refreshExample2_ch5() {
+            initExample2_ch5();
+        }
+
+        function sortData_ch5() {
+            // 排序逻辑
+        }
+
+        function refreshExample3_ch5() {
+            initExample3_ch5();
+        }
+
+        function compareYears_ch5() {
+            alert('对比分析：2018年相比2017年，一线城市用户增长51倍，二线城市增长73倍');
+        }
+
+        function refreshExample4_ch5() {
+            initExample4_ch5();
+        }
+
+        function toggleView_ch5() {
+            // 视图切换逻辑
+        }
+
+        function refreshExample5_ch5() {
+            initExample5_ch5();
+        }
+
+        function showAnalysis_ch5() {
+            alert('分析报告：上半年总销售额9210亿元，北京地区销量最高(83775辆)，呈现稳步增长趋势');
+        }
+
+        // ========== 章节切换辅助函数 ==========
+        function switchSection_ch3(section, tabElement) {
+            // 第三章章节切换
+        }
+
+        function switchTab_ch4(instance, tabElement) {
+            // 第四章标签切换
+        }
+
+        function showSection_ch6(section, tabElement) {
+            // 第六章章节切换
+        }
+
+        // ========== 页面加载初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化第二章...');
+            setTimeout(() => {
+                initChapter2();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

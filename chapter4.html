@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第4章数据可视化平台 - Python数据可视化基础</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .chart-container {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .control-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stats-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab-button {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 第4章数据可视化平台</h1>
+            <p>Python数据可视化基础 - 5种核心图表类型演示</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('book', this)">实例1：图书采购</button>
+            <button class="tab-button" onclick="showTab('exchange', this)">实例2：汇率走势</button>
+            <button class="tab-button" onclick="showTab('sales', this)">实例3：产品销售额</button>
+            <button class="tab-button" onclick="showTab('temperature', this)">实例4：气温走势</button>
+            <button class="tab-button" onclick="showTab('snowflake', this)">实例5：彩色雪花</button>
+        </div>
+
+        <div class="content-area">
+            <!-- 实例1：图书采购 -->
+            <div id="book" class="tab-content active">
+                <div class="chart-container">
+                    <div class="chart-title">📚 两个地区对不同种类图书的采购情况</div>
+                    <div class="chart-wrapper">
+                        <canvas id="bookChart"></canvas>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn" onclick="generateBookData()">🔄 重新生成数据</button>
+                        <button class="control-btn" onclick="toggleBookType()">📊 切换图表类型</button>
+                    </div>
+                    <div class="stats-info">
+                        <p>堆叠柱形图展示两个地区对不同图书类别的采购数量对比，帮助分析地区间采购偏好差异</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实例2：汇率走势 -->
+            <div id="exchange" class="tab-content">
+                <div class="chart-container">
+                    <div class="chart-title">💰 2017年7月与2019年7月美元/人民币汇率走势</div>
+                    <div class="chart-wrapper">
+                        <canvas id="exchangeChart"></canvas>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn" onclick="generateExchangeData()">🔄 刷新数据</button>
+                        <button class="control-btn" onclick="toggleLineStyle()">📈 切换线型</button>
+                    </div>
+                    <div class="stats-info">
+                        <p>双折线图展示不同年份同月汇率变化趋势，分析汇率波动规律和季节性特征</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实例3：产品销售额 -->
+            <div id="sales" class="tab-content">
+                <div class="chart-container">
+                    <div class="chart-title">📈 标记不同产品各季度的销售额</div>
+                    <div class="chart-wrapper">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn" onclick="generateSalesData()">🔄 更新数据</button>
+                        <button class="control-btn" onclick="toggleMarkerStyle()">🎯 切换标记样式</button>
+                    </div>
+                    <div class="stats-info">
+                        <p>多系列折线图展示不同产品在各季度的销售表现，包含数据点标记便于精确读取</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实例4：气温走势 -->
+            <div id="temperature" class="tab-content">
+                <div class="chart-container">
+                    <div class="chart-title">🌡️ 未来15天最高气温和最低气温的走势</div>
+                    <div class="chart-wrapper">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn" onclick="generateTemperatureData()">🔄 重新生成数据</button>
+                        <button class="control-btn" onclick="toggleTemperatureLabels()">🏷️ 显示/隐藏数值标签</button>
+                    </div>
+                    <div class="stats-info">
+                        <p>双折线图展示未来两周温度变化趋势，包含数值标注便于精确了解每日温度情况</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实例5：彩色雪花 -->
+            <div id="snowflake" class="tab-content">
+                <div class="chart-container">
+                    <div class="chart-title">❄️ 彩色的"雪花"分形图案</div>
+                    <div class="chart-wrapper">
+                        <canvas id="kochSnowflake" width="600" height="400"></canvas>
+                    </div>
+                    <div class="controls">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <label>迭代次数:</label>
+                            <select id="snowflakeIterations" onchange="drawKochSnowflake()">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <label>颜色:</label>
+                            <select id="snowflakeColor" onchange="drawKochSnowflake()">
+                                <option value="#FF6B6B">珊瑚红</option>
+                                <option value="#4ECDC4">青绿色</option>
+                                <option value="#45B7D1">天蓝色</option>
+                                <option value="#96CEB4">薄荷绿</option>
+                                <option value="#DDA0DD">梅花紫</option>
+                                <option value="#FFB6C1">粉红色</option>
+                            </select>
+                            <button class="control-btn" onclick="animateSnowflake()">🎬 动画演示</button>
+                            <button class="control-btn" onclick="drawKochSnowflake()">🔄 重新绘制</button>
+                        </div>
+                    </div>
+                    <div class="stats-info">
+                        <p>Koch雪花分形图案展示数学之美，通过迭代算法生成具有自相似性的几何图形</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量存储图表实例
+        let charts = {};
+        let currentSnowflakeColor = '#FF6B6B';
+        let snowflakeComplexity = 3;
+        let showLabels = true;
+
+        // 标签切换功能
+        function showTab(tabName, buttonElement) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 移除所有按钮的active类
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabName).classList.add('active');
+            
+            // 添加active类到对应按钮
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+            
+            // 延迟初始化图表，确保容器可见
+            setTimeout(() => {
+                switch(tabName) {
+                    case 'book': 
+                        initBookChart(); 
+                        break;
+                    case 'exchange': 
+                        initExchangeChart(); 
+                        break;
+                    case 'sales': 
+                        initSalesChart(); 
+                        break;
+                    case 'temperature': 
+                        initTemperatureChart(); 
+                        break;
+                    case 'snowflake': 
+                        initSnowflakeChart(); 
+                        break;
+                }
+            }, 100);
+        }
+
+        // 生成随机数据
+        function generateRandomData(count, min, max) {
+            return Array.from({length: count}, () => 
+                Math.floor(Math.random() * (max - min + 1)) + min
+            );
+        }
+
+        // 实例1：图书采购
+        function initBookChart() {
+            const ctx = document.getElementById('bookChart');
+            if (!ctx) return;
+            
+            if (charts.book) {
+                charts.book.destroy();
+            }
+
+            const data = {
+                labels: ['家庭', '小说', '心理', '科技', '儿童'],
+                datasets: [{
+                    label: '地区1',
+                    data: generateRandomData(5, 1000, 2500),
+                    backgroundColor: '#FFCC00',
+                    borderColor: '#FFCC00',
+                    borderWidth: 1
+                }, {
+                    label: '地区2',
+                    data: generateRandomData(5, 800, 2200),
+                    backgroundColor: '#B0C4DE',
+                    borderColor: '#B0C4DE',
+                    borderWidth: 1
+                }]
+            };
+
+            charts.book = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' 本';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: '图书种类'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '采购数量(本)'
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateBookData() {
+            if (charts.book) {
+                charts.book.data.datasets[0].data = generateRandomData(5, 1000, 2500);
+                charts.book.data.datasets[1].data = generateRandomData(5, 800, 2200);
+                charts.book.update();
+            }
+        }
+
+        function toggleBookType() {
+            if (charts.book) {
+                const currentType = charts.book.config.type;
+                charts.book.config.type = currentType === 'bar' ? 'line' : 'bar';
+                charts.book.update();
+            }
+        }
+
+        // 实例2：汇率走势
+        function initExchangeChart() {
+            const ctx = document.getElementById('exchangeChart');
+            if (!ctx) return;
+            
+            if (charts.exchange) {
+                charts.exchange.destroy();
+            }
+
+            const date_x = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 24, 25, 26, 31];
+            const eurcny_2017 = generateRandomData(19, 6.7, 6.9);
+            const eurcny_2019 = generateRandomData(19, 6.8, 7.0);
+
+            const data = {
+                labels: date_x,
+                datasets: [{
+                    label: '2017年7月美元/人民币汇率',
+                    data: eurcny_2017,
+                    borderColor: '#006374',
+                    backgroundColor: 'rgba(0, 99, 116, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }, {
+                    label: '2019年7月美元/人民币汇率',
+                    data: eurcny_2019,
+                    borderColor: '#8a2e76',
+                    backgroundColor: 'rgba(138, 46, 118, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            };
+
+            charts.exchange = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(4);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '日期'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '汇率'
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateExchangeData() {
+            if (charts.exchange) {
+                charts.exchange.data.datasets[0].data = generateRandomData(19, 6.7, 6.9);
+                charts.exchange.data.datasets[1].data = generateRandomData(19, 6.8, 7.0);
+                charts.exchange.update();
+            }
+        }
+
+        function toggleLineStyle() {
+            if (charts.exchange) {
+                const dataset1 = charts.exchange.data.datasets[1];
+                dataset1.borderDash = dataset1.borderDash.length ? [] : [5, 5];
+                charts.exchange.update();
+            }
+        }
+
+        // 实例3：产品销售额
+        function initSalesChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+            
+            if (charts.sales) {
+                charts.sales.destroy();
+            }
+
+            const sale_a = generateRandomData(4, 2000, 8000);
+            const sale_b = generateRandomData(4, 800, 4500);
+            const sale_c = generateRandomData(4, 100, 700);
+
+            const data = {
+                labels: ['第1季度', '第2季度', '第3季度', '第4季度'],
+                datasets: [{
+                    label: '产品A',
+                    data: sale_a,
+                    borderColor: '#FF6B6B',
+                    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                    borderWidth: 3,
+                    pointStyle: 'triangle',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    tension: 0.1
+                }, {
+                    label: '产品B',
+                    data: sale_b,
+                    borderColor: '#4ECDC4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                    borderWidth: 3,
+                    pointStyle: 'rect',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    tension: 0.1
+                }, {
+                    label: '产品C',
+                    data: sale_c,
+                    borderColor: '#45B7D1',
+                    backgroundColor: 'rgba(69, 183, 209, 0.1)',
+                    borderWidth: 3,
+                    pointStyle: 'rectRot',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    tension: 0.1,
+                    borderDash: [5, 5]
+                }]
+            };
+
+            charts.sales = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' 万元';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '季度'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '销售额(万元)'
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateSalesData() {
+            if (charts.sales) {
+                charts.sales.data.datasets[0].data = generateRandomData(4, 2000, 8000);
+                charts.sales.data.datasets[1].data = generateRandomData(4, 800, 4500);
+                charts.sales.data.datasets[2].data = generateRandomData(4, 100, 700);
+                charts.sales.update();
+            }
+        }
+
+        function toggleMarkerStyle() {
+            if (charts.sales) {
+                const styles = ['circle', 'triangle', 'rect', 'rectRot', 'star', 'triangle'];
+                charts.sales.data.datasets.forEach((dataset, index) => {
+                    const currentStyle = dataset.pointStyle;
+                    const currentIndex = styles.indexOf(currentStyle);
+                    dataset.pointStyle = styles[(currentIndex + 1) % styles.length];
+                });
+                charts.sales.update();
+            }
+        }
+
+        // 实例4：气温走势
+        function initTemperatureChart() {
+            const ctx = document.getElementById('temperatureChart');
+            if (!ctx) return;
+            
+            if (charts.temperature) {
+                charts.temperature.destroy();
+            }
+
+            const x = Array.from({length: 15}, (_, i) => i + 4);
+            const y_max = generateRandomData(15, 20, 35);
+            const y_min = generateRandomData(15, 10, 25);
+
+            const data = {
+                labels: x,
+                datasets: [{
+                    label: '最高温度',
+                    data: y_max,
+                    borderColor: '#FF6B6B',
+                    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    tension: 0.2
+                }, {
+                    label: '最低温度',
+                    data: y_min,
+                    borderColor: '#4ECDC4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    tension: 0.2
+                }]
+            };
+
+            charts.temperature = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '°C';
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: showLabels,
+                            align: 'top',
+                            anchor: 'end',
+                            offset: 8,
+                            color: '#666',
+                            font: {
+                                size: 10
+                            },
+                            formatter: function(value, context) {
+                                return value + '°C';
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '日期'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            min: 0,
+                            max: 40,
+                            title: {
+                                display: true,
+                                text: '温度(°C)'
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTemperatureData() {
+            if (charts.temperature) {
+                charts.temperature.data.datasets[0].data = generateRandomData(15, 20, 35);
+                charts.temperature.data.datasets[1].data = generateRandomData(15, 10, 25);
+                charts.temperature.update();
+            }
+        }
+
+        function toggleTemperatureLabels() {
+            showLabels = !showLabels;
+            if (charts.temperature) {
+                charts.temperature.options.plugins.datalabels.display = showLabels;
+                charts.temperature.update();
+            }
+        }
+
+        // 实例5：Koch雪花分形
+        function initSnowflakeChart() {
+            // 使用Canvas直接绘制Koch雪花
+            drawKochSnowflake();
+        }
+
+        function drawKochSnowflake() {
+            const canvas = document.getElementById('kochSnowflake');
+            if (!canvas) {
+                console.log('Canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            canvas.width = 600;
+            canvas.height = 400;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 获取用户设置
+            const iterations = parseInt(document.getElementById('snowflakeIterations').value);
+            const snowflakeColor = document.getElementById('snowflakeColor').value;
+            
+            console.log('Drawing snowflake:', iterations, snowflakeColor);
+            
+            // 设置样式
+            ctx.strokeStyle = snowflakeColor;
+            ctx.lineWidth = 2;
+            ctx.fillStyle = snowflakeColor + '30'; // 添加透明度填充
+            
+            // 雪花参数
+            const size = 150;
+            const centerX = 300;
+            const centerY = 200;
+            
+            // 先绘制一个简单的三角形作为测试
+            const angle1 = -Math.PI / 2; // 顶点朝上
+            const angle2 = angle1 + (2 * Math.PI / 3);
+            const angle3 = angle2 + (2 * Math.PI / 3);
+            
+            const p1 = {
+                x: centerX + size * Math.cos(angle1),
+                y: centerY + size * Math.sin(angle1)
+            };
+            const p2 = {
+                x: centerX + size * Math.cos(angle2),
+                y: centerY + size * Math.sin(angle2)
+            };
+            const p3 = {
+                x: centerX + size * Math.cos(angle3),
+                y: centerY + size * Math.sin(angle3)
+            };
+            
+            // Koch曲线生成函数 - 修复版本
+            function getKochLine(x1, y1, x2, y2, level) {
+                if (level === 0) {
+                    return [{x: x1, y: y1}, {x: x2, y: y2}];
+                }
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                
+                // 计算三等分点
+                const x3 = x1 + dx/3;
+                const y3 = y1 + dy/3;
+                const x5 = x1 + 2*dx/3;
+                const y5 = y1 + 2*dy/3;
+                
+                // 计算等边三角形的顶点
+                const angle = Math.atan2(dy, dx) - Math.PI/3;
+                const length = Math.sqrt(dx*dx + dy*dy) / 3;
+                
+                const x4 = x3 + length * Math.cos(angle);
+                const y4 = y3 + length * Math.sin(angle);
+                
+                // 递归生成四段
+                const segment1 = getKochLine(x1, y1, x3, y3, level - 1);
+                const segment2 = getKochLine(x3, y3, x4, y4, level - 1);
+                const segment3 = getKochLine(x4, y4, x5, y5, level - 1);
+                const segment4 = getKochLine(x5, y5, x2, y2, level - 1);
+                
+                // 合并所有点，去掉重复的点
+                return [
+                    ...segment1.slice(0, -1),
+                    ...segment2.slice(0, -1),
+                    ...segment3.slice(0, -1),
+                    ...segment4
+                ];
+            }
+            
+            // 生成三条Koch曲线组成雪花
+            const side1 = getKochLine(p1.x, p1.y, p2.x, p2.y, iterations);
+            const side2 = getKochLine(p2.x, p2.y, p3.x, p3.y, iterations);
+            const side3 = getKochLine(p3.x, p3.y, p1.x, p1.y, iterations);
+            
+            console.log('Points generated:', side1.length, side2.length, side3.length);
+            
+            // 绘制雪花
+            ctx.beginPath();
+            
+            // 绘制第一条边
+            ctx.moveTo(side1[0].x, side1[0].y);
+            for (let i = 1; i < side1.length; i++) {
+                ctx.lineTo(side1[i].x, side1[i].y);
+            }
+            
+            // 绘制第二条边
+            for (let i = 1; i < side2.length; i++) {
+                ctx.lineTo(side2[i].x, side2[i].y);
+            }
+            
+            // 绘制第三条边
+            for (let i = 1; i < side3.length; i++) {
+                ctx.lineTo(side3[i].x, side3[i].y);
+            }
+            
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // 显示迭代信息
+            ctx.fillStyle = '#666';
+            ctx.font = '14px Arial';
+            ctx.fillText(`Koch雪花分形 - 迭代次数: ${iterations}`, 10, 25);
+            ctx.fillText(`边数: ${3 * Math.pow(4, iterations)}`, 10, 45);
+            
+            console.log('Snowflake drawing completed');
+        }
+
+        function generateSnowflake() {
+            drawKochSnowflake();
+        }
+
+        function changeSnowflakeColor() {
+            drawKochSnowflake();
+        }
+
+        function adjustSnowflakeComplexity() {
+            drawKochSnowflake();
+        }
+
+        function animateSnowflake() {
+            let iteration = 0;
+            const maxIteration = 4;
+            
+            const animate = () => {
+                document.getElementById('snowflakeIterations').value = iteration;
+                drawKochSnowflake();
+                
+                iteration++;
+                if (iteration <= maxIteration) {
+                    setTimeout(animate, 800);
+                }
+            };
+            
+            animate();
+        }
+
+        // 初始化图表
+        function initializeCharts() {
+            // 延迟初始化，确保DOM元素已加载
+            if (document.getElementById('bookChart')) {
+                initBookChart();
+            }
+            if (document.getElementById('kochSnowflake')) {
+                initSnowflakeChart();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initializeCharts();
+                // 默认显示第一个标签
+                const firstButton = document.querySelector('.tab-button');
+                if (firstButton) {
+                    firstButton.classList.add('active');
+                    const tabName = firstButton.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    showTab(tabName, firstButton);
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>
