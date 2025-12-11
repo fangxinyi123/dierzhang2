@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第4章数据可视化平台 - Python数据可视化基础</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 加固CDN加载 - 多个备选源 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        // Chart.js 加载失败检测和重试
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"><\/script>');
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -975,19 +982,78 @@
             }
         }
 
-        // 页面加载完成后初始化
+        // 页面加载完成后初始化 - 加固版本
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                initializeCharts();
-                // 默认显示第一个标签
-                const firstButton = document.querySelector('.tab-button');
-                if (firstButton) {
-                    firstButton.classList.add('active');
-                    const tabName = firstButton.getAttribute('onclick').match(/'([^']+)'/)[1];
-                    showTab(tabName, firstButton);
-                }
-            }, 200);
+            waitForChartJSAndInit();
         });
+
+        function waitForChartJSAndInit() {
+            let retries = 0;
+            const maxRetries = 10;
+            const retryInterval = 500;
+
+            function checkChartJS() {
+                retries++;
+                
+                if (typeof Chart === 'undefined') {
+                    console.warn('Chart.js 尚未加载，重试中...', retries);
+                    if (retries < maxRetries) {
+                        setTimeout(checkChartJS, retryInterval);
+                        return;
+                    } else {
+                        console.error('Chart.js 加载失败');
+                        showErrorMessage('Chart.js 图表库加载失败，请刷新页面重试');
+                        return;
+                    }
+                }
+                
+                // Chart.js已加载，开始初始化
+                console.log('Chart.js 加载完成，开始初始化...');
+                try {
+                    setTimeout(() => {
+                        initializeCharts();
+                        // 默认显示第一个标签
+                        const firstButton = document.querySelector('.tab-button');
+                        if (firstButton) {
+                            firstButton.classList.add('active');
+                            const tabName = firstButton.getAttribute('onclick').match(/'([^']+)'/)[1];
+                            showTab(tabName, firstButton);
+                        }
+                        console.log('第4章图表初始化成功');
+                    }, 200);
+                } catch (error) {
+                    console.error('第4章图表初始化失败:', error);
+                    showErrorMessage('图表初始化失败: ' + error.message);
+                }
+            }
+            
+            checkChartJS();
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #e74c3c;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 300px;
+                font-size: 14px;
+            `;
+            errorDiv.innerHTML = `<strong>加载错误:</strong> ${message}<br><small>请检查网络连接并刷新页面</small>`;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
     </script>
 </body>
 </html>

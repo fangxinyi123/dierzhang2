@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第三章 - 数据可视化综合平台</title>
-    <!-- 同时加载两个图表库 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- 加固CDN加载 - 多个备选源 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        // Chart.js 加载失败检测和重试
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"><\/script>');
+        }
+    </script>
+    
+    <script src="https://cdn.plot.ly/plotly-2.18.0.min.js"></script>
+    <script>
+        // Plotly 加载失败检测和重试
+        if (typeof Plotly === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.18.0/plotly.min.js"><\/script>');
+        }
+    </script>
     
     <style>
         * {
@@ -846,13 +859,62 @@
         
         // ========== 页面加载初始化 ==========
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始化基础图表
-            initBasicCharts();
-            updateBasicNavigation();
+            // 等待图表库完全加载
+            waitForLibrariesAndInit();
+        });
+
+        function waitForLibrariesAndInit() {
+            let retries = 0;
+            const maxRetries = 10;
+            const retryInterval = 500;
+
+            function checkLibraries() {
+                retries++;
+                
+                // 检查Chart.js是否加载
+                if (typeof Chart === 'undefined') {
+                    console.warn('Chart.js 尚未加载，重试中...', retries);
+                    if (retries < maxRetries) {
+                        setTimeout(checkLibraries, retryInterval);
+                        return;
+                    } else {
+                        console.error('Chart.js 加载失败');
+                        showErrorMessage('Chart.js 图表库加载失败，请刷新页面重试');
+                        return;
+                    }
+                }
+                
+                // 检查Plotly是否加载
+                if (typeof Plotly === 'undefined') {
+                    console.warn('Plotly 尚未加载，重试中...', retries);
+                    if (retries < maxRetries) {
+                        setTimeout(checkLibraries, retryInterval);
+                        return;
+                    } else {
+                        console.error('Plotly 加载失败');
+                        showErrorMessage('Plotly 图表库加载失败，请刷新页面重试');
+                        return;
+                    }
+                }
+                
+                // 所有库都已加载，开始初始化
+                console.log('所有图表库加载完成，开始初始化...');
+                try {
+                    initBasicCharts();
+                    updateBasicNavigation();
+                    updateCharts();
+                    initEventListeners();
+                    console.log('图表初始化成功');
+                } catch (error) {
+                    console.error('图表初始化失败:', error);
+                    showErrorMessage('图表初始化失败: ' + error.message);
+                }
+            }
             
-            // 初始化交互式图表
-            updateCharts();
-            
+            checkLibraries();
+        }
+
+        function initEventListeners() {
             // 键盘导航支持
             document.addEventListener('keydown', function(event) {
                 if (document.getElementById('basic-section').classList.contains('active')) {
@@ -866,12 +928,44 @@
             
             // 响应式调整
             window.addEventListener('resize', function() {
-                Plotly.Plots.resize('dynamicLineChart');
-                Plotly.Plots.resize('interactiveScatter');
-                Plotly.Plots.resize('liveBarChart');
-                Plotly.Plots.resize('linkedCharts');
+                if (typeof Plotly !== 'undefined') {
+                    try {
+                        Plotly.Plots.resize('dynamicLineChart');
+                        Plotly.Plots.resize('interactiveScatter');
+                        Plotly.Plots.resize('liveBarChart');
+                        Plotly.Plots.resize('linkedCharts');
+                    } catch (error) {
+                        console.warn('Plotly resize 警告:', error);
+                    }
+                }
             });
-        });
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #e74c3c;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 300px;
+                font-size: 14px;
+            `;
+            errorDiv.innerHTML = `<strong>加载错误:</strong> ${message}<br><small>请检查网络连接并刷新页面</small>`;
+            document.body.appendChild(errorDiv);
+            
+            // 5秒后自动移除
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
         
         // 自动更新功能（可选）
         let autoUpdateInterval;
