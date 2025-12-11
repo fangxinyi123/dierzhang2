@@ -256,7 +256,6 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="control-btn" onclick="refreshExample2()">刷新数据</button>
                     <button class="control-btn" onclick="sortData()">排序显示</button>
                 </div>
             </div>
@@ -286,7 +285,6 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="control-btn" onclick="refreshExample3()">刷新数据</button>
                     <button class="control-btn" onclick="compareYears()">对比分析</button>
                 </div>
             </div>
@@ -306,7 +304,6 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="control-btn" onclick="refreshExample4()">刷新数据</button>
                     <button class="control-btn" onclick="toggleView()">切换视图</button>
                 </div>
             </div>
@@ -336,7 +333,6 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="control-btn" onclick="refreshExample5()">刷新数据</button>
                     <button class="control-btn" onclick="showAnalysis()">分析报告</button>
                 </div>
             </div>
@@ -879,17 +875,13 @@
             initExample2();
         }
         
-        function refreshExample3() {
-            initExample3();
-        }
+
         
         function compareYears() {
             alert('对比分析：2018年相比2017年，一线城市用户增长51倍，二线城市增长73倍');
         }
         
-        function refreshExample4() {
-            initExample4();
-        }
+
         
         function toggleView() {
             currentView = currentView === 'combined' ? 'separate' : 'combined';
@@ -897,9 +889,7 @@
             initExample4();
         }
         
-        function refreshExample5() {
-            initExample5();
-        }
+
         
         function showAnalysis() {
             alert('分析报告：上半年总销售额9210亿元，北京地区销量最高(83775辆)，呈现稳步增长趋势');
