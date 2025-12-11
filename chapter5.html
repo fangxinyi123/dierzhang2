@@ -229,9 +229,7 @@
                     </div>
                 </div>
                 
-                <div class="controls">
-                    <button class="control-btn" onclick="toggleAnimation1()">切换动画</button>
-                </div>
+
             </div>
             
             <!-- 实例2：部分国家养猫与养狗人群比例分析 -->
@@ -254,9 +252,7 @@
                     </div>
                 </div>
                 
-                <div class="controls">
-                    <button class="control-btn" onclick="sortData()">排序显示</button>
-                </div>
+
             </div>
             
             <!-- 实例3：2017年与2018年抖音用户分析 -->
@@ -283,9 +279,7 @@
                     </div>
                 </div>
                 
-                <div class="controls">
-                    <button class="control-btn" onclick="compareYears()">对比分析</button>
-                </div>
+
             </div>
             
             <!-- 实例4：某地区全年平均气温与降水量、蒸发量的关系 -->
@@ -302,9 +296,7 @@
                     <canvas id="example4-climate"></canvas>
                 </div>
                 
-                <div class="controls">
-                    <button class="control-btn" onclick="toggleView()">切换视图</button>
-                </div>
+
             </div>
             
             <!-- 实例5：2018年上半年某品牌汽车销售情况 -->
@@ -331,9 +323,7 @@
                     </div>
                 </div>
                 
-                <div class="controls">
-                    <button class="control-btn" onclick="showAnalysis()">分析报告</button>
-                </div>
+
             </div>
         </div>
     </div>
@@ -856,40 +846,25 @@
         
 
         
-        function toggleAnimation1() {
-            animationEnabled = !animationEnabled;
-            initExample1();
-        }
+
         
         function refreshExample2() {
             initExample2();
         }
         
-        function sortData() {
-            // 这里可以实现排序功能
-            alert('排序功能演示：数据已按比例重新排序');
-            initExample2();
-        }
+
         
 
         
-        function compareYears() {
-            alert('对比分析：2018年相比2017年，一线城市用户增长51倍，二线城市增长73倍');
-        }
+
         
 
         
-        function toggleView() {
-            currentView = currentView === 'combined' ? 'separate' : 'combined';
-            alert(`切换视图：${currentView === 'combined' ? '组合视图' : '分离视图'}`);
-            initExample4();
-        }
+
         
 
         
-        function showAnalysis() {
-            alert('分析报告：上半年总销售额9210亿元，北京地区销量最高(83775辆)，呈现稳步增长趋势');
-        }
+
         
         // 页面加载时初始化 - 加固版本
         document.addEventListener('DOMContentLoaded', function() {
